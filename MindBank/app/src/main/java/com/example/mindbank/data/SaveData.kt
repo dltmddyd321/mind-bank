@@ -1,9 +1,12 @@
 package com.example.mindbank.data
 
 import android.graphics.Bitmap
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 
+@Entity(tableName = "save_model")
 data class SaveData(
-    val id: String,
+    @PrimaryKey val id: String,
     val title: String,
     val detail: String,
     val dtCreated: Long,
