@@ -39,6 +39,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.example.mindbank.data.SaveData
+import com.example.mindbank.data.Type
 import com.example.mindbank.ui.theme.MindBankTheme
 import java.util.UUID
 
@@ -73,6 +74,7 @@ fun MainGrid() {
     val itemList = listOf(
         SaveData(
             UUID.randomUUID().toString(),
+            Type.Account.name,
             "테스트입니다!",
             "세부 설명",
             System.currentTimeMillis(),
@@ -80,6 +82,7 @@ fun MainGrid() {
         ),
         SaveData(
             UUID.randomUUID().toString(),
+            Type.Account.name,
             "두 번째 표시",
             "세부 설명",
             System.currentTimeMillis(),

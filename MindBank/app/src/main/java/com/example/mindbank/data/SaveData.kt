@@ -12,8 +12,7 @@ data class SaveData(
     val detail: String,
     val dtCreated: Long,
     val dtUpdated: Long,
-    val img: Bitmap? = null,
-    val color: Int? = null //TODO: 컬러값 저장하는 방식 알아보기
+    val color: Int? = null
 )
 
 enum class Type {
