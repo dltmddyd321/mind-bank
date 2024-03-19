@@ -1,5 +1,6 @@
 package com.example.mindbank
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -13,9 +14,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -23,12 +26,17 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CardElevation
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -41,6 +49,7 @@ import androidx.compose.ui.zIndex
 import com.example.mindbank.data.SaveData
 import com.example.mindbank.data.Type
 import com.example.mindbank.ui.theme.MindBankTheme
+import com.example.mindbank.viewmodel.SearchViewModel
 import java.util.UUID
 
 class MainActivity : ComponentActivity() {
@@ -155,6 +164,47 @@ fun MemoItemView(data: SaveData) {
                 tint = Color.Gray // 아이콘 색상을 조절합니다.
             )
         }
+    }
+}
+
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MainScreen() {
+    val viewModel = SearchViewModel()
+    val searchText by viewModel.searchText.collectAsState()
+    val isSearching by viewModel.isSearching.collectAsState()
+    val countriesList by viewModel.countriesList.collectAsState()
+
+    Scaffold(
+        topBar = {
+            SearchBar(
+                query = searchText,
+                onQueryChange = viewModel::onSearchTextChange,
+                onSearch = viewModel::onSearchTextChange,
+                active = isSearching,
+                onActiveChange = { viewModel.onToggleSearch() },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
+                LazyColumn {
+                    items(countriesList) { country ->
+                        Text(
+                            text = country,
+                            modifier = Modifier.padding(
+                                start = 8.dp,
+                                top = 4.dp,
+                                end = 8.dp,
+                                bottom = 4.dp
+                            )
+                        )
+                    }
+                }
+            }
+        }
+    ) {
+
     }
 }
 
