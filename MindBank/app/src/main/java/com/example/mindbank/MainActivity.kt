@@ -62,19 +62,11 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    Greeting("Android")
+                    MainScreen()
                 }
             }
         }
     }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
 }
 
 @Composable
@@ -203,8 +195,10 @@ fun MainScreen() {
                 }
             }
         }
-    ) {
-
+    ) { innerPadding ->
+        Column(modifier = Modifier.padding(innerPadding)) {
+            if (!isSearching) MainGrid()
+        }
     }
 }
 
