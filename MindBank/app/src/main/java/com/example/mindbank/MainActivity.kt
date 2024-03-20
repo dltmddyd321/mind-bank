@@ -23,10 +23,14 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CardElevation
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FabPosition
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -176,6 +180,8 @@ fun MainScreen() {
                 onSearch = viewModel::onSearchTextChange,
                 active = isSearching,
                 onActiveChange = { viewModel.onToggleSearch() },
+                placeholder = { Text(text = "검색어를 입력하시오.") },
+                trailingIcon = { Icon(imageVector = Icons.Default.Search, null) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp)
@@ -194,11 +200,30 @@ fun MainScreen() {
                     }
                 }
             }
-        }
+        },
+        floatingActionButton = { FloatingButton() },
+        floatingActionButtonPosition = FabPosition.End
     ) { innerPadding ->
         Column(modifier = Modifier.padding(innerPadding)) {
             if (!isSearching) MainGrid()
         }
+    }
+}
+
+@Composable
+fun FloatingButton() {
+    FloatingActionButton(
+        onClick = {
+            //OnClick Method
+        },
+        containerColor = MaterialTheme.colorScheme.secondary,
+        shape = RoundedCornerShape(16.dp),
+    ) {
+        Icon(
+            imageVector = Icons.Rounded.Add,
+            contentDescription = "Add FAB",
+            tint = Color.White,
+        )
     }
 }
 
