@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">MindBank</string>
+    <string name="title_activity_add">AddActivity</string>
 </resources>
