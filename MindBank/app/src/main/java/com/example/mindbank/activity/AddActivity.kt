@@ -18,6 +18,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.mindbank.activity.ui.theme.MindBankTheme
 
@@ -35,6 +36,36 @@ class AddActivity : ComponentActivity() {
                 }
             }
         }
+    }
+}
+
+@Composable
+fun AutoBackUpCheckDialog() {
+    var showDialog by remember {
+        mutableStateOf(false)
+    }
+
+    if (showDialog) {
+        AlertDialog(onDismissRequest = {
+            showDialog = false
+        }, title = {
+            Text(text = "백업 데이터 불러오기")
+        }, confirmButton = {
+            TextButton(
+                onClick = {
+                    //TODO: 백업 데이터 불러오기
+                }
+            ) { Text("확인") }
+        }, text = {
+            Text(
+                text = "저장이 완료되지 않은 데이터가 있습니다.\n마저 작성하시겠습니까?",
+                textAlign = TextAlign.Center
+            )
+        }, dismissButton = {
+            TextButton(
+                onClick = { showDialog = false }
+            ) { Text("취소") }
+        })
     }
 }
 
