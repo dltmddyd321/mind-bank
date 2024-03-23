@@ -15,6 +15,12 @@ object DBModule {
 
     @Singleton
     @Provides
+    fun providesDataStoreRepo(
+        @ApplicationContext context: Context
+    ) : DatastoreRepo = DatastoreRepoImpl(context)
+
+    @Singleton
+    @Provides
     fun provideSaveDatabase(
         @ApplicationContext context: Context
     ): MemoDatabase = Room.databaseBuilder(context, MemoDatabase::class.java, "memo.db").build()
