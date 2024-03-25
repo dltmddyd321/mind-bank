@@ -23,6 +23,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.rounded.Add
@@ -202,7 +203,7 @@ fun MainScreen() {
                 }
             }
         },
-        floatingActionButton = { FloatingButton() },
+        floatingActionButton = { FloatingButton(false) },
         floatingActionButtonPosition = FabPosition.End
     ) { innerPadding ->
         Column(modifier = Modifier.padding(innerPadding)) {
@@ -212,7 +213,7 @@ fun MainScreen() {
 }
 
 @Composable
-fun FloatingButton() {
+fun FloatingButton(isAddMode: Boolean) {
     val context = LocalContext.current
     FloatingActionButton(
         onClick = {
@@ -223,7 +224,7 @@ fun FloatingButton() {
         shape = RoundedCornerShape(16.dp),
     ) {
         Icon(
-            imageVector = Icons.Rounded.Add,
+            imageVector = if (isAddMode) Icons.Default.Check else Icons.Rounded.Add,
             contentDescription = "Add FAB",
             tint = Color.White,
         )

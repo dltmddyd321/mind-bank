@@ -1,16 +1,27 @@
 package com.example.mindbank.activity
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -97,11 +108,37 @@ fun BackHandlerWithQuestionDialog() {
     BackHandler { showDialog = true }
 }
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@ExperimentalMaterial3Api
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
+fun InputScreen() {
+    Scaffold(
+        topBar = { AddTopBar() }
+    ) {
+        Column(modifier = Modifier.fillMaxSize()) {
+
+        }
+    }
+}
+
+@ExperimentalMaterial3Api
+@Composable
+fun AddTopBar() {
+    TopAppBar(
+        title = {
+            Text(text = "Save", color = MaterialTheme.colorScheme.onPrimary)
+        },
+        navigationIcon = {
+            IconButton(onClick = { /* Handle back press */ }) {
+                Icon(imageVector = Icons.Default.Close, contentDescription = "Close")
+            }
+        },
+        actions = {
+            Button(onClick = { /* Handle send tweet */ }) {
+                Text("Tweet")
+            }
+        },
+        colors = TopAppBarDefaults.smallTopAppBarColors(containerColor = MaterialTheme.colorScheme.primary)
     )
 }
 
@@ -109,6 +146,5 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
 @Composable
 fun GreetingPreview2() {
     MindBankTheme {
-        Greeting("Android")
     }
 }
