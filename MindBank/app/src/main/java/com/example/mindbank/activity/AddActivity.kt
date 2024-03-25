@@ -40,8 +40,7 @@ class AddActivity : ComponentActivity() {
             MindBankTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
+                    modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
                 ) {
                     BackHandlerWithQuestionDialog()
                 }
@@ -62,20 +61,15 @@ fun AutoBackUpCheckDialog() {
         }, title = {
             Text(text = "백업 데이터 불러오기")
         }, confirmButton = {
-            TextButton(
-                onClick = {
-                    //TODO: 백업 데이터 불러오기
-                }
-            ) { Text("확인") }
+            TextButton(onClick = {
+                //TODO: 백업 데이터 불러오기
+            }) { Text("확인") }
         }, text = {
             Text(
-                text = "저장이 완료되지 않은 데이터가 있습니다.\n마저 작성하시겠습니까?",
-                textAlign = TextAlign.Center
+                text = "저장이 완료되지 않은 데이터가 있습니다.\n마저 작성하시겠습니까?", textAlign = TextAlign.Center
             )
         }, dismissButton = {
-            TextButton(
-                onClick = { showDialog = false }
-            ) { Text("취소") }
+            TextButton(onClick = { showDialog = false }) { Text("취소") }
         })
     }
 }
@@ -91,17 +85,13 @@ fun BackHandlerWithQuestionDialog() {
         AlertDialog(onDismissRequest = {
             showDialog = false
         }, confirmButton = {
-            TextButton(
-                onClick = { activity?.finish() }
-            ) { Text("확인") }
+            TextButton(onClick = { activity?.finish() }) { Text("확인") }
         }, title = {
             Text(text = "메모 추가 취소")
         }, text = {
             Text(text = "메모 추가를 취소하시겠습니까?")
         }, dismissButton = {
-            TextButton(
-                onClick = { showDialog = false }
-            ) { Text("취소") }
+            TextButton(onClick = { showDialog = false }) { Text("취소") }
         })
     }
 
@@ -112,9 +102,7 @@ fun BackHandlerWithQuestionDialog() {
 @ExperimentalMaterial3Api
 @Composable
 fun InputScreen() {
-    Scaffold(
-        topBar = { AddTopBar() }
-    ) {
+    Scaffold(topBar = { AddTopBar() }) {
         Column(modifier = Modifier.fillMaxSize()) {
 
         }
@@ -124,27 +112,26 @@ fun InputScreen() {
 @ExperimentalMaterial3Api
 @Composable
 fun AddTopBar() {
-    TopAppBar(
-        title = {
-            Text(text = "Save", color = MaterialTheme.colorScheme.onPrimary)
-        },
-        navigationIcon = {
-            IconButton(onClick = { /* Handle back press */ }) {
-                Icon(imageVector = Icons.Default.Close, contentDescription = "Close")
-            }
-        },
-        actions = {
-            Button(onClick = { /* Handle send tweet */ }) {
-                Text("Tweet")
-            }
-        },
-        colors = TopAppBarDefaults.smallTopAppBarColors(containerColor = MaterialTheme.colorScheme.primary)
-    )
+    TopAppBar(title = {
+        Text(text = "Save", color = MaterialTheme.colorScheme.onPrimary)
+    }, navigationIcon = {
+        IconButton(onClick = { /* Handle back press */ }) {
+            Icon(imageVector = Icons.Default.Close, contentDescription = "Close")
+        }
+    }, actions = {
+        Button(onClick = { /* Handle send tweet */ }) {
+            Text("Tweet")
+        }
+    }, colors = TopAppBarDefaults.topAppBarColors(
+        containerColor = MaterialTheme.colorScheme.primary,
+        titleContentColor = MaterialTheme.colorScheme.onPrimary,
+        navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
+        actionIconContentColor = MaterialTheme.colorScheme.onSecondary
+    ))
 }
 
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview2() {
-    MindBankTheme {
-    }
+    MindBankTheme {}
 }
