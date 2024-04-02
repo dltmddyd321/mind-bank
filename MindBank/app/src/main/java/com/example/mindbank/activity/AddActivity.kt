@@ -6,12 +6,12 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -30,11 +30,14 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
@@ -44,9 +47,18 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.mindbank.activity.ui.theme.MindBankTheme
+import com.example.mindbank.db.DataStoreViewModel
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.debounce
 
+@AndroidEntryPoint
 @ExperimentalMaterial3Api
 class AddActivity : ComponentActivity() {
+
+    private val dataStoreViewModel: DataStoreViewModel by viewModels()
+
+    @OptIn(FlowPreview::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -56,7 +68,7 @@ class AddActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
                 ) {
                     BackHandlerWithQuestionDialog(false)
-                    InputScreen()
+                    InputScreen(dataStoreViewModel)
                 }
             }
         }
@@ -112,12 +124,13 @@ fun BackHandlerWithQuestionDialog(initValue: Boolean) {
     BackHandler { showDialog = true }
 }
 
+@FlowPreview
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @ExperimentalMaterial3Api
 @Composable
-fun InputScreen() {
+fun InputScreen(viewModel: DataStoreViewModel) {
     Scaffold(topBar = { AddTopBar() }) {
-        InputField(it)
+        InputField(it, viewModel)
     }
 }
 
@@ -127,7 +140,7 @@ fun AddTopBar() {
     TopAppBar(title = {
         Text(text = "Save", color = MaterialTheme.colorScheme.onPrimary)
     }, navigationIcon = {
-        IconButton(onClick = { 
+        IconButton(onClick = {
             //TODO: 취소 확인 다이얼로그 팝업하기
         }) {
             Icon(imageVector = Icons.Default.Close, contentDescription = "Close")
@@ -147,14 +160,19 @@ fun AddTopBar() {
     )
 }
 
+@FlowPreview
 @Composable
-fun InputField(paddingValues: PaddingValues) {
+fun InputField(paddingValues: PaddingValues, viewModel: DataStoreViewModel) {
+    var text by remember { mutableStateOf("") }
     val textFieldModifier = Modifier
         .padding(paddingValues)
-        .padding(16.dp) // Add some padding around the text field
-        .fillMaxWidth() // Fill the max width of the parent
-        .fillMaxHeight()// Specify a fixed height for the text field
-        .border(1.dp, Color.Gray, RoundedCornerShape(4.dp)) // Add a border
+        .padding(16.dp)
+        .fillMaxWidth()
+        .fillMaxHeight()
+        .border(1.dp, Color.Gray, RoundedCornerShape(4.dp))
+        .onFocusChanged {
+            if (!it.isFocused) viewModel.setUnSavedData(text)
+        }
 
     val textStyle = TextStyle(
         fontSize = 20.sp,
@@ -162,7 +180,14 @@ fun InputField(paddingValues: PaddingValues) {
         color = Color.Black
     )
 
-    var text by remember { mutableStateOf("") }
+    LaunchedEffect(key1 = text) {
+        snapshotFlow { text }
+            .debounce(1000)
+            .collect {
+                viewModel.setUnSavedData(it)
+            }
+    }
+
     BasicTextField(
         value = text, onValueChange = { text = it }, modifier = textFieldModifier,
         decorationBox = { innerTextField ->
