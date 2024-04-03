@@ -63,10 +63,10 @@ class AddActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             MindBankTheme {
-                // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
                 ) {
+                    AutoBackUpCheckDialog(dataStoreViewModel)
                     BackHandlerWithQuestionDialog(false)
                     InputScreen(dataStoreViewModel)
                 }
@@ -76,9 +76,12 @@ class AddActivity : ComponentActivity() {
 }
 
 @Composable
-fun AutoBackUpCheckDialog() {
-    var showDialog by remember {
-        mutableStateOf(false)
+fun AutoBackUpCheckDialog(viewModel: DataStoreViewModel) {
+    var showDialog by remember { mutableStateOf(false) }
+
+    LaunchedEffect(key1 = Unit) {
+        val unSavedData = viewModel.getUnSavedData()
+        if (unSavedData.isNotEmpty()) showDialog = true
     }
 
     if (showDialog) {
