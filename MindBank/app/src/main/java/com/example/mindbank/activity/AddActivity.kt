@@ -129,26 +129,35 @@ fun BackHandlerWithQuestionDialog(initValue: Boolean) {
 @ExperimentalMaterial3Api
 @Composable
 fun InputScreen(viewModel: DataStoreViewModel) {
-    Scaffold(topBar = { AddTopBar() }) {
-        InputField(it, viewModel)
+    var text by remember { mutableStateOf("") }
+    Scaffold(topBar = {
+        AddTopBar(onSave = {
+            viewModel.setUnSavedData(text)
+        })
+    }) {
+        InputField(text, onTextChange = { value ->
+            text = value
+        }, it, viewModel)
     }
 }
 
 @ExperimentalMaterial3Api
 @Composable
-fun AddTopBar() {
+fun AddTopBar(onSave: () -> Unit) {
+
+    var showBackDialog by remember { mutableStateOf(false) }
+    if (showBackDialog) {
+        BackHandlerWithQuestionDialog(true)
+    }
+
     TopAppBar(title = {
         Text(text = "Save", color = MaterialTheme.colorScheme.onPrimary)
     }, navigationIcon = {
-        IconButton(onClick = {
-            //TODO: 취소 확인 다이얼로그 팝업하기
-        }) {
+        IconButton(onClick = { showBackDialog = true }) {
             Icon(imageVector = Icons.Default.Close, contentDescription = "Close")
         }
     }, actions = {
-        Button(onClick = {
-            //TODO: ROOM DB 데이터 저장
-        }) {
+        Button(onClick = onSave) {
             Text("Save")
         }
     }, colors = TopAppBarDefaults.topAppBarColors(
@@ -162,8 +171,12 @@ fun AddTopBar() {
 
 @FlowPreview
 @Composable
-fun InputField(paddingValues: PaddingValues, viewModel: DataStoreViewModel) {
-    var text by remember { mutableStateOf("") }
+fun InputField(
+    text: String,
+    onTextChange: (String) -> Unit,
+    paddingValues: PaddingValues,
+    viewModel: DataStoreViewModel
+) {
     val textFieldModifier = Modifier
         .padding(paddingValues)
         .padding(16.dp)
@@ -189,7 +202,7 @@ fun InputField(paddingValues: PaddingValues, viewModel: DataStoreViewModel) {
     }
 
     BasicTextField(
-        value = text, onValueChange = { text = it }, modifier = textFieldModifier,
+        value = text, onValueChange = onTextChange, modifier = textFieldModifier,
         decorationBox = { innerTextField ->
             if (text.isEmpty()) Text("What's happening?", color = Color.Gray)
             innerTextField()
