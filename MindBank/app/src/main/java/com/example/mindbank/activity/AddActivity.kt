@@ -78,9 +78,10 @@ class AddActivity : ComponentActivity() {
 @Composable
 fun AutoBackUpCheckDialog(viewModel: DataStoreViewModel) {
     var showDialog by remember { mutableStateOf(false) }
+    var unSavedData: String
 
     LaunchedEffect(key1 = Unit) {
-        val unSavedData = viewModel.getUnSavedData()
+        unSavedData = viewModel.getUnSavedData()
         if (unSavedData.isNotEmpty()) showDialog = true
     }
 
