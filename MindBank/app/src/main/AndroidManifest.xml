@@ -15,9 +15,14 @@
         tools:targetApi="31">
         <activity
             android:name=".activity.PasswordActivity"
-            android:exported="false"
+            android:exported="true"
             android:label="@string/title_activity_password"
-            android:theme="@style/Theme.MindBank" />
+            android:theme="@style/Theme.MindBank">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".activity.AddActivity"
             android:exported="false"
@@ -25,15 +30,9 @@
             android:theme="@style/Theme.MindBank" />
         <activity
             android:name=".activity.MainActivity"
-            android:exported="true"
+            android:exported="false"
             android:label="@string/app_name"
-            android:theme="@style/Theme.MindBank">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+            android:theme="@style/Theme.MindBank" />
     </application>
 
 </manifest>
