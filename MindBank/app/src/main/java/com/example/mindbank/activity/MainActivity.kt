@@ -56,8 +56,10 @@ import com.example.mindbank.data.SaveData
 import com.example.mindbank.data.Type
 import com.example.mindbank.ui.theme.MindBankTheme
 import com.example.mindbank.viewmodel.SearchViewModel
+import dagger.hilt.android.AndroidEntryPoint
 import java.util.UUID
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

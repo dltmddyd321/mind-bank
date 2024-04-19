@@ -1,8 +1,15 @@
 package com.example.mindbank.activity
 
+import android.animation.ObjectAnimator
+import android.annotation.SuppressLint
+import android.os.Build
 import android.os.Bundle
+import android.view.animation.AnticipateInterpolator
+import android.view.animation.OvershootInterpolator
+import android.window.SplashScreen
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -37,11 +44,22 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.animation.doOnEnd
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.example.mindbank.activity.ui.theme.MindBankTheme
+import com.example.mindbank.viewmodel.SplashViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class PasswordActivity : ComponentActivity() {
+
+    private lateinit var splash: androidx.core.splashscreen.SplashScreen
+    private val splashViewModel: SplashViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        splash = installSplashScreen()
+        startSplash()
         setContent {
             MindBankTheme {
                 // A surface container using the 'background' color from the theme
@@ -50,6 +68,25 @@ class PasswordActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     PasswordScreen()
+                }
+            }
+        }
+    }
+
+    @SuppressLint("Recycle")
+    private fun startSplash() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            splashScreen.setOnExitAnimationListener { splashView ->
+                val icon = splashView.iconView ?: return@setOnExitAnimationListener
+
+                ObjectAnimator.ofPropertyValuesHolder(icon).run {
+                    interpolator = AnticipateInterpolator()
+                    repeatCount = 2 // 반복 횟수
+                    duration = 500L
+                    doOnEnd {
+                        splashView.remove()
+                    }
+                    start()
                 }
             }
         }
