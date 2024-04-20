@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -29,6 +30,7 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
@@ -40,27 +42,37 @@ import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.example.mindbank.R
 import com.example.mindbank.data.SaveData
 import com.example.mindbank.data.Type
+import com.example.mindbank.db.DataViewModel
 import com.example.mindbank.ui.theme.MindBankTheme
 import com.example.mindbank.viewmodel.SearchViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
 import java.util.UUID
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    private val dataViewModel: DataViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -70,7 +82,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    MainScreen()
+                    MainScreen(dataViewModel)
                 }
             }
         }
@@ -78,33 +90,42 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun MainGrid() {
+fun MainGrid(dataViewModel: DataViewModel) {
+    val isLoading = remember { mutableStateOf(true) }
+    val itemList = mutableListOf<SaveData>()
 
-    val itemList = listOf(
-        SaveData(
-            UUID.randomUUID().toString(),
-            Type.Account.name,
-            "테스트입니다!",
-            "세부 설명",
-            System.currentTimeMillis(),
-            System.currentTimeMillis()
-        ),
-        SaveData(
-            UUID.randomUUID().toString(),
-            Type.Account.name,
-            "두 번째 표시",
-            "세부 설명",
-            System.currentTimeMillis(),
-            System.currentTimeMillis()
-        )
-    )
+    LaunchedEffect(key1 = Unit) {
+        withContext(Dispatchers.IO) {
+            itemList.addAll(dataViewModel.getAllData())
+        }
+        delay(2000) // 2초간 지연
+        isLoading.value = false // 로딩 상태 업데이트
+    }
 
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(2), // 한 줄에 표시할 아이템의 수
-        contentPadding = PaddingValues(8.dp) // 그리드의 전체 패딩
-    ) {
-        items(itemList) { item ->
-            MemoItemView(item)
+    if (isLoading.value) {
+        Box(
+            contentAlignment = Alignment.Center, // Box 안의 내용을 중앙에 정렬
+            modifier = Modifier.fillMaxSize() // Box를 화면 전체 크기로 확장
+        ) {
+            CircularProgressIndicator()
+        }
+    } else {
+        if (itemList.isNotEmpty()) {
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(2), // 한 줄에 표시할 아이템의 수
+                contentPadding = PaddingValues(8.dp) // 그리드의 전체 패딩
+            ) {
+                items(itemList) { item ->
+                    MemoItemView(item)
+                }
+            }
+        } else {
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier.fillMaxSize()
+            ) {
+                Text(text = "저장된 메모가 없습니다.\n새로운 메모를 추가해보세요.", textAlign = TextAlign.Center)
+            }
         }
     }
 }
@@ -170,7 +191,7 @@ fun MemoItemView(data: SaveData) {
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen() {
+fun MainScreen(dataViewModel: DataViewModel) {
     val viewModel = SearchViewModel()
     val searchText by viewModel.searchText.collectAsState()
     val isSearching by viewModel.isSearching.collectAsState()
@@ -209,7 +230,7 @@ fun MainScreen() {
         floatingActionButtonPosition = FabPosition.End
     ) { innerPadding ->
         Column(modifier = Modifier.padding(innerPadding)) {
-            if (!isSearching) MainGrid()
+            if (!isSearching) MainGrid(dataViewModel)
         }
     }
 }
@@ -231,13 +252,5 @@ fun FloatingButton(isAddMode: Boolean) {
             contentDescription = "Add FAB",
             tint = Color.White,
         )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    MindBankTheme {
-        MainGrid()
     }
 }
