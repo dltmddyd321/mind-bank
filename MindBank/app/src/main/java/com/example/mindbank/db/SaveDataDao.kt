@@ -14,4 +14,10 @@ interface SaveDataDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertOrUpdate(saveData: SaveData)
+
+    @Query("DELETE FROM save_model WHERE id = :id")
+    fun deleteById(id: String): Int
+
+    @Query("DELETE FROM save_model")
+    fun deleteAll(): Int
 }
