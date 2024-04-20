@@ -2,8 +2,10 @@ package com.example.mindbank.activity
 
 import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.animation.AnticipateInterpolator
 import android.view.animation.OvershootInterpolator
 import android.window.SplashScreen
@@ -47,28 +49,53 @@ import androidx.compose.ui.unit.sp
 import androidx.core.animation.doOnEnd
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.example.mindbank.activity.ui.theme.MindBankTheme
+import com.example.mindbank.db.DataStoreViewModel
 import com.example.mindbank.viewmodel.SplashViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @AndroidEntryPoint
 class PasswordActivity : ComponentActivity() {
 
     private lateinit var splash: androidx.core.splashscreen.SplashScreen
-    private val splashViewModel: SplashViewModel by viewModels()
+    private val dataStoreViewModel: DataStoreViewModel by viewModels()
+    private var password = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         splash = installSplashScreen()
         startSplash()
-        setContent {
-            MindBankTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    PasswordScreen()
+        fetchPassword {
+            setContent {
+                MindBankTheme {
+                    // A surface container using the 'background' color from the theme
+                    Surface(
+                        modifier = Modifier.fillMaxSize(),
+                        color = MaterialTheme.colorScheme.background
+                    ) {
+                        PasswordScreen()
+                    }
                 }
+            }
+        }
+    }
+
+    private fun fetchPassword(onCheckPassword: () -> Unit) {
+        CoroutineScope(Dispatchers.IO).launch {
+            password = dataStoreViewModel.getPassWord().toString()
+            withContext(Dispatchers.Main) {
+                if (password.isEmpty()) startActivity(
+                    Intent(
+                        this@PasswordActivity,
+                        MainActivity::class.java
+                    )
+                ) else {
+                    onCheckPassword.invoke()
+                }
+                Log.e("패스워드", password)
             }
         }
     }

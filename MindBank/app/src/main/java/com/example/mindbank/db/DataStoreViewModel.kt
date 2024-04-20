@@ -25,9 +25,7 @@ class DataStoreViewModel @Inject constructor(
         }
     }
 
-    suspend fun getPassWord() {
-        datastoreRepo.getString("PASSWORD") ?: ""
-    }
+    suspend fun getPassWord(): String = datastoreRepo.getString("PASSWORD") ?: ""
 
     fun setPassword(data: String) {
         CoroutineScope(Dispatchers.IO).launch {
