@@ -8,9 +8,12 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
@@ -27,6 +30,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -86,6 +90,32 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+}
+
+@Composable
+fun MainTopBar() {
+    val context = LocalContext.current
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = "Completed",
+            style = MaterialTheme.typography.bodyMedium
+        )
+        Spacer(modifier = Modifier.weight(1f))
+        Icon(
+            imageVector = Icons.Default.Settings,
+            contentDescription = "Settings",
+            modifier = Modifier
+                .size(24.dp)
+                .clickable {
+                    context.startActivity(Intent(context, SettingsActivity::class.java))
+                }
+        )
     }
 }
 
@@ -199,29 +229,32 @@ fun MainScreen(dataViewModel: DataViewModel) {
 
     Scaffold(
         topBar = {
-            SearchBar(
-                query = searchText,
-                onQueryChange = viewModel::onSearchTextChange,
-                onSearch = viewModel::onSearchTextChange,
-                active = isSearching,
-                onActiveChange = { viewModel.onToggleSearch() },
-                placeholder = { Text(text = "검색어를 입력하시오.") },
-                trailingIcon = { Icon(imageVector = Icons.Default.Search, null) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-            ) {
-                LazyColumn {
-                    items(countriesList) { country ->
-                        Text(
-                            text = country,
-                            modifier = Modifier.padding(
-                                start = 8.dp,
-                                top = 4.dp,
-                                end = 8.dp,
-                                bottom = 4.dp
+            Column {
+                MainTopBar()
+                SearchBar(
+                    query = searchText,
+                    onQueryChange = viewModel::onSearchTextChange,
+                    onSearch = viewModel::onSearchTextChange,
+                    active = isSearching,
+                    onActiveChange = { viewModel.onToggleSearch() },
+                    placeholder = { Text(text = "검색어를 입력하시오.") },
+                    trailingIcon = { Icon(imageVector = Icons.Default.Search, null) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                ) {
+                    LazyColumn {
+                        items(countriesList) { country ->
+                            Text(
+                                text = country,
+                                modifier = Modifier.padding(
+                                    start = 8.dp,
+                                    top = 4.dp,
+                                    end = 8.dp,
+                                    bottom = 4.dp
+                                )
                             )
-                        )
+                        }
                     }
                 }
             }
