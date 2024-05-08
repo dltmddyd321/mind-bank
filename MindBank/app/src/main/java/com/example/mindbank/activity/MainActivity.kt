@@ -58,6 +58,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.example.mindbank.R
@@ -285,5 +286,21 @@ fun FloatingButton(isAddMode: Boolean) {
             contentDescription = "Add FAB",
             tint = Color.White,
         )
+    }
+}
+
+@Composable
+fun Greeting(name: String) {
+    Text(
+        text = "Hello $name!",
+        color = Color.Blue
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+fun GreetingPreview() {
+    MindBankTheme {
+        Greeting("승용")
     }
 }
