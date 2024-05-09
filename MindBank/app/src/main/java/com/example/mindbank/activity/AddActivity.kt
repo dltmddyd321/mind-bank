@@ -58,6 +58,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.mindbank.R
 import com.example.mindbank.activity.ui.theme.MindBankTheme
 import com.example.mindbank.db.DataStoreViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -310,5 +311,14 @@ fun TbText(
         fontWeight = labelWeight,
         textAlign = labelAlign,
         modifier = modifier
+    )
+    TestCompose()
+}
+
+@Composable
+fun TestCompose() {
+    Text(
+        text = "${R.string.app_name}",
+        color = Color.Blue
     )
 }
