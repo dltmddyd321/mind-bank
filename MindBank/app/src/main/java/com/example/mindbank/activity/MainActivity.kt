@@ -60,6 +60,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import com.example.mindbank.R
 import com.example.mindbank.data.SaveData
@@ -105,6 +106,8 @@ fun MainTopBar() {
     ) {
         Text(
             text = "Completed",
+            fontSize = 20.sp,
+            textAlign = TextAlign.Center,
             style = MaterialTheme.typography.bodyMedium
         )
         Spacer(modifier = Modifier.weight(1f))
@@ -112,7 +115,7 @@ fun MainTopBar() {
             imageVector = Icons.Default.Settings,
             contentDescription = "Settings",
             modifier = Modifier
-                .size(24.dp)
+                .size(36.dp)
                 .clickable {
                     context.startActivity(Intent(context, SettingsActivity::class.java))
                 }

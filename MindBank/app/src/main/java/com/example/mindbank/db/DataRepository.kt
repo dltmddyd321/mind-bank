@@ -12,6 +12,10 @@ class DataRepository @Inject constructor(
         dataDao.getAllSaveData()
     }
 
+    suspend fun searchByKeyword(keyword: String): List<SaveData> = withContext(Dispatchers.IO) {
+        dataDao.searchByKeyword(keyword)
+    }
+
     fun insertOrUpdate(data: SaveData) {
         dataDao.insertOrUpdate(data)
     }
@@ -23,5 +27,4 @@ class DataRepository @Inject constructor(
     fun clear() {
         dataDao.deleteAll()
     }
-
 }

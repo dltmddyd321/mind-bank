@@ -20,4 +20,7 @@ interface SaveDataDao {
 
     @Query("DELETE FROM save_model")
     fun deleteAll(): Int
+
+    @Query("SELECT * FROM save_model WHERE title LIKE '%' || :keyword || '%' OR detail LIKE '%' || :keyword || '%'")
+    fun searchByKeyword(keyword: String): List<SaveData>
 }
