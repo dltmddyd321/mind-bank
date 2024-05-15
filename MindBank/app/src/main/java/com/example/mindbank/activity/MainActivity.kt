@@ -69,8 +69,10 @@ import com.example.mindbank.db.DataViewModel
 import com.example.mindbank.ui.theme.MindBankTheme
 import com.example.mindbank.viewmodel.SearchViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.UUID
 
@@ -238,7 +240,11 @@ fun MainScreen(dataViewModel: DataViewModel) {
                 SearchBar(
                     query = searchText,
                     onQueryChange = viewModel::onSearchTextChange,
-                    onSearch = viewModel::onSearchTextChange,
+                    onSearch = {
+                        CoroutineScope(Dispatchers.IO).launch {
+                            val result = dataViewModel.searchByKeyword(it)
+                        }
+                    },
                     active = isSearching,
                     onActiveChange = { viewModel.onToggleSearch() },
                     placeholder = { Text(text = "검색어를 입력하시오.") },
