@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -61,6 +62,9 @@ import androidx.compose.ui.unit.sp
 import com.example.mindbank.R
 import com.example.mindbank.activity.ui.theme.MindBankTheme
 import com.example.mindbank.db.DataStoreViewModel
+import com.github.skydoves.colorpicker.compose.ColorEnvelope
+import com.github.skydoves.colorpicker.compose.HsvColorPicker
+import com.github.skydoves.colorpicker.compose.rememberColorPickerController
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.debounce
@@ -161,11 +165,22 @@ fun InputScreen(viewModel: DataStoreViewModel) {
 @ExperimentalMaterial3Api
 @Composable
 fun AddTopBar(onSave: () -> Unit) {
-
+    val colorController = rememberColorPickerController()
     var showBackDialog by remember { mutableStateOf(false) }
     if (showBackDialog) {
         BackHandlerWithQuestionDialog(true)
     }
+
+    HsvColorPicker(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(450.dp)
+            .padding(10.dp),
+        controller = colorController,
+        onColorChanged = { colorEnvelope: ColorEnvelope ->
+            // do something
+        }
+    )
 
     TopAppBar(title = {
         Text(text = "Save", color = MaterialTheme.colorScheme.onPrimary)
@@ -174,8 +189,13 @@ fun AddTopBar(onSave: () -> Unit) {
             Icon(imageVector = Icons.Default.Close, contentDescription = "Close")
         }
     }, actions = {
-        Button(onClick = onSave) {
-            Text("Save")
+        Row {
+            Button(onClick = onSave) {
+                Text("Color")
+            }
+            Button(onClick = onSave) {
+                Text("Save")
+            }
         }
     }, colors = TopAppBarDefaults.topAppBarColors(
         containerColor = MaterialTheme.colorScheme.primary,
