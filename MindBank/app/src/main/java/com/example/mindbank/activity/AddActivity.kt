@@ -59,6 +59,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import com.example.mindbank.R
 import com.example.mindbank.activity.ui.theme.MindBankTheme
 import com.example.mindbank.db.DataStoreViewModel
@@ -167,20 +168,25 @@ fun InputScreen(viewModel: DataStoreViewModel) {
 fun AddTopBar(onSave: () -> Unit) {
     val colorController = rememberColorPickerController()
     var showBackDialog by remember { mutableStateOf(false) }
+    var showColorPicker by remember { mutableStateOf(false) }
     if (showBackDialog) {
         BackHandlerWithQuestionDialog(true)
     }
 
-    HsvColorPicker(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(450.dp)
-            .padding(10.dp),
-        controller = colorController,
-        onColorChanged = { colorEnvelope: ColorEnvelope ->
-            // do something
+    if (showColorPicker) {
+        Dialog(onDismissRequest = { showColorPicker = false }) {
+            HsvColorPicker(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(450.dp)
+                    .padding(10.dp),
+                controller = colorController,
+                onColorChanged = { colorEnvelope: ColorEnvelope ->
+                    // do something
+                }
+            )
         }
-    )
+    }
 
     TopAppBar(title = {
         Text(text = "Save", color = MaterialTheme.colorScheme.onPrimary)
@@ -190,7 +196,9 @@ fun AddTopBar(onSave: () -> Unit) {
         }
     }, actions = {
         Row {
-            Button(onClick = onSave) {
+            Button(onClick = {
+                showColorPicker = true
+            }) {
                 Text("Color")
             }
             Button(onClick = onSave) {
