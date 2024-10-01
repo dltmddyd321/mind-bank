@@ -7,8 +7,6 @@ import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.animation.AnticipateInterpolator
-import android.view.animation.OvershootInterpolator
-import android.window.SplashScreen
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -50,7 +48,6 @@ import androidx.core.animation.doOnEnd
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.example.mindbank.activity.ui.theme.MindBankTheme
 import com.example.mindbank.db.DataStoreViewModel
-import com.example.mindbank.viewmodel.SplashViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -85,7 +82,7 @@ class PasswordActivity : ComponentActivity() {
 
     private fun fetchPassword(onCheckPassword: () -> Unit) {
         CoroutineScope(Dispatchers.IO).launch {
-            password = dataStoreViewModel.getPassWord().toString()
+            password = dataStoreViewModel.getPassWord()
             withContext(Dispatchers.Main) {
                 if (password.isEmpty()) startActivity(
                     Intent(
@@ -217,21 +214,5 @@ fun NumberButton(num: String, onClick: () -> Unit) {
             fontSize = 24.sp,
             textAlign = TextAlign.Center
         )
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview3() {
-    MindBankTheme {
-        Greeting("Android")
     }
 }
