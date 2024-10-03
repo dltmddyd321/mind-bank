@@ -3,6 +3,7 @@ package com.example.mindbank.activity
 import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -78,6 +79,7 @@ class PasswordActivity : ComponentActivity() {
                 }
             }
         }
+        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
     }
 
     private fun fetchPassword(onCheckPassword: () -> Unit) {

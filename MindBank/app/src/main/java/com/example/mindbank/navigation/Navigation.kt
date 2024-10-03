@@ -19,8 +19,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.example.mindbank.db.DataStoreViewModel
-import com.example.mindbank.db.DataViewModel
 
 sealed class Screen(val route: String, val title: String, val icon: ImageVector) {
     data object Home : Screen("home", "Home", Icons.Default.Home)
@@ -68,11 +66,11 @@ fun BottomNavBar(navController: NavController) {
 fun NavigationGraph(
     navController: NavHostController,
     dataViewModel: ViewModel,
-    dataStoreViewModel: DataStoreViewModel,
-    paddingValues: PaddingValues) {
+    paddingValues: PaddingValues
+) {
     NavHost(navController, startDestination = Screen.Home.route) {
         composable(Screen.Home.route) { HomeScreen(dataViewModel, paddingValues, navController) }
-        composable(Screen.Notes.route) { NotesScreen(dataStoreViewModel, paddingValues) }
+        composable(Screen.Notes.route) { NotesScreen(dataViewModel, paddingValues, navController) }
         composable(Screen.Daily.route) { DailyScreen(dataViewModel, paddingValues) }
         composable(Screen.Settings.route) { SettingsScreen(dataViewModel, paddingValues) }
     }

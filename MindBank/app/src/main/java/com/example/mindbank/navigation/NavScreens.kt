@@ -27,6 +27,19 @@ import kotlinx.coroutines.FlowPreview
 
 @Composable
 fun HomeScreen(viewModel: ViewModel, paddingValues: PaddingValues, navController: NavController) {
+    val dataViewModel = viewModel as? DataStoreViewModel ?: return
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(paddingValues),
+        contentAlignment = Alignment.Center
+    ) {
+
+    }
+}
+
+@Composable
+fun NotesScreen(viewModel: ViewModel, paddingValues: PaddingValues, navController: NavController) {
     val dataViewModel = viewModel as? DataViewModel ?: return
     Box(
         modifier = Modifier
@@ -40,28 +53,6 @@ fun HomeScreen(viewModel: ViewModel, paddingValues: PaddingValues, navController
                 color = MaterialTheme.colorScheme.background
             ) {
                 MainScreen(dataViewModel, navController)
-            }
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class, FlowPreview::class)
-@Composable
-fun NotesScreen(viewModel: ViewModel, paddingValues: PaddingValues) {
-    val dataViewModel = viewModel as? DataStoreViewModel ?: return
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(paddingValues),
-        contentAlignment = Alignment.Center
-    ) {
-        MindBankTheme {
-            Surface(
-                modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
-            ) {
-                AutoBackUpCheckDialog(dataViewModel)
-                BackHandlerWithQuestionDialog(false)
-                InputScreen(dataViewModel)
             }
         }
     }

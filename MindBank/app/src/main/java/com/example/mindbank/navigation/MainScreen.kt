@@ -22,6 +22,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material3.Card
@@ -47,6 +49,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -71,11 +74,19 @@ fun MainTopBar() {
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = "Completed",
-            fontSize = 20.sp,
-            textAlign = TextAlign.Center,
-            style = MaterialTheme.typography.bodyMedium
+            text = "Memos",
+            fontWeight = FontWeight.Bold,
+            style = MaterialTheme.typography.headlineMedium,
+            modifier = Modifier
+                .weight(1f)
+                .padding(6.dp)
         )
+        IconButton(onClick = { /* 메뉴 아이콘 클릭 동작 */ }) {
+            Icon(
+                imageVector = Icons.Default.Menu,
+                contentDescription = "Menu"
+            )
+        }
     }
 }
 
@@ -203,7 +214,7 @@ fun MainScreen(dataViewModel: DataViewModel, navController: NavController) {
                     trailingIcon = { Icon(imageVector = Icons.Default.Search, null) },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(16.dp)
+                        .padding(start = 16.dp, end = 16.dp)
                 ) {
                     LazyColumn {
                         items(countriesList) { country ->
