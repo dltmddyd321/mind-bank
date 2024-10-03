@@ -1,26 +1,15 @@
-package com.example.mindbank.activity
+package com.example.mindbank.navigation
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
-import androidx.activity.compose.setContent
-import androidx.activity.viewModels
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
@@ -32,7 +21,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -44,54 +32,22 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import com.example.mindbank.R
-import com.example.mindbank.activity.ui.theme.MindBankTheme
 import com.example.mindbank.db.DataStoreViewModel
 import com.github.skydoves.colorpicker.compose.ColorEnvelope
 import com.github.skydoves.colorpicker.compose.HsvColorPicker
 import com.github.skydoves.colorpicker.compose.rememberColorPickerController
-import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.debounce
-
-@AndroidEntryPoint
-@ExperimentalMaterial3Api
-class AddActivity : ComponentActivity() {
-
-    private val dataStoreViewModel: DataStoreViewModel by viewModels()
-
-    @OptIn(FlowPreview::class)
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContent {
-            MindBankTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
-                ) {
-                    AutoBackUpCheckDialog(dataStoreViewModel)
-                    BackHandlerWithQuestionDialog(false)
-                    InputScreen(dataStoreViewModel)
-                }
-            }
-        }
-    }
-}
 
 @Composable
 fun AutoBackUpCheckDialog(viewModel: DataStoreViewModel) {
@@ -252,101 +208,5 @@ fun InputField(
             if (text.isEmpty()) Text("What's happening?", color = Color.Gray)
             innerTextField()
         }, textStyle = textStyle
-    )
-}
-
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview2() {
-    MindBankTheme {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            ReCompositionTest()
-        }
-    }
-}
-
-@Composable
-fun ReCompositionTest() {
-    //상태 저장 변수 선언
-    var text by remember { mutableStateOf("안녕하세요?") }
-
-    //다크 모드 사용 여부 파악
-    val isSystemInDarkTheme = isSystemInDarkTheme()
-
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Button(onClick = { text = "반갑습니다!" }) {
-            Text("클릭하세요")
-        }
-        TbText(
-            modifier = Modifier.padding(top = 16.dp),
-            text = text,
-            isDarkMode = isSystemInDarkTheme,
-            labelSize = 20.sp,
-            labelWeight = FontWeight.Bold
-        )
-    }
-}
-
-@Composable
-fun TbLogo(
-    isDarkMode: Boolean,
-    logoIcon: Painter,
-    logoSize: Dp,
-    labelSize: TextUnit,
-    labelWeight: FontWeight
-) {
-    Box(
-        modifier = Modifier
-            .background(
-                if (isDarkMode) Color.Black else Color.White, shape = RoundedCornerShape(10.dp)
-            )
-            .padding(16.dp)
-    ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Image(
-                painter = logoIcon,
-                contentDescription = "Logo",
-                modifier = Modifier.size(logoSize)
-            )
-            TbText(
-                modifier = Modifier.padding(start = 8.dp),
-                text = "TimeBlocks",
-                isDarkMode = isDarkMode,
-                labelSize = labelSize,
-                labelWeight = labelWeight
-            )
-        }
-    }
-}
-
-@Composable
-fun TbText(
-    modifier: Modifier,
-    text: String,
-    isDarkMode: Boolean,
-    labelSize: TextUnit,
-    labelWeight: FontWeight,
-    labelAlign: TextAlign = TextAlign.Center
-) {
-    Text(
-        text = text,
-        color = if (isDarkMode) Color.White else Color.Black,
-        fontSize = labelSize,
-        fontWeight = labelWeight,
-        textAlign = labelAlign,
-        modifier = modifier
-    )
-    TestCompose()
-}
-
-@Composable
-fun TestCompose() {
-    Text(
-        text = "${R.string.app_name}",
-        color = Color.Blue
     )
 }

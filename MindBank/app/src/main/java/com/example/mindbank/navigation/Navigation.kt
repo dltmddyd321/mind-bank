@@ -13,11 +13,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.lifecycle.ViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.example.mindbank.db.DataStoreViewModel
 import com.example.mindbank.db.DataViewModel
 
 sealed class Screen(val route: String, val title: String, val icon: ImageVector) {
@@ -65,12 +67,13 @@ fun BottomNavBar(navController: NavController) {
 @Composable
 fun NavigationGraph(
     navController: NavHostController,
-    dataViewModel: DataViewModel,
+    dataViewModel: ViewModel,
+    dataStoreViewModel: DataStoreViewModel,
     paddingValues: PaddingValues) {
     NavHost(navController, startDestination = Screen.Home.route) {
-        composable(Screen.Home.route) { HomeScreen(dataViewModel, paddingValues) }
-        composable(Screen.Notes.route) { NotesScreen() }
-        composable(Screen.Daily.route) { DailyScreen() }
-        composable(Screen.Settings.route) { SettingsScreen() }
+        composable(Screen.Home.route) { HomeScreen(dataViewModel, paddingValues, navController) }
+        composable(Screen.Notes.route) { NotesScreen(dataStoreViewModel, paddingValues) }
+        composable(Screen.Daily.route) { DailyScreen(dataViewModel, paddingValues) }
+        composable(Screen.Settings.route) { SettingsScreen(dataViewModel, paddingValues) }
     }
 }
