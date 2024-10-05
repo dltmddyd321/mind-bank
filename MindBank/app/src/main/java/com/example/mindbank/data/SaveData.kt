@@ -1,20 +1,15 @@
 package com.example.mindbank.data
 
-import android.graphics.Bitmap
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "save_model")
 data class SaveData(
-    @PrimaryKey val id: String,
-    val type: String,
+    @PrimaryKey val id: String? = null,
     val title: String,
     val detail: String,
     val dtCreated: Long,
     val dtUpdated: Long,
-    val color: Int? = null
+    val color: String
 )
 
-enum class Type {
-    Memo, Link, Account
-}

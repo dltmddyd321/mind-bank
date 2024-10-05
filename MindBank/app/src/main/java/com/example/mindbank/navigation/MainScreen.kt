@@ -1,6 +1,7 @@
 package com.example.mindbank.navigation
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -48,6 +49,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -56,6 +58,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavController
 import com.example.mindbank.R
+import com.example.mindbank.activity.AddActivity
 import com.example.mindbank.data.SaveData
 import com.example.mindbank.db.DataViewModel
 import com.example.mindbank.viewmodel.SearchViewModel
@@ -240,15 +243,18 @@ fun MainScreen(dataViewModel: DataViewModel, navController: NavController) {
 @ExperimentalMaterial3Api
 @Composable
 fun FloatingButton(isAddMode: Boolean, navController: NavController) {
+    val context = LocalContext.current
     FloatingActionButton(
         onClick = {
-            navController.navigate(Screen.Notes.route) {
-                popUpTo(navController.graph.startDestinationId) {
-                    saveState = true // 상태 유지
-                }
-                launchSingleTop = true
-                restoreState = true // 이전 상태 복원
-            }
+            val intent = Intent(context, AddActivity::class.java)
+            context.startActivity(intent)
+//            navController.navigate(Screen.Notes.route) {
+//                popUpTo(navController.graph.startDestinationId) {
+//                    saveState = true // 상태 유지
+//                }
+//                launchSingleTop = true
+//                restoreState = true // 이전 상태 복원
+//            }
         },
         containerColor = MaterialTheme.colorScheme.secondary,
         shape = RoundedCornerShape(16.dp),
