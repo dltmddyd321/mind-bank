@@ -11,3 +11,6 @@ fun Color.toHex(): String {
 
     return String.format("#%02X%02X%02X%02X", alpha, red, green, blue)
 }
+
+fun hexToColor(hex: String): Color =
+    Color(android.graphics.Color.parseColor(hex))

@@ -15,13 +15,29 @@ import javax.inject.Inject
 class DataStoreViewModel @Inject constructor(
     private val datastoreRepo: DatastoreRepo
 ) : ViewModel() {
-    suspend fun getUnSavedData(): String = withContext(Dispatchers.IO) {
-        datastoreRepo.getString("UNSAVED") ?: ""
+    suspend fun getUnSavedData(): UnSaved = withContext(Dispatchers.IO) {
+        UnSaved(
+            datastoreRepo.getString("UNSAVED_TITLE") ?: "",
+            datastoreRepo.getString("UNSAVED_MEMO") ?: "",
+            datastoreRepo.getString("UNSAVED_COLOR") ?: ""
+        )
     }
 
-    fun setUnSavedData(data: String) {
+    fun setUnSavedTitle(data: String) {
         CoroutineScope(Dispatchers.IO).launch {
-            datastoreRepo.putString("UNSAVED", data)
+            datastoreRepo.putString("UNSAVED_TITLE", data)
+        }
+    }
+
+    fun setUnSavedMemo(data: String) {
+        CoroutineScope(Dispatchers.IO).launch {
+            datastoreRepo.putString("UNSAVED_MEMO", data)
+        }
+    }
+
+    fun setUnSavedColor(data: String) {
+        CoroutineScope(Dispatchers.IO).launch {
+            datastoreRepo.putString("UNSAVED_COLOR", data)
         }
     }
 
@@ -33,3 +49,9 @@ class DataStoreViewModel @Inject constructor(
         }
     }
 }
+
+data class UnSaved(
+    val title: String,
+    val memo: String,
+    val color: String
+)

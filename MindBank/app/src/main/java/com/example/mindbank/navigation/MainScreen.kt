@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -30,6 +31,7 @@ import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
@@ -98,11 +100,17 @@ fun MainGrid(dataViewModel: DataViewModel) {
     val isLoading = remember { mutableStateOf(true) }
     val itemList = mutableListOf<SaveData>()
 
+    itemList.add(
+        SaveData(
+            title = "테스트", detail = "메모", dtUpdated = System.currentTimeMillis(),
+            dtCreated = System.currentTimeMillis(), color = "#FF0000"
+        )
+    )
+
     LaunchedEffect(key1 = Unit) {
         withContext(Dispatchers.IO) {
             itemList.addAll(dataViewModel.getAllData())
         }
-        delay(2000) // 2초간 지연
         isLoading.value = false // 로딩 상태 업데이트
     }
 
@@ -149,43 +157,53 @@ fun MemoItemView(data: SaveData) {
             colors = CardDefaults.cardColors(Color.White)
         ) {
             Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier
-                    .padding(16.dp)
-                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                    .fillMaxWidth() // Column이 전체 너비를 채우도록 설정
             ) {
-                Image(
-                    painter = painterResource(id = R.drawable.ic_launcher_background),
-                    contentDescription = data.title,
-                    modifier = Modifier.size(100.dp), // 이미지 크기
-                    contentScale = ContentScale.Fit
+                // 제목과 닫기 버튼을 한 줄에 배치
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically // 세로 가운데 정렬
+                ) {
+                    // 제목 텍스트
+                    Text(
+                        text = data.title,
+                        color = Color.Black,
+                        style = MaterialTheme.typography.labelMedium,
+                        modifier = Modifier.weight(1f) // Text가 Row 안에서 남은 공간을 채움
+                    )
+
+                    // 닫기 버튼
+                    IconButton(
+                        onClick = { /* TODO: 닫기 액션 */ },
+                        modifier = Modifier.size(24.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Close,
+                            contentDescription = "Close",
+                            modifier = Modifier.size(16.dp),
+                            tint = Color.Gray // 아이콘 색상을 조절
+                        )
+                    }
+                }
+
+                // 구분선 추가
+                Divider(
+                    color = Color.LightGray,
+                    thickness = 1.dp,
+                    modifier = Modifier.padding(vertical = 8.dp) // 구분선 위아래에 패딩 추가
                 )
+
+                // 하단 메모 내용 표시
                 Text(
-                    text = data.title,
-                    color = Color.Black,
-                    style = MaterialTheme.typography.labelMedium,
-                    modifier = Modifier.padding(top = 8.dp)
+                    text = data.detail, // 메모 내용이 들어갈 변수
+                    color = Color.Gray,
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.fillMaxWidth() // 메모 텍스트를 가득 채움
                 )
             }
-        }
-        IconButton(
-            onClick = { }, modifier = Modifier
-                .align(Alignment.TopEnd)
-                .size(24.dp) // 버튼 크기를 조절합니다.
-                .offset(x = (-12).dp, y = (12).dp) // 아이콘을 카드의 우측 상단에서 조금 내려줍니다.
-                .zIndex(1f) // 버튼을 카드 위에 놓습니다.
-                .background(
-                    color = Color.White.copy(alpha = 0.5f), // 반투명한 흰색 배경
-                    shape = CircleShape // 원형 모양
-                )
-                .padding(6.dp) // IconButton 안쪽에 패딩을 주어 Icon과 배경 사이의 여백을 생성합니다.
-        ) {
-            Icon(
-                imageVector = Icons.Filled.Close,
-                contentDescription = "Close",
-                modifier = Modifier.size(16.dp),
-                tint = Color.Gray // 아이콘 색상을 조절합니다.
-            )
         }
     }
 }

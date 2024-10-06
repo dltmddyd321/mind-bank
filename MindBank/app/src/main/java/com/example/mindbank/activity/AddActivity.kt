@@ -13,9 +13,7 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -75,6 +73,9 @@ class AddActivity : ComponentActivity() {
 
     private val dataStoreViewModel: DataStoreViewModel by viewModels()
     private val dataViewModel: DataViewModel by viewModels()
+    private var initTitle = ""
+    private var initMemo = ""
+    private var initColor = ""
 
     @OptIn(ExperimentalMaterial3Api::class, FlowPreview::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -86,7 +87,7 @@ class AddActivity : ComponentActivity() {
                 ) {
                     AutoBackUpCheckDialog(dataStoreViewModel)
                     BackHandlerWithQuestionDialog(false)
-                    InputScreen(dataStoreViewModel, dataViewModel)
+                    InputScreen()
                 }
             }
         }
@@ -96,11 +97,13 @@ class AddActivity : ComponentActivity() {
     @Composable
     fun AutoBackUpCheckDialog(viewModel: DataStoreViewModel) {
         var showDialog by remember { mutableStateOf(false) }
-        var unSavedData: String
 
         LaunchedEffect(key1 = Unit) {
-            unSavedData = viewModel.getUnSavedData()
-            if (unSavedData.isNotEmpty()) showDialog = true
+            val unSaved = viewModel.getUnSavedData()
+            initTitle = unSaved.title
+            initMemo = unSaved.memo
+            initColor = unSaved.color
+            if (initTitle.isNotEmpty() || initMemo.isNotEmpty()) showDialog = true
         }
 
         if (showDialog) {
@@ -150,7 +153,7 @@ class AddActivity : ComponentActivity() {
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     @ExperimentalMaterial3Api
     @Composable
-    fun InputScreen(storeViewModel: DataStoreViewModel, dataViewModel: DataViewModel) {
+    fun InputScreen() {
         var title by remember { mutableStateOf("") }
         var text by remember { mutableStateOf("") }
         Scaffold(topBar = {
@@ -227,7 +230,7 @@ class AddActivity : ComponentActivity() {
                 })
                 InputField(text, onTextChange = { value ->
                     text = value
-                }, viewModel = storeViewModel)
+                })
             }
         }
     }
@@ -242,7 +245,10 @@ class AddActivity : ComponentActivity() {
             maxLines = 1,  // 제목 필드가 한 줄만 입력 가능하도록 제한
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 8.dp),
+                .padding(horizontal = 8.dp)
+                .onFocusChanged {
+                    if (!it.isFocused) dataStoreViewModel.setUnSavedTitle(title)
+                },
             colors = TextFieldDefaults.textFieldColors(
                 containerColor = Color.Transparent
             ),
@@ -253,8 +259,7 @@ class AddActivity : ComponentActivity() {
     @Composable
     fun InputField(
         text: String,
-        onTextChange: (String) -> Unit,
-        viewModel: DataStoreViewModel
+        onTextChange: (String) -> Unit
     ) {
         val textFieldModifier = Modifier
             .padding(16.dp)
@@ -262,7 +267,7 @@ class AddActivity : ComponentActivity() {
             .fillMaxHeight()
             .border(1.dp, Color.Gray, RoundedCornerShape(4.dp))
             .onFocusChanged {
-                if (!it.isFocused) viewModel.setUnSavedData(text)
+                if (!it.isFocused) dataStoreViewModel.setUnSavedMemo(text)
             }
 
         val textStyle = TextStyle(
@@ -275,7 +280,7 @@ class AddActivity : ComponentActivity() {
             snapshotFlow { text }
                 .debounce(1000)
                 .collect {
-                    viewModel.setUnSavedData(it)
+                    dataStoreViewModel.setUnSavedMemo(it)
                 }
         }
 
@@ -286,9 +291,5 @@ class AddActivity : ComponentActivity() {
                 innerTextField()
             }, textStyle = textStyle
         )
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
     }
 }

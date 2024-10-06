@@ -16,7 +16,7 @@ interface SaveDataDao {
     fun insertOrUpdate(saveData: SaveData)
 
     @Query("DELETE FROM save_model WHERE id = :id")
-    fun deleteById(id: String): Int
+    fun deleteById(id: Int): Int
 
     @Query("DELETE FROM save_model")
     fun deleteAll(): Int

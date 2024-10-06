@@ -5,7 +5,7 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "save_model")
 data class SaveData(
-    @PrimaryKey val id: String? = null,
+    @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val title: String,
     val detail: String,
     val dtCreated: Long,
