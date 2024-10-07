@@ -2,31 +2,29 @@ package com.example.mindbank.navigation
 
 import android.annotation.SuppressLint
 import android.content.Intent
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -39,35 +37,34 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.zIndex
 import androidx.navigation.NavController
 import com.example.mindbank.R
 import com.example.mindbank.activity.AddActivity
 import com.example.mindbank.data.SaveData
 import com.example.mindbank.db.DataViewModel
-import com.example.mindbank.viewmodel.SearchViewModel
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 @Composable
@@ -100,12 +97,14 @@ fun MainGrid(dataViewModel: DataViewModel) {
     val isLoading = remember { mutableStateOf(true) }
     val itemList = mutableListOf<SaveData>()
 
-    itemList.add(
-        SaveData(
-            title = "테스트", detail = "메모", dtUpdated = System.currentTimeMillis(),
-            dtCreated = System.currentTimeMillis(), color = "#FF0000"
+    repeat(20) {
+        itemList.add(
+            SaveData(
+                title = "테스트", detail = "메모", dtUpdated = System.currentTimeMillis(),
+                dtCreated = System.currentTimeMillis(), color = "#FF0000"
+            )
         )
-    )
+    }
 
     LaunchedEffect(key1 = Unit) {
         withContext(Dispatchers.IO) {
@@ -212,55 +211,27 @@ fun MemoItemView(data: SaveData) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(dataViewModel: DataViewModel, navController: NavController) {
-    val viewModel = SearchViewModel()
-    val searchText by viewModel.searchText.collectAsState()
-    val isSearching by viewModel.isSearching.collectAsState()
-    val countriesList by viewModel.countriesList.collectAsState()
-
     Scaffold(
         topBar = {
             Column {
                 MainTopBar()
                 SearchBar(
-                    query = searchText,
-                    onQueryChange = viewModel::onSearchTextChange,
-                    onSearch = {
-                        CoroutineScope(Dispatchers.IO).launch {
-                            val result = dataViewModel.searchByKeyword(it)
-                        }
-                    },
-                    active = isSearching,
-                    onActiveChange = { viewModel.onToggleSearch() },
-                    placeholder = { Text(text = "검색어를 입력하시오.") },
-                    trailingIcon = { Icon(imageVector = Icons.Default.Search, null) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(start = 16.dp, end = 16.dp)
-                ) {
-                    LazyColumn {
-                        items(countriesList) { country ->
-                            Text(
-                                text = country, modifier = Modifier.padding(
-                                    start = 8.dp, top = 4.dp, end = 8.dp, bottom = 4.dp
-                                )
-                            )
-                        }
-                    }
-                }
+                    hint = "검색어를 입력하시오."
+                )
             }
         },
-        floatingActionButton = { FloatingButton(false, navController) },
+        floatingActionButton = { FloatingButton(false) },
         floatingActionButtonPosition = FabPosition.End
     ) { innerPadding ->
         Column(modifier = Modifier.padding(innerPadding)) {
-            if (!isSearching) MainGrid(dataViewModel)
+            MainGrid(dataViewModel)
         }
     }
 }
 
 @ExperimentalMaterial3Api
 @Composable
-fun FloatingButton(isAddMode: Boolean, navController: NavController) {
+fun FloatingButton(isAddMode: Boolean) {
     val context = LocalContext.current
     FloatingActionButton(
         onClick = {
@@ -282,5 +253,96 @@ fun FloatingButton(isAddMode: Boolean, navController: NavController) {
             contentDescription = "Add FAB",
             tint = Color.White,
         )
+    }
+}
+
+@Composable
+fun SearchBar(
+    hint: String,
+    modifier: Modifier = Modifier,
+    isEnabled: (Boolean) = true,
+    height: Dp = 40.dp,
+    elevation: Dp = 3.dp,
+    cornerShape: androidx.compose.ui.graphics.Shape = RoundedCornerShape(8.dp),
+    backgroundColor: Color = Color.White,
+    onSearchClicked: () -> Unit = {},
+    onTextChange: (String) -> Unit = {},
+) {
+    var text by remember { mutableStateOf(TextFieldValue()) }
+    Row(
+        modifier = Modifier
+            .height(height)
+            .fillMaxWidth()
+            .shadow(elevation = elevation, shape = cornerShape)
+            .background(color = backgroundColor, shape = cornerShape)
+            .clickable { onSearchClicked() },
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        BasicTextField(
+            modifier = modifier
+                .weight(5f)
+                .fillMaxWidth()
+                .padding(horizontal = 24.dp),
+            value = text,
+            onValueChange = {
+                text = it
+                onTextChange(it.text)
+            },
+            enabled = isEnabled,
+            textStyle = TextStyle(
+                color = MaterialTheme.colorScheme.primary,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold
+            ),
+            decorationBox = { innerTextField ->
+                if (text.text.isEmpty()) {
+                    Text(
+                        text = hint,
+                        color = Color.Gray.copy(alpha = 0.5f),
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                    )
+                }
+                innerTextField()
+            },
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Text,
+                imeAction = ImeAction.Search
+            ),
+            keyboardActions = KeyboardActions(onSearch = { onSearchClicked() }),
+            singleLine = true
+        )
+        Box(
+            modifier = modifier
+                .weight(1f)
+                .size(40.dp)
+                .background(color = Color.Transparent, shape = CircleShape)
+                .clickable {
+                    if (text.text.isNotEmpty()) {
+                        text = TextFieldValue(text = "")
+                        onTextChange("")
+                    }
+                },
+        ) {
+            if (text.text.isNotEmpty()) {
+                Icon(
+                    modifier = modifier
+                        .fillMaxSize()
+                        .padding(10.dp),
+                    painter = painterResource(id = R.drawable.baseline_close_24),
+                    contentDescription = "Search Clear",
+                    tint = MaterialTheme.colorScheme.primary,
+                )
+            } else {
+                Icon(
+                    modifier = modifier
+                        .fillMaxSize()
+                        .padding(10.dp),
+                    painter = painterResource(id = R.drawable.baseline_search_24),
+                    contentDescription = "Search Call",
+                    tint = MaterialTheme.colorScheme.primary,
+                )
+            }
+        }
     }
 }
