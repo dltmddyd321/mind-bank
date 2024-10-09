@@ -60,6 +60,7 @@ import com.example.mindbank.data.SaveData
 import com.example.mindbank.db.DataStoreViewModel
 import com.example.mindbank.db.DataViewModel
 import com.example.mindbank.ui.theme.MindBankTheme
+import com.example.mindbank.util.hexToColor
 import com.example.mindbank.util.toHex
 import com.github.skydoves.colorpicker.compose.ColorEnvelope
 import com.github.skydoves.colorpicker.compose.HsvColorPicker
@@ -85,9 +86,22 @@ class AddActivity : ComponentActivity() {
                 Surface(
                     modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
                 ) {
-                    AutoBackUpCheckDialog(dataStoreViewModel)
+                    var title by remember { mutableStateOf("") }
+                    var memo by remember { mutableStateOf("") }
+                    var circleColor by remember { mutableStateOf(Color.Red) }
+                    AutoBackUpCheckDialog(dataStoreViewModel) { backupTitle, backupMemo, backupColor ->
+                        title = backupTitle
+                        memo = backupMemo
+                        circleColor = hexToColor(backupColor)
+                    }
                     BackHandlerWithQuestionDialog(false)
-                    InputScreen()
+                    InputScreen(title, memo, circleColor, onTitleChange = {
+                        title = it
+                    }, onTextChange = {
+                        memo = it
+                    }, onColorChange = {
+                        circleColor = it
+                    })
                 }
             }
         }
@@ -95,7 +109,10 @@ class AddActivity : ComponentActivity() {
     }
 
     @Composable
-    fun AutoBackUpCheckDialog(viewModel: DataStoreViewModel) {
+    fun AutoBackUpCheckDialog(
+        viewModel: DataStoreViewModel,
+        onBackupLoad: (String, String, String) -> Unit
+    ) {
         var showDialog by remember { mutableStateOf(false) }
 
         LaunchedEffect(key1 = Unit) {
@@ -113,7 +130,8 @@ class AddActivity : ComponentActivity() {
                 Text(text = "백업 데이터 불러오기")
             }, confirmButton = {
                 TextButton(onClick = {
-                    //TODO: 백업 데이터 불러오기
+                    onBackupLoad.invoke(initTitle, initMemo, initColor)
+                    showDialog = false
                 }) { Text("확인") }
             }, text = {
                 Text(
@@ -153,14 +171,19 @@ class AddActivity : ComponentActivity() {
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     @ExperimentalMaterial3Api
     @Composable
-    fun InputScreen() {
-        var title by remember { mutableStateOf("") }
-        var text by remember { mutableStateOf("") }
+    fun InputScreen(
+        title: String,
+        memo: String,
+        circleColor: Color,
+        onTitleChange: (String) -> Unit,
+        onTextChange: (String) -> Unit,
+        onColorChange: (Color) -> Unit
+    ) {
+
         Scaffold(topBar = {
             val colorController = rememberColorPickerController()
             var showBackDialog by remember { mutableStateOf(false) }
             var showColorPicker by remember { mutableStateOf(false) }
-            var circleColor by remember { mutableStateOf(Color.Red) }
             if (showBackDialog) {
                 BackHandlerWithQuestionDialog(true)
             }
@@ -174,7 +197,7 @@ class AddActivity : ComponentActivity() {
                             .padding(10.dp),
                         controller = colorController,
                         onColorChanged = { colorEnvelope: ColorEnvelope ->
-                            circleColor = colorEnvelope.color
+                            onColorChange.invoke(colorEnvelope.color)
                         }
                     )
                 }
@@ -206,7 +229,7 @@ class AddActivity : ComponentActivity() {
                         dataViewModel.insertData(
                             SaveData(
                                 title = title,
-                                detail = text,
+                                detail = memo,
                                 dtCreated = System.currentTimeMillis(),
                                 dtUpdated = System.currentTimeMillis(),
                                 color = circleColor.toHex()
@@ -226,10 +249,10 @@ class AddActivity : ComponentActivity() {
         }) {
             Column(modifier = Modifier.padding(it)) {
                 TitleInputField(title, onTitleChange = { value ->
-                    title = value
+                    onTitleChange.invoke(value)
                 })
-                InputField(text, onTextChange = { value ->
-                    text = value
+                InputField(memo, onTextChange = { value ->
+                    onTextChange.invoke(value)
                 })
             }
         }
