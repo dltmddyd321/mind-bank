@@ -17,14 +17,12 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavController
 import com.example.mindbank.db.DataStoreViewModel
 import com.example.mindbank.db.DataViewModel
 import com.example.mindbank.ui.theme.MindBankTheme
-import kotlinx.coroutines.FlowPreview
 
 @Composable
 fun HomeScreen(viewModel: ViewModel, paddingValues: PaddingValues, navController: NavController) {
@@ -40,12 +38,10 @@ fun HomeScreen(viewModel: ViewModel, paddingValues: PaddingValues, navController
 }
 
 @Composable
-fun NotesScreen(viewModel: ViewModel, paddingValues: PaddingValues, navController: NavController) {
+fun NotesScreen(viewModel: ViewModel, paddingValues: PaddingValues) {
     val dataViewModel = viewModel as? DataViewModel ?: return
     Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(paddingValues),
+        modifier = Modifier.fillMaxSize().padding(paddingValues),
         contentAlignment = Alignment.Center
     ) {
         MindBankTheme {
@@ -53,7 +49,7 @@ fun NotesScreen(viewModel: ViewModel, paddingValues: PaddingValues, navControlle
                 modifier = Modifier.fillMaxSize(),
                 color = MaterialTheme.colorScheme.background
             ) {
-                MainScreen(dataViewModel, navController)
+                MainScreen(dataViewModel)
             }
         }
     }

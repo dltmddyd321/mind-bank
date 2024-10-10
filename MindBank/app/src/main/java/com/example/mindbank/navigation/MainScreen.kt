@@ -67,7 +67,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
 import com.example.mindbank.R
 import com.example.mindbank.activity.AddActivity
 import com.example.mindbank.data.SaveData
@@ -107,29 +106,6 @@ fun MainGrid(dataViewModel: DataViewModel, searchText: String) {
 
     itemList.clear()
 
-    repeat(10) {
-        itemList.add(
-            SaveData(
-                title = "테스트", detail = "메모", dtUpdated = System.currentTimeMillis(),
-                dtCreated = System.currentTimeMillis(), color = "#FF0000"
-            )
-        )
-    }
-
-    itemList.add(
-        SaveData(
-            title = "가나다라", detail = "메모", dtUpdated = System.currentTimeMillis(),
-            dtCreated = System.currentTimeMillis(), color = "#FF0000"
-        )
-    )
-
-    itemList.add(
-        SaveData(
-            title = "호날두", detail = "메모", dtUpdated = System.currentTimeMillis(),
-            dtCreated = System.currentTimeMillis(), color = "#FF0000"
-        )
-    )
-
     LaunchedEffect(key1 = Unit) {
         withContext(Dispatchers.IO) {
             val data = if (searchText.isNotEmpty()) dataViewModel.searchByKeyword(searchText)
@@ -156,8 +132,9 @@ fun MainGrid(dataViewModel: DataViewModel, searchText: String) {
     } else {
         if (filteredList.isNotEmpty()) {
             LazyVerticalGrid(
-                columns = GridCells.Fixed(2), // 한 줄에 표시할 아이템의 수
-                contentPadding = PaddingValues(8.dp) // 그리드의 전체 패딩
+                columns = GridCells.Fixed(2),
+                contentPadding = PaddingValues(8.dp),
+                modifier = Modifier.fillMaxSize()
             ) {
                 items(filteredList) { item ->
                     MemoItemView(item)
@@ -243,7 +220,7 @@ fun MemoItemView(data: SaveData) {
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen(dataViewModel: DataViewModel, navController: NavController) {
+fun MainScreen(dataViewModel: DataViewModel) {
     var searchText by remember { mutableStateOf("") }
     Scaffold(
         topBar = {
@@ -257,8 +234,9 @@ fun MainScreen(dataViewModel: DataViewModel, navController: NavController) {
         },
         floatingActionButton = { FloatingButton(false) },
         floatingActionButtonPosition = FabPosition.End
-    ) { innerPadding ->
-        Column(modifier = Modifier.padding(innerPadding)) {
+    ) {
+        Column(modifier = Modifier.fillMaxSize()
+        ) {
             MainGrid(dataViewModel, searchText)
         }
     }

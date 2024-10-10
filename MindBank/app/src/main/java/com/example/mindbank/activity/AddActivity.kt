@@ -12,6 +12,7 @@ import androidx.activity.viewModels
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -293,12 +294,6 @@ class AddActivity : ComponentActivity() {
                 if (!it.isFocused) dataStoreViewModel.setUnSavedMemo(text)
             }
 
-        val textStyle = TextStyle(
-            fontSize = 20.sp,
-            fontFamily = FontFamily.Monospace,
-            color = Color.Black
-        )
-
         LaunchedEffect(key1 = text) {
             snapshotFlow { text }
                 .debounce(1000)
@@ -307,10 +302,19 @@ class AddActivity : ComponentActivity() {
                 }
         }
 
+        val textColor = MaterialTheme.colorScheme.onBackground
+        val placeholderColor = if (!isSystemInDarkTheme()) Color.Gray else Color.LightGray
+
+        val textStyle = TextStyle(
+            fontSize = 20.sp,
+            fontFamily = FontFamily.Monospace,
+            color = textColor
+        )
+
         BasicTextField(
             value = text, onValueChange = onTextChange, modifier = textFieldModifier,
             decorationBox = { innerTextField ->
-                if (text.isEmpty()) Text("What's happening?", color = Color.Gray)
+                if (text.isEmpty()) Text("What's happening?", color = placeholderColor)
                 innerTextField()
             }, textStyle = textStyle
         )

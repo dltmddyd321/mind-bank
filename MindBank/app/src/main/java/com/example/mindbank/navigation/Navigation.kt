@@ -70,7 +70,7 @@ fun NavigationGraph(
 ) {
     NavHost(navController, startDestination = Screen.Home.route) {
         composable(Screen.Home.route) { HomeScreen(dataViewModel, paddingValues, navController) }
-        composable(Screen.Notes.route) { NotesScreen(dataViewModel, paddingValues, navController) }
+        composable(Screen.Notes.route) { NotesScreen(dataViewModel, paddingValues) }
         composable(Screen.Daily.route) { DailyScreen(dataViewModel, paddingValues) }
         composable(Screen.Settings.route) { SettingsScreen(dataViewModel, paddingValues) }
     }
