@@ -52,6 +52,7 @@ android {
 }
 
 dependencies {
+    implementation(libs.androidx.activity.compose.v180alpha07)
     implementation("androidx.navigation:navigation-compose:2.8.1")
     implementation("com.github.skydoves:colorpicker-compose:1.1.1")
     implementation("androidx.core:core-splashscreen:1.0.1")

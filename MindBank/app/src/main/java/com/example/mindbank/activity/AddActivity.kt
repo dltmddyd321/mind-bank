@@ -74,9 +74,6 @@ class AddActivity : ComponentActivity() {
 
     private val dataStoreViewModel: DataStoreViewModel by viewModels()
     private val dataViewModel: DataViewModel by viewModels()
-    private var initTitle = ""
-    private var initMemo = ""
-    private var initColor = ""
 
     @OptIn(ExperimentalMaterial3Api::class, FlowPreview::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -114,6 +111,9 @@ class AddActivity : ComponentActivity() {
         onBackupLoad: (String, String, String) -> Unit
     ) {
         var showDialog by remember { mutableStateOf(false) }
+        var initTitle = ""
+        var initMemo = ""
+        var initColor = ""
 
         LaunchedEffect(key1 = Unit) {
             val unSaved = viewModel.getUnSavedData()

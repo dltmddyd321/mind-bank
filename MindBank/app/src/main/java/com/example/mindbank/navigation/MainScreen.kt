@@ -2,6 +2,7 @@ package com.example.mindbank.navigation
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -41,14 +42,21 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -93,11 +101,13 @@ fun MainTopBar() {
 }
 
 @Composable
-fun MainGrid(dataViewModel: DataViewModel) {
+fun MainGrid(dataViewModel: DataViewModel, searchText: String) {
     val isLoading = remember { mutableStateOf(true) }
-    val itemList = mutableListOf<SaveData>()
+    val itemList = remember { mutableStateListOf<SaveData>() }
 
-    repeat(20) {
+    itemList.clear()
+
+    repeat(10) {
         itemList.add(
             SaveData(
                 title = "테스트", detail = "메모", dtUpdated = System.currentTimeMillis(),
@@ -106,11 +116,34 @@ fun MainGrid(dataViewModel: DataViewModel) {
         )
     }
 
+    itemList.add(
+        SaveData(
+            title = "가나다라", detail = "메모", dtUpdated = System.currentTimeMillis(),
+            dtCreated = System.currentTimeMillis(), color = "#FF0000"
+        )
+    )
+
+    itemList.add(
+        SaveData(
+            title = "호날두", detail = "메모", dtUpdated = System.currentTimeMillis(),
+            dtCreated = System.currentTimeMillis(), color = "#FF0000"
+        )
+    )
+
     LaunchedEffect(key1 = Unit) {
         withContext(Dispatchers.IO) {
-            itemList.addAll(dataViewModel.getAllData())
+            val data = if (searchText.isNotEmpty()) dataViewModel.searchByKeyword(searchText)
+            else dataViewModel.getAllData()
+            itemList.addAll(data)
         }
         isLoading.value = false // 로딩 상태 업데이트
+    }
+
+    val filteredList = itemList.filter {
+        it.title.contains(searchText, ignoreCase = true) || it.detail.contains(
+            searchText,
+            ignoreCase = true
+        )
     }
 
     if (isLoading.value) {
@@ -121,12 +154,12 @@ fun MainGrid(dataViewModel: DataViewModel) {
             CircularProgressIndicator()
         }
     } else {
-        if (itemList.isNotEmpty()) {
+        if (filteredList.isNotEmpty()) {
             LazyVerticalGrid(
                 columns = GridCells.Fixed(2), // 한 줄에 표시할 아이템의 수
                 contentPadding = PaddingValues(8.dp) // 그리드의 전체 패딩
             ) {
-                items(itemList) { item ->
+                items(filteredList) { item ->
                     MemoItemView(item)
                 }
             }
@@ -134,7 +167,7 @@ fun MainGrid(dataViewModel: DataViewModel) {
             Box(
                 contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()
             ) {
-                Text(text = "저장된 메모가 없습니다.\n새로운 메모를 추가해보세요.", textAlign = TextAlign.Center)
+                Text(text = "메모가 없습니다.", textAlign = TextAlign.Center)
             }
         }
     }
@@ -211,12 +244,14 @@ fun MemoItemView(data: SaveData) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(dataViewModel: DataViewModel, navController: NavController) {
+    var searchText by remember { mutableStateOf("") }
     Scaffold(
         topBar = {
             Column {
                 MainTopBar()
                 SearchBar(
-                    hint = "검색어를 입력하시오."
+                    hint = "검색어를 입력하시오.",
+                    onTextChange = { searchText = it }
                 )
             }
         },
@@ -224,7 +259,7 @@ fun MainScreen(dataViewModel: DataViewModel, navController: NavController) {
         floatingActionButtonPosition = FabPosition.End
     ) { innerPadding ->
         Column(modifier = Modifier.padding(innerPadding)) {
-            MainGrid(dataViewModel)
+            MainGrid(dataViewModel, searchText)
         }
     }
 }
@@ -263,26 +298,32 @@ fun SearchBar(
     isEnabled: (Boolean) = true,
     height: Dp = 40.dp,
     elevation: Dp = 3.dp,
-    cornerShape: androidx.compose.ui.graphics.Shape = RoundedCornerShape(8.dp),
+    cornerShape: Shape = RoundedCornerShape(8.dp),
     backgroundColor: Color = Color.White,
-    onSearchClicked: () -> Unit = {},
     onTextChange: (String) -> Unit = {},
 ) {
     var text by remember { mutableStateOf(TextFieldValue()) }
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val focusRequester = remember { FocusRequester() }
+    val focusManager = LocalFocusManager.current
+    var isTextFieldFocused by remember { mutableStateOf(false) }
     Row(
         modifier = Modifier
             .height(height)
             .fillMaxWidth()
             .shadow(elevation = elevation, shape = cornerShape)
-            .background(color = backgroundColor, shape = cornerShape)
-            .clickable { onSearchClicked() },
+            .background(color = backgroundColor, shape = cornerShape),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         BasicTextField(
             modifier = modifier
                 .weight(5f)
                 .fillMaxWidth()
-                .padding(horizontal = 24.dp),
+                .padding(horizontal = 24.dp)
+                .focusRequester(focusRequester)
+                .onFocusChanged {
+                    isTextFieldFocused = it.isFocused
+                },
             value = text,
             onValueChange = {
                 text = it
@@ -309,7 +350,10 @@ fun SearchBar(
                 keyboardType = KeyboardType.Text,
                 imeAction = ImeAction.Search
             ),
-            keyboardActions = KeyboardActions(onSearch = { onSearchClicked() }),
+            keyboardActions = KeyboardActions(onSearch = {
+                keyboardController?.hide()
+                focusManager.clearFocus()
+            }),
             singleLine = true
         )
         Box(
@@ -321,6 +365,8 @@ fun SearchBar(
                     if (text.text.isNotEmpty()) {
                         text = TextFieldValue(text = "")
                         onTextChange("")
+                        keyboardController?.hide()
+                        focusManager.clearFocus()
                     }
                 },
         ) {
@@ -343,6 +389,12 @@ fun SearchBar(
                     tint = MaterialTheme.colorScheme.primary,
                 )
             }
+        }
+    }
+    BackHandler {
+        if (isTextFieldFocused) {
+            keyboardController?.hide() // 키보드 숨김
+            focusManager.clearFocus() // 포커스 해제
         }
     }
 }
