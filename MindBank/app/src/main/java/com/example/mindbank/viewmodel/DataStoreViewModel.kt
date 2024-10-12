@@ -1,6 +1,7 @@
-package com.example.mindbank.db
+package com.example.mindbank.viewmodel
 
 import androidx.lifecycle.ViewModel
+import com.example.mindbank.db.DatastoreRepo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

@@ -1,8 +1,9 @@
-package com.example.mindbank.db
+package com.example.mindbank.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mindbank.data.SaveData
+import com.example.mindbank.db.DataRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.withContext
 import javax.inject.Inject

@@ -58,8 +58,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.example.mindbank.data.SaveData
-import com.example.mindbank.db.DataStoreViewModel
-import com.example.mindbank.db.DataViewModel
+import com.example.mindbank.viewmodel.DataStoreViewModel
+import com.example.mindbank.viewmodel.DataViewModel
 import com.example.mindbank.ui.theme.MindBankTheme
 import com.example.mindbank.util.hexToColor
 import com.example.mindbank.util.toHex

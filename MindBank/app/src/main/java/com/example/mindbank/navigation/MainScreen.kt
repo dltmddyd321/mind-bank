@@ -70,7 +70,7 @@ import androidx.compose.ui.unit.sp
 import com.example.mindbank.R
 import com.example.mindbank.activity.AddActivity
 import com.example.mindbank.data.SaveData
-import com.example.mindbank.db.DataViewModel
+import com.example.mindbank.viewmodel.DataViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
