@@ -69,9 +69,9 @@ fun NavigationGraph(
     paddingValues: PaddingValues
 ) {
     NavHost(navController, startDestination = Screen.Home.route) {
-        composable(Screen.Home.route) { HomeScreen(dataViewModel, paddingValues, navController) }
+        composable(Screen.Home.route) { HomeScreen(dataViewModel, paddingValues) }
         composable(Screen.Notes.route) { NotesScreen(dataViewModel, paddingValues) }
-        composable(Screen.Daily.route) { DailyScreen(dataViewModel, paddingValues) }
-        composable(Screen.Settings.route) { SettingsScreen(dataViewModel, paddingValues) }
+        composable(Screen.Daily.route) { DailyScreen(paddingValues) }
+        composable(Screen.Settings.route) { SettingsScreen(paddingValues) }
     }
 }

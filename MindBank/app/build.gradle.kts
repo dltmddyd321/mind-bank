@@ -52,6 +52,11 @@ android {
 }
 
 dependencies {
+    // Retrofit
+    implementation (libs.retrofit)
+    implementation (libs.converter.gson)
+    implementation (libs.logging.interceptor)
+    implementation (libs.timber)
     implementation(libs.androidx.activity.compose.v180alpha07)
     implementation("androidx.navigation:navigation-compose:2.8.1")
     implementation("com.github.skydoves:colorpicker-compose:1.1.1")

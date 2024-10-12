@@ -19,13 +19,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
-import androidx.navigation.NavController
 import com.example.mindbank.db.DataStoreViewModel
 import com.example.mindbank.db.DataViewModel
 import com.example.mindbank.ui.theme.MindBankTheme
 
 @Composable
-fun HomeScreen(viewModel: ViewModel, paddingValues: PaddingValues, navController: NavController) {
+fun HomeScreen(viewModel: ViewModel, paddingValues: PaddingValues) {
     val dataViewModel = viewModel as? DataStoreViewModel ?: return
     Box(
         modifier = Modifier
@@ -56,7 +55,7 @@ fun NotesScreen(viewModel: ViewModel, paddingValues: PaddingValues) {
 }
 
 @Composable
-fun DailyScreen(viewModel: ViewModel, paddingValues: PaddingValues) {
+fun DailyScreen(paddingValues: PaddingValues) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -69,7 +68,7 @@ fun DailyScreen(viewModel: ViewModel, paddingValues: PaddingValues) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsScreen(viewModel: ViewModel, paddingValues: PaddingValues) {
+fun SettingsScreen(paddingValues: PaddingValues) {
     Box(
         modifier = Modifier
             .fillMaxSize()
