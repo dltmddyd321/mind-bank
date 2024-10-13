@@ -14,3 +14,11 @@ fun Color.toHex(): String {
 
 fun hexToColor(hex: String): Color =
     Color(android.graphics.Color.parseColor(hex))
+
+fun isDarkColor(color: Color): Boolean {
+    val r = color.red
+    val g = color.green
+    val b = color.blue
+    val luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b
+    return luminance < 0.5
+}

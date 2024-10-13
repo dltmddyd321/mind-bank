@@ -236,6 +236,7 @@ class AddActivity : ComponentActivity() {
                                 color = circleColor.toHex()
                             )
                         )
+                        finish()
                     }) {
                         Text("Save")
                     }

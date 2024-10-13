@@ -70,6 +70,8 @@ import androidx.compose.ui.unit.sp
 import com.example.mindbank.R
 import com.example.mindbank.activity.AddActivity
 import com.example.mindbank.data.SaveData
+import com.example.mindbank.util.hexToColor
+import com.example.mindbank.util.isDarkColor
 import com.example.mindbank.viewmodel.DataViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -157,18 +159,20 @@ fun MemoItemView(data: SaveData) {
             .padding(8.dp)
             .fillMaxWidth()
     ) {
+        val backgroundColor = hexToColor(data.color)
         Card(
-            shape = RoundedCornerShape(10.dp), // 모서리의 둥근 정도 설정
+            shape = RoundedCornerShape(10.dp),
             elevation = CardDefaults.cardElevation(defaultElevation = 4.dp), // 그림자 깊이
             modifier = Modifier
                 .padding(8.dp)
-                .fillMaxWidth(), // Card 외부의 패딩
-            colors = CardDefaults.cardColors(Color.White)
+                .fillMaxWidth(),
+            colors = CardDefaults.cardColors(backgroundColor)
         ) {
+            val textColor = if (isDarkColor(backgroundColor)) Color.White else Color.Black
             Column(
                 modifier = Modifier
                     .padding(horizontal = 16.dp, vertical = 8.dp)
-                    .fillMaxWidth() // Column이 전체 너비를 채우도록 설정
+                    .fillMaxWidth()
             ) {
                 // 제목과 닫기 버튼을 한 줄에 배치
                 Row(
@@ -179,7 +183,7 @@ fun MemoItemView(data: SaveData) {
                     // 제목 텍스트
                     Text(
                         text = data.title,
-                        color = Color.Black,
+                        color = textColor,
                         style = MaterialTheme.typography.labelMedium,
                         modifier = Modifier.weight(1f) // Text가 Row 안에서 남은 공간을 채움
                     )
@@ -193,24 +197,24 @@ fun MemoItemView(data: SaveData) {
                             imageVector = Icons.Filled.Close,
                             contentDescription = "Close",
                             modifier = Modifier.size(16.dp),
-                            tint = Color.Gray // 아이콘 색상을 조절
+                            tint = textColor
                         )
                     }
                 }
 
                 // 구분선 추가
                 Divider(
-                    color = Color.LightGray,
+                    color = textColor,
                     thickness = 1.dp,
-                    modifier = Modifier.padding(vertical = 8.dp) // 구분선 위아래에 패딩 추가
+                    modifier = Modifier.padding(vertical = 8.dp)
                 )
 
                 // 하단 메모 내용 표시
                 Text(
-                    text = data.detail, // 메모 내용이 들어갈 변수
-                    color = Color.Gray,
+                    text = data.detail,
+                    color = textColor,
                     style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.fillMaxWidth() // 메모 텍스트를 가득 채움
+                    modifier = Modifier.fillMaxWidth()
                 )
             }
         }
@@ -235,7 +239,8 @@ fun MainScreen(dataViewModel: DataViewModel) {
         floatingActionButton = { FloatingButton(false) },
         floatingActionButtonPosition = FabPosition.End
     ) {
-        Column(modifier = Modifier.fillMaxSize()
+        Column(
+            modifier = Modifier.fillMaxSize()
         ) {
             MainGrid(dataViewModel, searchText)
         }
