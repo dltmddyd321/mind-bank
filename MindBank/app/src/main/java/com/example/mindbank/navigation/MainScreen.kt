@@ -1,8 +1,11 @@
 package com.example.mindbank.navigation
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Intent
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -222,9 +225,13 @@ fun MemoItemView(data: SaveData) {
 }
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(dataViewModel: DataViewModel) {
+    val refreshTrigger = remember { mutableStateOf(false) }
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { _ -> refreshTrigger.value = !refreshTrigger.value }
+
     var searchText by remember { mutableStateOf("") }
     Scaffold(
         topBar = {
@@ -236,7 +243,23 @@ fun MainScreen(dataViewModel: DataViewModel) {
                 )
             }
         },
-        floatingActionButton = { FloatingButton(false) },
+        floatingActionButton = {
+            val context = LocalContext.current
+            FloatingActionButton(
+                onClick = {
+                    val intent = Intent(context, AddActivity::class.java)
+                    launcher.launch(intent)
+                },
+                containerColor = MaterialTheme.colorScheme.secondary,
+                shape = RoundedCornerShape(16.dp),
+            ) {
+                Icon(
+                    imageVector = Icons.Rounded.Add,
+                    contentDescription = "Add FAB",
+                    tint = Color.White,
+                )
+            }
+        },
         floatingActionButtonPosition = FabPosition.End
     ) {
         Column(
@@ -244,33 +267,6 @@ fun MainScreen(dataViewModel: DataViewModel) {
         ) {
             MainGrid(dataViewModel, searchText)
         }
-    }
-}
-
-@ExperimentalMaterial3Api
-@Composable
-fun FloatingButton(isAddMode: Boolean) {
-    val context = LocalContext.current
-    FloatingActionButton(
-        onClick = {
-            val intent = Intent(context, AddActivity::class.java)
-            context.startActivity(intent)
-//            navController.navigate(Screen.Notes.route) {
-//                popUpTo(navController.graph.startDestinationId) {
-//                    saveState = true // 상태 유지
-//                }
-//                launchSingleTop = true
-//                restoreState = true // 이전 상태 복원
-//            }
-        },
-        containerColor = MaterialTheme.colorScheme.secondary,
-        shape = RoundedCornerShape(16.dp),
-    ) {
-        Icon(
-            imageVector = if (isAddMode) Icons.Default.Check else Icons.Rounded.Add,
-            contentDescription = "Add FAB",
-            tint = Color.White,
-        )
     }
 }
 
