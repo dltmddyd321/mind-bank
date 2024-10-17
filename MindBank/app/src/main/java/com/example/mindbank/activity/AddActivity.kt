@@ -198,6 +198,7 @@ class AddActivity : ComponentActivity() {
                             .padding(10.dp),
                         controller = colorController,
                         onColorChanged = { colorEnvelope: ColorEnvelope ->
+                            dataStoreViewModel.setUnSavedColor(colorEnvelope.hexCode)
                             onColorChange.invoke(colorEnvelope.color)
                         }
                     )

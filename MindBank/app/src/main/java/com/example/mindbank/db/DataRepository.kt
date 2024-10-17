@@ -1,7 +1,9 @@
 package com.example.mindbank.db
 
 import com.example.mindbank.data.SaveData
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -17,14 +19,20 @@ class DataRepository @Inject constructor(
     }
 
     fun insertOrUpdate(data: SaveData) {
-        dataDao.insertOrUpdate(data)
+        CoroutineScope(Dispatchers.IO).launch {
+            dataDao.insertOrUpdate(data)
+        }
     }
 
     fun delete(data: SaveData) {
-        dataDao.deleteById(data.id)
+        CoroutineScope(Dispatchers.IO).launch {
+            dataDao.deleteById(data.id)
+        }
     }
 
     fun clear() {
-        dataDao.deleteAll()
+        CoroutineScope(Dispatchers.IO).launch {
+            dataDao.deleteAll()
+        }
     }
 }

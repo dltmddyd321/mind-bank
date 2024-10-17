@@ -1,7 +1,6 @@
 package com.example.mindbank.navigation
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.Intent
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -26,7 +25,6 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.rounded.Add
@@ -34,7 +32,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -109,8 +106,6 @@ fun MainGrid(dataViewModel: DataViewModel, searchText: String) {
     val isLoading = remember { mutableStateOf(true) }
     val itemList = remember { mutableStateListOf<SaveData>() }
 
-    itemList.clear()
-
     LaunchedEffect(key1 = Unit) {
         withContext(Dispatchers.IO) {
             val data = if (searchText.isNotEmpty()) dataViewModel.searchByKeyword(searchText)
@@ -118,13 +113,6 @@ fun MainGrid(dataViewModel: DataViewModel, searchText: String) {
             itemList.addAll(data)
         }
         isLoading.value = false // 로딩 상태 업데이트
-    }
-
-    val filteredList = itemList.filter {
-        it.title.contains(searchText, ignoreCase = true) || it.detail.contains(
-            searchText,
-            ignoreCase = true
-        )
     }
 
     if (isLoading.value) {
@@ -135,13 +123,13 @@ fun MainGrid(dataViewModel: DataViewModel, searchText: String) {
             CircularProgressIndicator()
         }
     } else {
-        if (filteredList.isNotEmpty()) {
+        if (itemList.isNotEmpty()) {
             LazyVerticalGrid(
                 columns = GridCells.Fixed(2),
                 contentPadding = PaddingValues(8.dp),
                 modifier = Modifier.fillMaxSize()
             ) {
-                items(filteredList) { item ->
+                items(itemList) { item ->
                     MemoItemView(item)
                 }
             }
@@ -261,9 +249,9 @@ fun MainScreen(dataViewModel: DataViewModel) {
             }
         },
         floatingActionButtonPosition = FabPosition.End
-    ) {
+    ) { innerPadding ->
         Column(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxSize().padding(innerPadding)
         ) {
             MainGrid(dataViewModel, searchText)
         }

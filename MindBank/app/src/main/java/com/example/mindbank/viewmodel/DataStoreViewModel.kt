@@ -42,6 +42,14 @@ class DataStoreViewModel @Inject constructor(
         }
     }
 
+    fun clearUnSaved() {
+        CoroutineScope(Dispatchers.IO).launch {
+            datastoreRepo.putString("UNSAVED_TITLE", "")
+            datastoreRepo.putString("UNSAVED_MEMO", "")
+            datastoreRepo.putString("UNSAVED_COLOR", "")
+        }
+    }
+
     suspend fun getPassWord(): String = datastoreRepo.getString("PASSWORD") ?: ""
 
     fun setPassword(data: String) {
