@@ -55,18 +55,6 @@ fun NotesScreen(viewModel: ViewModel, paddingValues: PaddingValues) {
     }
 }
 
-@Composable
-fun DailyScreen(paddingValues: PaddingValues) {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(paddingValues),
-        contentAlignment = Alignment.Center
-    ) {
-
-    }
-}
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(paddingValues: PaddingValues) {

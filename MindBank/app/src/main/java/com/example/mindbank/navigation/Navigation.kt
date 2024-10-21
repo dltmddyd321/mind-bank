@@ -24,7 +24,6 @@ import com.example.mindbank.viewmodel.AdviceViewModel
 sealed class Screen(val route: String, val title: String, val icon: ImageVector) {
     data object Home : Screen("home", "Home", Icons.Default.Home)
     data object Notes : Screen("notes", "Notes", Icons.Default.Search)
-    data object Daily : Screen("daily", "Daily", Icons.Default.Check)
     data object Settings : Screen("settings", "Settings", Icons.Default.Settings)
 }
 
@@ -33,7 +32,6 @@ fun BottomNavBar(navController: NavController) {
     val items = listOf(
         Screen.Home,
         Screen.Notes,
-        Screen.Daily,
         Screen.Settings
     )
 
@@ -73,7 +71,6 @@ fun NavigationGraph(
     NavHost(navController, startDestination = Screen.Home.route) {
         composable(Screen.Home.route) { HomeScreen(adviceViewModel, paddingValues) }
         composable(Screen.Notes.route) { NotesScreen(dataViewModel, paddingValues) }
-        composable(Screen.Daily.route) { DailyScreen(paddingValues) }
         composable(Screen.Settings.route) { SettingsScreen(paddingValues) }
     }
 }
