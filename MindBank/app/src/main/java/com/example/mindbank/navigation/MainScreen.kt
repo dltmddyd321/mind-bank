@@ -110,10 +110,18 @@ fun MainGrid(dataViewModel: DataViewModel, searchText: String) {
         withContext(Dispatchers.IO) {
             val data = if (searchText.isNotEmpty()) dataViewModel.searchByKeyword(searchText)
             else dataViewModel.getAllData()
+            itemList.clear()
             itemList.addAll(data)
         }
         isLoading.value = false // 로딩 상태 업데이트
     }
+
+    val filteredList = if (searchText.isNotEmpty()) itemList.filter {
+        it.title.contains(searchText, ignoreCase = true) || it.detail.contains(
+            searchText,
+            ignoreCase = true
+        )
+    } else itemList
 
     if (isLoading.value) {
         Box(
@@ -123,14 +131,17 @@ fun MainGrid(dataViewModel: DataViewModel, searchText: String) {
             CircularProgressIndicator()
         }
     } else {
-        if (itemList.isNotEmpty()) {
+        if (filteredList.isNotEmpty()) {
             LazyVerticalGrid(
                 columns = GridCells.Fixed(2),
                 contentPadding = PaddingValues(8.dp),
                 modifier = Modifier.fillMaxSize()
             ) {
-                items(itemList) { item ->
-                    MemoItemView(item)
+                items(filteredList) { item ->
+                    MemoItemView(item) {
+                        dataViewModel.deleteData(item)
+                        itemList.remove(item)
+                    }
                 }
             }
         } else {
@@ -144,7 +155,7 @@ fun MainGrid(dataViewModel: DataViewModel, searchText: String) {
 }
 
 @Composable
-fun MemoItemView(data: SaveData) {
+fun MemoItemView(data: SaveData, onDelete: () -> Unit) {
     Box(
         modifier = Modifier
             .padding(8.dp)
@@ -181,7 +192,7 @@ fun MemoItemView(data: SaveData) {
 
                     // 닫기 버튼
                     IconButton(
-                        onClick = { /* TODO: 닫기 액션 */ },
+                        onClick = { onDelete() },
                         modifier = Modifier.size(24.dp)
                     ) {
                         Icon(
