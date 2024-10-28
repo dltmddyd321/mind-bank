@@ -69,6 +69,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.mindbank.R
 import com.example.mindbank.activity.AddActivity
+import com.example.mindbank.component.HyperlinkText
+import com.example.mindbank.component.WebViewScreen
 import com.example.mindbank.data.SaveData
 import com.example.mindbank.util.hexToColor
 import com.example.mindbank.util.isDarkColor
@@ -211,13 +213,21 @@ fun MemoItemView(data: SaveData, onDelete: () -> Unit) {
                     modifier = Modifier.padding(vertical = 8.dp)
                 )
 
-                // 하단 메모 내용 표시
-                Text(
-                    text = data.detail,
-                    color = textColor,
-                    style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.fillMaxWidth()
-                )
+                var currentUrl by remember { mutableStateOf<String?>(null) }
+
+                if (currentUrl != null) {
+                    currentUrl?.let { WebViewScreen(url = it, onBack = { currentUrl = null }) }
+                } else {
+                    // 링크 텍스트를 표시
+                    HyperlinkText(
+                        modifier = Modifier.fillMaxWidth(),
+                        text = data.detail,
+                        textColor = textColor,
+                        style = MaterialTheme.typography.bodyMedium
+                    ) {
+
+                    }
+                }
             }
         }
     }
@@ -262,7 +272,9 @@ fun MainScreen(dataViewModel: DataViewModel) {
         floatingActionButtonPosition = FabPosition.End
     ) { innerPadding ->
         Column(
-            modifier = Modifier.fillMaxSize().padding(innerPadding)
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
         ) {
             MainGrid(dataViewModel, searchText)
         }
