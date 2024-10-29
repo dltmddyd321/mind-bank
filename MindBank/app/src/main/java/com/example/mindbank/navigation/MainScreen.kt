@@ -225,7 +225,7 @@ fun MemoItemView(data: SaveData, onDelete: () -> Unit) {
                         textColor = textColor,
                         style = MaterialTheme.typography.bodyMedium
                     ) {
-
+                        currentUrl = it
                     }
                 }
             }
