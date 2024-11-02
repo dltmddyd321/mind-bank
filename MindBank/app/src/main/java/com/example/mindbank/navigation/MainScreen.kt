@@ -28,6 +28,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -39,6 +40,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -67,6 +69,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.DialogProperties
 import com.example.mindbank.R
 import com.example.mindbank.activity.AddActivity
 import com.example.mindbank.component.HyperlinkText
@@ -192,9 +195,11 @@ fun MemoItemView(data: SaveData, onDelete: () -> Unit) {
                         modifier = Modifier.weight(1f) // Text가 Row 안에서 남은 공간을 채움
                     )
 
+                    var showDialog by remember { mutableStateOf(false) }
+
                     // 닫기 버튼
                     IconButton(
-                        onClick = { onDelete() },
+                        onClick = { showDialog = true },
                         modifier = Modifier.size(24.dp)
                     ) {
                         Icon(
@@ -203,6 +208,36 @@ fun MemoItemView(data: SaveData, onDelete: () -> Unit) {
                             modifier = Modifier.size(16.dp),
                             tint = textColor
                         )
+                        if (showDialog) {
+                            AlertDialog(
+                                onDismissRequest = {
+                                    showDialog = false // 다이얼로그 닫기
+                                },
+                                title = {
+                                    Text(text = "삭제하시겠습니까?")
+                                },
+                                confirmButton = {
+                                    TextButton(
+                                        onClick = {
+                                            onDelete() // 삭제 확인 시 onDelete 실행
+                                            showDialog = false // 다이얼로그 닫기
+                                        }
+                                    ) {
+                                        Text("확인")
+                                    }
+                                },
+                                dismissButton = {
+                                    TextButton(
+                                        onClick = {
+                                            showDialog = false // 취소 시 다이얼로그 닫기
+                                        }
+                                    ) {
+                                        Text("취소")
+                                    }
+                                },
+                                properties = DialogProperties(dismissOnClickOutside = false) // 다이얼로그 외부 클릭 방지
+                            )
+                        }
                     }
                 }
 
