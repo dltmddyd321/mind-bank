@@ -53,6 +53,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 @AndroidEntryPoint
 class PasswordActivity : ComponentActivity() {
@@ -93,7 +94,7 @@ class PasswordActivity : ComponentActivity() {
                 ) else {
                     onCheckPassword.invoke()
                 }
-                Log.e("패스워드", password)
+                Timber.tag("패스워드").e(password)
             }
         }
     }

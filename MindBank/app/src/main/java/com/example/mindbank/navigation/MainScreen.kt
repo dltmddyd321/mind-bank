@@ -1,6 +1,7 @@
 package com.example.mindbank.navigation
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Intent
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -72,6 +73,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
 import com.example.mindbank.R
 import com.example.mindbank.activity.AddActivity
+import com.example.mindbank.activity.WebViewActivity
 import com.example.mindbank.component.HyperlinkText
 import com.example.mindbank.component.WebViewScreen
 import com.example.mindbank.data.SaveData
@@ -249,9 +251,14 @@ fun MemoItemView(data: SaveData, onDelete: () -> Unit) {
                 )
 
                 var currentUrl by remember { mutableStateOf<String?>(null) }
+                val activity = LocalContext.current as? Activity ?: return@Column
 
                 if (currentUrl != null) {
-                    currentUrl?.let { WebViewScreen(url = it, onBack = { currentUrl = null }) }
+                    currentUrl?.let {
+                        val intent = Intent(activity, WebViewActivity::class.java)
+                        intent.putExtra("url", it)
+                        activity.startActivity(intent)
+                    }
                 } else {
                     // 링크 텍스트를 표시
                     HyperlinkText(
