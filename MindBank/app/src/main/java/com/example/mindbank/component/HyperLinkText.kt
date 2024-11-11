@@ -15,7 +15,6 @@ import androidx.compose.ui.text.withStyle
 fun HyperlinkText(
     modifier: Modifier,
     text: String,
-    textColor: Color,
     style: TextStyle,
     onLinkClicked: (String) -> Unit
 ) {
@@ -64,6 +63,7 @@ fun HyperlinkText(
                 .firstOrNull()?.let { annotation ->
                     onLinkClicked(annotation.item) // 링크 클릭 시 실행할 동작
                 }
-        }
+        },
+        style = style
     )
 }

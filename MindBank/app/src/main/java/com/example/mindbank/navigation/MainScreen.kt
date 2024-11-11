@@ -75,7 +75,6 @@ import com.example.mindbank.R
 import com.example.mindbank.activity.AddActivity
 import com.example.mindbank.activity.WebViewActivity
 import com.example.mindbank.component.HyperlinkText
-import com.example.mindbank.component.WebViewScreen
 import com.example.mindbank.data.SaveData
 import com.example.mindbank.util.hexToColor
 import com.example.mindbank.util.isDarkColor
@@ -264,7 +263,6 @@ fun MemoItemView(data: SaveData, onDelete: () -> Unit) {
                     HyperlinkText(
                         modifier = Modifier.fillMaxWidth(),
                         text = data.detail,
-                        textColor = textColor,
                         style = MaterialTheme.typography.bodyMedium
                     ) {
                         currentUrl = it
