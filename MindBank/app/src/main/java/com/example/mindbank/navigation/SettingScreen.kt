@@ -1,8 +1,10 @@
 package com.example.mindbank.navigation
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -12,6 +14,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -39,39 +43,62 @@ fun SettingsScreen() {
             SettingsItem(title = "Latest Version", onClick = { /* Handle click */ })
         }
         item {
-            SettingsItem(title = "Alarm", onClick = { /* Handle click */ })
+            SettingsItem(title = "Delete All Data", onClick = { /* Handle click */ })
         }
     }
 }
 
 @Composable
 fun SettingsItem(title: String, onClick: () -> Unit) {
-    var expand by remember {
-        mutableStateOf(false)
-    }
-    val height by animateDpAsState(if (expand) 48.dp else 12.dp, label = "")
+    var expand by remember { mutableStateOf(false) }
 
-    Row(
+    Column(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = { expand = !expand })
-            .padding(vertical = 12.dp, horizontal = 16.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
+            .padding(horizontal = 16.dp, vertical = 12.dp)
     ) {
-        Text(
-            text = title,
-            color = Color.Black,
-            fontSize = 18.sp
-        )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(48.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                text = title,
+                color = Color.Black,
+                fontSize = 18.sp
+            )
 
-        Icon(
-            modifier = Modifier.clickable { onClick() },
-            imageVector = Icons.Default.ArrowForward,
-            contentDescription = "Go to $title",
-            tint = Color.Gray
-        )
+            Icon(
+                imageVector = Icons.Default.ArrowForward,
+                contentDescription = "Go to $title",
+                tint = Color.Gray
+            )
+        }
+        AnimatedVisibility(visible = expand) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp)
+            ) {
+                Button(
+                    onClick = { onClick() },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(48.dp)
+                ) {
+                    Text(
+                        text = "Delete",
+                        color = Color.White,
+                        fontSize = 16.sp
+                    )
+                }
+            }
+        }
+        Spacer(modifier = Modifier.height(8.dp))
+        Divider(color = Color.LightGray, thickness = 1.dp)
     }
-    Spacer(modifier = Modifier.height(height))
-    Divider(color = Color.LightGray, thickness = 1.dp)
 }
