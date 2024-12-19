@@ -84,6 +84,9 @@ class AddActivity : ComponentActivity() {
                 Surface(
                     modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
                 ) {
+                    val id = intent?.getStringExtra("id") ?: -1
+                    val editingData = dataViewModel.searchByKeyword(id)
+
                     var title by remember { mutableStateOf("") }
                     var memo by remember { mutableStateOf("") }
                     var circleColor by remember { mutableStateOf(Color.Red) }

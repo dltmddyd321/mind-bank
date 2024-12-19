@@ -20,6 +20,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.mindbank.viewmodel.AdviceViewModel
+import com.example.mindbank.viewmodel.DataViewModel
 
 sealed class Screen(val route: String, val title: String, val icon: ImageVector) {
     data object Home : Screen("home", "Home", Icons.Default.Home)
@@ -64,13 +65,13 @@ fun BottomNavBar(navController: NavController) {
 @Composable
 fun NavigationGraph(
     navController: NavHostController,
-    dataViewModel: ViewModel,
+    dataViewModel: DataViewModel,
     adviceViewModel: AdviceViewModel,
     paddingValues: PaddingValues
 ) {
     NavHost(navController, startDestination = Screen.Home.route) {
         composable(Screen.Home.route) { HomeScreen(adviceViewModel, paddingValues) }
         composable(Screen.Notes.route) { NotesScreen(dataViewModel, paddingValues) }
-        composable(Screen.Settings.route) { SettingsScreen(paddingValues) }
+        composable(Screen.Settings.route) { SettingsScreen(paddingValues) { dataViewModel.clear() } }
     }
 }

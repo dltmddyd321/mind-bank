@@ -57,7 +57,7 @@ fun NotesScreen(viewModel: ViewModel, paddingValues: PaddingValues) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsScreen(paddingValues: PaddingValues) {
+fun SettingsScreen(paddingValues: PaddingValues, onConfirmDelete: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -92,7 +92,9 @@ fun SettingsScreen(paddingValues: PaddingValues) {
                             .padding(it),
                         color = MaterialTheme.colorScheme.background
                     ) {
-                        SettingsScreen()
+                        SettingsScreen(onConfirmDelete = {
+
+                        })
                     }
                 }
             )

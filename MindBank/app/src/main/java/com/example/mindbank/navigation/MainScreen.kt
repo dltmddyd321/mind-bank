@@ -27,6 +27,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material3.AlertDialog
@@ -98,21 +99,15 @@ fun MainTopBar() {
                 .weight(1f)
                 .padding(6.dp)
         )
-        IconButton(onClick = { /* 메뉴 아이콘 클릭 동작 */ }) {
-            Icon(
-                imageVector = Icons.Default.Menu,
-                contentDescription = "Menu"
-            )
-        }
     }
 }
 
 @Composable
-fun MainGrid(dataViewModel: DataViewModel, searchText: String) {
+fun MainGrid(dataViewModel: DataViewModel, searchText: String, refreshTrigger: Boolean) {
     val isLoading = remember { mutableStateOf(true) }
     val itemList = remember { mutableStateListOf<SaveData>() }
 
-    LaunchedEffect(key1 = Unit) {
+    LaunchedEffect(key1 = refreshTrigger) {
         withContext(Dispatchers.IO) {
             val data = if (searchText.isNotEmpty()) dataViewModel.searchByKeyword(searchText)
             else dataViewModel.getAllData()
@@ -197,8 +192,24 @@ fun MemoItemView(data: SaveData, onDelete: () -> Unit) {
                     )
 
                     var showDialog by remember { mutableStateOf(false) }
+                    val context = LocalContext.current
 
-                    // 닫기 버튼
+                    IconButton(
+                        onClick = {
+                            val intent = Intent(context, AddActivity::class.java)
+                                .apply { putExtra("id", data.id) }
+                            context.startActivity(intent)
+                        },
+                        modifier = Modifier.size(24.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Edit,
+                            contentDescription = "Edit",
+                            modifier = Modifier.size(16.dp),
+                            tint = textColor
+                        )
+                    }
+
                     IconButton(
                         onClick = { showDialog = true },
                         modifier = Modifier.size(24.dp)
@@ -316,7 +327,7 @@ fun MainScreen(dataViewModel: DataViewModel) {
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            MainGrid(dataViewModel, searchText)
+            MainGrid(dataViewModel, searchText, refreshTrigger.value)
         }
     }
 }
@@ -341,6 +352,7 @@ fun SearchBar(
         modifier = Modifier
             .height(height)
             .fillMaxWidth()
+            .padding(horizontal = 18.dp)
             .shadow(elevation = elevation, shape = cornerShape)
             .background(color = backgroundColor, shape = cornerShape),
         verticalAlignment = Alignment.CenterVertically,

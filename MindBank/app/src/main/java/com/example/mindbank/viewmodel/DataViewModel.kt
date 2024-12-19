@@ -20,6 +20,10 @@ class DataViewModel @Inject constructor(
         dataRepository.searchByKeyword(keyword)
     }
 
+    suspend fun searchByKeyword(id: Int): SaveData? = withContext(viewModelScope.coroutineContext) {
+        dataRepository.searchById(id)
+    }
+
     fun insertData(data: SaveData) {
         dataRepository.insertOrUpdate(data)
     }

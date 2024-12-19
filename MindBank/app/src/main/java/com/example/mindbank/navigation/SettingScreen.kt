@@ -14,10 +14,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -31,25 +34,85 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun SettingsScreen() {
+fun SettingsScreen(onConfirmDelete: () -> Unit) {
     LazyColumn(contentPadding = PaddingValues(vertical = 4.dp)) {
         item {
-            SettingsItem(title = "Account and security", onClick = { /* Handle click */ })
+            VersionCheckButton(title = "Latest Version", onClick = { /* Handle click */ })
         }
         item {
-            SettingsItem(title = "Units", onClick = { /* Handle click */ })
-        }
-        item {
-            SettingsItem(title = "Latest Version", onClick = { /* Handle click */ })
-        }
-        item {
-            SettingsItem(title = "Delete All Data", onClick = { /* Handle click */ })
+            DeleteButton(title = "Delete All Data", onConfirmDelete = onConfirmDelete)
         }
     }
 }
 
 @Composable
-fun SettingsItem(title: String, onClick: () -> Unit) {
+fun DeleteButton(title: String, onConfirmDelete: () -> Unit) {
+    var expand by remember { mutableStateOf(false) }
+    var showDialog by remember { mutableStateOf(false) }
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = { expand = !expand })
+            .padding(horizontal = 16.dp, vertical = 12.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(48.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                text = title,
+                color = Color.Black,
+                fontSize = 18.sp
+            )
+
+            Icon(
+                imageVector = Icons.Default.ArrowForward,
+                contentDescription = "Go to $title",
+                tint = Color.Gray
+            )
+        }
+        AnimatedVisibility(visible = expand) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp)
+            ) {
+                Button(
+                    onClick = { showDialog = true },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(48.dp)
+                ) {
+                    Text(
+                        text = "Delete",
+                        color = Color.White,
+                        fontSize = 16.sp
+                    )
+                }
+            }
+        }
+        Spacer(modifier = Modifier.height(8.dp))
+        Divider(color = Color.LightGray, thickness = 1.dp)
+    }
+
+    if (showDialog) {
+        ConfirmDeleteDialog(
+            onConfirm = {
+                showDialog = false
+                onConfirmDelete()
+            },
+            onDismiss = { showDialog = false }
+        )
+    }
+}
+
+@Composable
+fun VersionCheckButton(title: String, onClick: () -> Unit) {
     var expand by remember { mutableStateOf(false) }
 
     Column(
@@ -101,4 +164,27 @@ fun SettingsItem(title: String, onClick: () -> Unit) {
         Spacer(modifier = Modifier.height(8.dp))
         Divider(color = Color.LightGray, thickness = 1.dp)
     }
+}
+
+@Composable
+fun ConfirmDeleteDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = { onDismiss() },
+        title = {
+            Text(text = "Confirm Delete", style = MaterialTheme.typography.titleMedium)
+        },
+        text = {
+            Text(text = "Are you sure you want to delete this? This action cannot be undone.")
+        },
+        confirmButton = {
+            Button(onClick = onConfirm) {
+                Text(text = "Yes", color = Color.White)
+            }
+        },
+        dismissButton = {
+            OutlinedButton(onClick = onDismiss) {
+                Text(text = "Cancel")
+            }
+        }
+    )
 }

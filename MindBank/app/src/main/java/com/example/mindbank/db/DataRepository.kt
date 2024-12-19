@@ -18,6 +18,10 @@ class DataRepository @Inject constructor(
         dataDao.searchByKeyword(keyword)
     }
 
+    suspend fun searchById(id: Int): SaveData? = withContext(Dispatchers.IO) {
+        dataDao.getSaveDataById(id)
+    }
+
     fun insertOrUpdate(data: SaveData) {
         CoroutineScope(Dispatchers.IO).launch {
             dataDao.insertOrUpdate(data)
