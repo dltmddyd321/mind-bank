@@ -440,3 +440,40 @@ fun SearchBar(
         }
     }
 }
+
+fun main() {
+
+
+    fun solution(video_len: String, pos: String, op_start: String, op_end: String, commands: Array<String>): String {
+        // Helper function to convert "mm:ss" to total seconds
+        fun toSeconds(time: String): Int {
+            val (mm, ss) = time.split(":").map { it.toInt() }
+            return mm * 60 + ss
+        }
+
+        // Helper function to convert total seconds to "mm:ss"
+        fun toTimeString(seconds: Int): String {
+            val mm = seconds / 60
+            val ss = seconds % 60
+            return String.format("%02d:%02d", mm, ss)
+        }
+
+        val videoLength = toSeconds(video_len)
+        val opStart = toSeconds(op_start)
+        val opEnd = toSeconds(op_end)
+        var currentTime = toSeconds(pos)
+
+        for (command in commands) {
+            when (command) {
+                "next" -> currentTime = minOf(currentTime + 10, videoLength)
+                "prev" -> currentTime = maxOf(currentTime - 10, 0)
+            }
+            if (currentTime in opStart..opEnd) {
+                currentTime = opEnd
+            }
+        }
+        return toTimeString(currentTime)
+    }
+
+    solution("07:22", "04:05", "00:15", "04:07", arrayOf("next"))
+}
