@@ -66,6 +66,8 @@ import com.example.mindbank.util.toHex
 import com.github.skydoves.colorpicker.compose.ColorEnvelope
 import com.github.skydoves.colorpicker.compose.HsvColorPicker
 import com.github.skydoves.colorpicker.compose.rememberColorPickerController
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.debounce
 
@@ -84,12 +86,21 @@ class AddActivity : ComponentActivity() {
                 Surface(
                     modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
                 ) {
-                    val id = intent?.getStringExtra("id") ?: -1
-                    val editingData = dataViewModel.searchByKeyword(id)
+                    val id = intent?.getIntExtra("id",  -1) ?: -1
+                    var editingData by remember { mutableStateOf<SaveData?>(null) }
 
                     var title by remember { mutableStateOf("") }
                     var memo by remember { mutableStateOf("") }
                     var circleColor by remember { mutableStateOf(Color.Red) }
+
+                    LaunchedEffect(id) {
+                        editingData = dataViewModel.searchById(id)
+                        title = editingData?.title ?: ""
+                        memo = editingData?.detail ?: ""
+                        val lastColor = editingData?.color
+                        if (!lastColor.isNullOrEmpty()) circleColor = hexToColor(lastColor)
+                    }
+
                     AutoBackUpCheckDialog(dataStoreViewModel) { backupTitle, backupMemo, backupColor ->
                         title = backupTitle
                         memo = backupMemo
