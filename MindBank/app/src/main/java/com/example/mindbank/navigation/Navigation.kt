@@ -3,6 +3,7 @@ package com.example.mindbank.navigation
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
@@ -23,7 +24,7 @@ import com.example.mindbank.viewmodel.AdviceViewModel
 import com.example.mindbank.viewmodel.DataViewModel
 
 sealed class Screen(val route: String, val title: String, val icon: ImageVector) {
-    data object Home : Screen("home", "Home", Icons.Default.Home)
+    data object Home : Screen("todo", "Todo", Icons.Default.CheckCircle)
     data object Notes : Screen("notes", "Notes", Icons.Default.Search)
     data object Settings : Screen("settings", "Settings", Icons.Default.Settings)
 }
