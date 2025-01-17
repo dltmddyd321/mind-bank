@@ -71,16 +71,16 @@ fun AdviceScreen(viewModel: AdviceViewModel) {
 fun ChecklistList(viewModel: AdviceViewModel) {
 //    val checklistItems = viewModel.checklistItems.collectAsState(initial = emptyList())
 
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxWidth()
-            .weight(1f) // 남은 공간을 모두 사용
-            .padding(16.dp)
-    ) {
-        items(checklistItems.value) { item ->
-            ChecklistItem(item)
-        }
-    }
+//    LazyColumn(
+//        modifier = Modifier
+//            .fillMaxWidth()
+//            .weight(1f) // 남은 공간을 모두 사용
+//            .padding(16.dp)
+//    ) {
+//        items(checklistItems.value) { item ->
+//            ChecklistItem(item)
+//        }
+//    }
 }
 
 @Composable

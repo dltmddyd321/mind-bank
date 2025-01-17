@@ -28,4 +28,14 @@ object DBModule {
     @Singleton
     @Provides
     fun provideSaveDataDao(memoDatabase: MemoDatabase): SaveDataDao = memoDatabase.saveDataDao()
+
+    @Singleton
+    @Provides
+    fun provideTodoDatabase(
+        @ApplicationContext context: Context
+    ): TodoDatabase = Room.databaseBuilder(context, TodoDatabase::class.java, "todo.db").build()
+
+    @Singleton
+    @Provides
+    fun provideTodoDao(todoDatabase: TodoDatabase): TodoDao = todoDatabase.todoDao()
 }
