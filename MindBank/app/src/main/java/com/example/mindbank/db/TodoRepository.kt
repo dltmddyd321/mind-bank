@@ -8,7 +8,7 @@ import javax.inject.Inject
 class TodoRepository @Inject constructor(
     private val todoDao: TodoDao
 ) {
-    suspend fun getAllTodos(): Unit = withContext(Dispatchers.IO) {
+    suspend fun getAllTodos(): List<Task> = withContext(Dispatchers.IO) {
         todoDao.getAllSaveData()
     }
 }

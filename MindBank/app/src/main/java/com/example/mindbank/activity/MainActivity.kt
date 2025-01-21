@@ -19,11 +19,13 @@ import com.example.mindbank.viewmodel.DataViewModel
 import com.example.mindbank.navigation.BottomNavBar
 import com.example.mindbank.navigation.NavigationGraph
 import com.example.mindbank.viewmodel.AdviceViewModel
+import com.example.mindbank.viewmodel.TodoViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
+    private val todoViewModel: TodoViewModel by viewModels()
     private val dataViewModel: DataViewModel by viewModels()
     private val adviceViewModel: AdviceViewModel by viewModels()
 
