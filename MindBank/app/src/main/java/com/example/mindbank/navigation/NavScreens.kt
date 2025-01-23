@@ -23,17 +23,17 @@ import com.example.mindbank.component.AdviceScreen
 import com.example.mindbank.viewmodel.DataViewModel
 import com.example.mindbank.ui.theme.MindBankTheme
 import com.example.mindbank.viewmodel.AdviceViewModel
+import com.example.mindbank.viewmodel.TodoViewModel
 
 @Composable
-fun HomeScreen(viewModel: ViewModel, paddingValues: PaddingValues) {
-    val adviceViewModel = viewModel as? AdviceViewModel ?: return
+fun HomeScreen(adviceViewModel: AdviceViewModel, todoViewModel: TodoViewModel, paddingValues: PaddingValues) {
     Box(
         modifier = Modifier
             .fillMaxSize()
             .padding(paddingValues),
         contentAlignment = Alignment.Center
     ) {
-        AdviceScreen(adviceViewModel)
+        AdviceScreen(adviceViewModel, todoViewModel)
     }
 }
 

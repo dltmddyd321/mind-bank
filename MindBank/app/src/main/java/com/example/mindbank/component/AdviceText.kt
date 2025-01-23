@@ -24,10 +24,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.mindbank.state.AdviceState
 import com.example.mindbank.viewmodel.AdviceViewModel
+import com.example.mindbank.viewmodel.TodoViewModel
 
 @Composable
-fun AdviceScreen(viewModel: AdviceViewModel) {
-    val uiState by viewModel.uiState.collectAsState()
+fun AdviceScreen(adviceViewModel: AdviceViewModel, todoViewModel: TodoViewModel) {
+    val uiState by adviceViewModel.uiState.collectAsState()
 
     Column(modifier = Modifier.fillMaxSize()) {
         // 상단 Advice 영역
@@ -62,25 +63,24 @@ fun AdviceScreen(viewModel: AdviceViewModel) {
         }
 
         // 하단 체크리스트
-        ChecklistList(viewModel = viewModel)
+        ChecklistList(todoViewModel)
     }
 }
 
 
 @Composable
-fun ChecklistList(viewModel: AdviceViewModel) {
-//    val checklistItems = viewModel.checklistItems.collectAsState(initial = emptyList())
+fun ChecklistList(viewModel: TodoViewModel) {
+    val checklistItems = viewModel.getAllData()
 
-//    LazyColumn(
-//        modifier = Modifier
-//            .fillMaxWidth()
-//            .weight(1f) // 남은 공간을 모두 사용
-//            .padding(16.dp)
-//    ) {
-//        items(checklistItems.value) { item ->
-//            ChecklistItem(item)
-//        }
-//    }
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
+        items(checklistItems.value) { item ->
+            ChecklistItem(item)
+        }
+    }
 }
 
 @Composable

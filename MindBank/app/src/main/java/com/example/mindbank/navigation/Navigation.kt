@@ -22,6 +22,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.mindbank.viewmodel.AdviceViewModel
 import com.example.mindbank.viewmodel.DataViewModel
+import com.example.mindbank.viewmodel.TodoViewModel
 
 sealed class Screen(val route: String, val title: String, val icon: ImageVector) {
     data object Home : Screen("todo", "Todo", Icons.Default.CheckCircle)
@@ -66,12 +67,13 @@ fun BottomNavBar(navController: NavController) {
 @Composable
 fun NavigationGraph(
     navController: NavHostController,
+    todoViewModel: TodoViewModel,
     dataViewModel: DataViewModel,
     adviceViewModel: AdviceViewModel,
     paddingValues: PaddingValues
 ) {
     NavHost(navController, startDestination = Screen.Home.route) {
-        composable(Screen.Home.route) { HomeScreen(adviceViewModel, paddingValues) }
+        composable(Screen.Home.route) { HomeScreen(adviceViewModel, todoViewModel, paddingValues) }
         composable(Screen.Notes.route) { NotesScreen(dataViewModel, paddingValues) }
         composable(Screen.Settings.route) { SettingsScreen(paddingValues) { dataViewModel.clear() } }
     }

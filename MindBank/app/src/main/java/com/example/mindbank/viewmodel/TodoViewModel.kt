@@ -12,7 +12,7 @@ import javax.inject.Inject
 class TodoViewModel @Inject constructor(
     private val todoRepository: TodoRepository
 ): ViewModel() {
-    suspend fun getAlData(): List<Task> = withContext(viewModelScope.coroutineContext) {
+    suspend fun getAllData(): List<Task> = withContext(viewModelScope.coroutineContext) {
         todoRepository.getAllTodos()
     }
 }
