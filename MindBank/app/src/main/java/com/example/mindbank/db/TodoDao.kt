@@ -21,7 +21,4 @@ interface TodoDao {
 
     @Query("DELETE FROM todo_task")
     fun deleteAll(): Int
-    
-    @Query("SELECT * FROM todo_task WHERE id = :id LIMIT 1")
-    fun getSaveDataById(id: Int): Task?
 }

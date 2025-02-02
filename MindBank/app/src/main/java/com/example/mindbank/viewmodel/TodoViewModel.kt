@@ -16,4 +16,8 @@ class TodoViewModel @Inject constructor(
     suspend fun getAllData(): List<Task> = withContext(viewModelScope.coroutineContext) {
         todoRepository.getAllTodos()
     }
+
+    fun updateTodo(task: Task) {
+        todoRepository.updateTodo(task)
+    }
 }

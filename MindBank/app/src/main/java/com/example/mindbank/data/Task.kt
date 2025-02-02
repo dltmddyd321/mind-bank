@@ -10,6 +10,6 @@ data class Task(
     val dtCreated: Long,
     val dtUpdated: Long,
     val color: String,
-    val isDone: Boolean,
+    var isDone: Boolean,
     val position: Long
 )

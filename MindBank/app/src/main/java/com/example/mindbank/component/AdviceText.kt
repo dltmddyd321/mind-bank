@@ -1,5 +1,6 @@
 package com.example.mindbank.component
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,8 +13,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -88,13 +92,15 @@ fun ChecklistList(viewModel: TodoViewModel) {
             .padding(16.dp)
     ) {
         items(checklistItems.value) {
-            ChecklistItem(item = it)
+            ChecklistItem(item = it) { todo ->
+                viewModel.updateTodo(todo)
+            }
         }
     }
 }
 
 @Composable
-fun ChecklistItem(item: Task) {
+fun ChecklistItem(item: Task, onChecked: (Task) -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -102,10 +108,14 @@ fun ChecklistItem(item: Task) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         Checkbox(
-            checked = false, // 체크 여부 (동적으로 설정 가능)
-            onCheckedChange = { /* Update state */ }
+            checked = item.isDone,
+            onCheckedChange = {
+                item.isDone = it
+                onChecked.invoke(item)
+            }
         )
         Spacer(modifier = Modifier.width(8.dp))
         Text(text = item.title, style = MaterialTheme.typography.bodyMedium)
+        Icon(imageVector = Icons.Default.Edit, contentDescription = "Edit")
     }
 }
