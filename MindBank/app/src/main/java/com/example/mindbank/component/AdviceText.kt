@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -107,6 +108,7 @@ fun ChecklistItem(item: Task, onChecked: (Task) -> Unit) {
             .padding(vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
+        // 체크박스
         Checkbox(
             checked = item.isDone,
             onCheckedChange = {
@@ -115,7 +117,22 @@ fun ChecklistItem(item: Task, onChecked: (Task) -> Unit) {
             }
         )
         Spacer(modifier = Modifier.width(8.dp))
-        Text(text = item.title, style = MaterialTheme.typography.bodyMedium)
-        Icon(imageVector = Icons.Default.Edit, contentDescription = "Edit")
+
+        // 텍스트가 남은 공간을 모두 차지하도록 weight(1f) 추가
+        Text(
+            text = item.title,
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.weight(1f) // 자동 줄바꿈 & 여백 조정
+        )
+
+        // 오른쪽 끝 아이콘을 유지하기 위한 Spacer 추가
+        Spacer(modifier = Modifier.width(8.dp))
+
+        // 기존 Edit 아이콘 유지
+        Icon(
+            imageVector = Icons.Default.Edit,
+            contentDescription = "Edit",
+            modifier = Modifier.size(20.dp) // 아이콘 크기 조정
+        )
     }
 }
