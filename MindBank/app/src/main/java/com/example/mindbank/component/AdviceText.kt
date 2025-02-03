@@ -1,5 +1,6 @@
 package com.example.mindbank.component
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -14,8 +15,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardElevation
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -102,37 +106,46 @@ fun ChecklistList(viewModel: TodoViewModel) {
 
 @Composable
 fun ChecklistItem(item: Task, onChecked: (Task) -> Unit) {
-    Row(
+    Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically
+            .padding(4.dp)
+            .background(Color.Transparent),
+        shape = RoundedCornerShape(8.dp),
+        border = BorderStroke(1.dp, Color.Gray.copy(alpha = 0.5f))
     ) {
-        // 체크박스
-        Checkbox(
-            checked = item.isDone,
-            onCheckedChange = {
-                item.isDone = it
-                onChecked.invoke(item)
-            }
-        )
-        Spacer(modifier = Modifier.width(8.dp))
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // 체크박스
+            Checkbox(
+                checked = item.isDone,
+                onCheckedChange = {
+                    item.isDone = it
+                    onChecked.invoke(item)
+                }
+            )
+            Spacer(modifier = Modifier.width(8.dp))
 
-        // 텍스트가 남은 공간을 모두 차지하도록 weight(1f) 추가
-        Text(
-            text = item.title,
-            style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.weight(1f) // 자동 줄바꿈 & 여백 조정
-        )
+            // 텍스트가 남은 공간을 모두 차지하도록 weight(1f) 추가
+            Text(
+                text = item.title,
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.weight(1f) // 자동 줄바꿈 & 여백 조정
+            )
 
-        // 오른쪽 끝 아이콘을 유지하기 위한 Spacer 추가
-        Spacer(modifier = Modifier.width(8.dp))
+            // 오른쪽 끝 아이콘을 유지하기 위한 Spacer 추가
+            Spacer(modifier = Modifier.width(8.dp))
 
-        // 기존 Edit 아이콘 유지
-        Icon(
-            imageVector = Icons.Default.Edit,
-            contentDescription = "Edit",
-            modifier = Modifier.size(20.dp) // 아이콘 크기 조정
-        )
+            // 기존 Edit 아이콘 유지
+            Icon(
+                imageVector = Icons.Default.Edit,
+                contentDescription = "Edit",
+                modifier = Modifier.size(20.dp) // 아이콘 크기 조정
+            )
+        }
     }
 }
