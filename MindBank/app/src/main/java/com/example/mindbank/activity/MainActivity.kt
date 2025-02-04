@@ -47,7 +47,7 @@ class MainActivity : ComponentActivity() {
             Scaffold(
                 bottomBar = { BottomNavBar(navController = navController) }
             ) { paddingValues ->
-                NavigationGraph(navController, dataViewModel, adviceViewModel, paddingValues)
+                NavigationGraph(navController, todoViewModel, dataViewModel, adviceViewModel, paddingValues)
             }
         }
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
