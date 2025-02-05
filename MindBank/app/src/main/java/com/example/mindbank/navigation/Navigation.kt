@@ -2,9 +2,7 @@ package com.example.mindbank.navigation
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
@@ -14,13 +12,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.lifecycle.ViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.example.mindbank.viewmodel.AdviceViewModel
+import com.example.mindbank.state.DataType
 import com.example.mindbank.viewmodel.DataViewModel
 import com.example.mindbank.viewmodel.TodoViewModel
 
@@ -69,12 +66,11 @@ fun NavigationGraph(
     navController: NavHostController,
     todoViewModel: TodoViewModel,
     dataViewModel: DataViewModel,
-    adviceViewModel: AdviceViewModel,
     paddingValues: PaddingValues
 ) {
     NavHost(navController, startDestination = Screen.Home.route) {
-        composable(Screen.Home.route) { HomeScreen(adviceViewModel, todoViewModel, paddingValues) }
-        composable(Screen.Notes.route) { NotesScreen(dataViewModel, paddingValues) }
+        composable(Screen.Home.route) { NotesScreen(dataViewModel, todoViewModel, paddingValues, DataType.Todo) }
+        composable(Screen.Notes.route) { NotesScreen(dataViewModel, todoViewModel, paddingValues, DataType.Memo) }
         composable(Screen.Settings.route) { SettingsScreen(paddingValues) { dataViewModel.clear() } }
     }
 }

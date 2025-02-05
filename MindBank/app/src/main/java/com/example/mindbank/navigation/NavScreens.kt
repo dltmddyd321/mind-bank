@@ -20,13 +20,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import com.example.mindbank.component.AdviceScreen
+import com.example.mindbank.state.DataType
 import com.example.mindbank.viewmodel.DataViewModel
 import com.example.mindbank.ui.theme.MindBankTheme
 import com.example.mindbank.viewmodel.AdviceViewModel
 import com.example.mindbank.viewmodel.TodoViewModel
 
 @Composable
-fun HomeScreen(adviceViewModel: AdviceViewModel, todoViewModel: TodoViewModel, paddingValues: PaddingValues) {
+fun HomeScreen(
+    adviceViewModel: AdviceViewModel,
+    todoViewModel: TodoViewModel,
+    paddingValues: PaddingValues
+) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -38,10 +43,16 @@ fun HomeScreen(adviceViewModel: AdviceViewModel, todoViewModel: TodoViewModel, p
 }
 
 @Composable
-fun NotesScreen(viewModel: ViewModel, paddingValues: PaddingValues) {
-    val dataViewModel = viewModel as? DataViewModel ?: return
+fun NotesScreen(
+    dataViewModel: DataViewModel,
+    todoViewModel: TodoViewModel,
+    paddingValues: PaddingValues,
+    dataType: DataType
+) {
     Box(
-        modifier = Modifier.fillMaxSize().padding(paddingValues),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(paddingValues),
         contentAlignment = Alignment.Center
     ) {
         MindBankTheme {
@@ -49,7 +60,11 @@ fun NotesScreen(viewModel: ViewModel, paddingValues: PaddingValues) {
                 modifier = Modifier.fillMaxSize(),
                 color = MaterialTheme.colorScheme.background
             ) {
-                MainScreen(dataViewModel)
+                if (dataType == DataType.Todo) {
+                    MainScreen(todoViewModel)
+                } else {
+                    MainScreen(dataViewModel)
+                }
             }
         }
     }
