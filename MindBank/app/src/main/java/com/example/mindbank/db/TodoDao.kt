@@ -21,4 +21,7 @@ interface TodoDao {
 
     @Query("DELETE FROM todo_task")
     fun deleteAll(): Int
+
+    @Query("SELECT * FROM todo_task WHERE title LIKE '%' || :keyword")
+    fun searchByKeyword(keyword: String): List<Task>
 }

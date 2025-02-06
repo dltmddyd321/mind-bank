@@ -20,4 +20,8 @@ class TodoViewModel @Inject constructor(
     fun updateTodo(task: Task) {
         todoRepository.updateTodo(task)
     }
+
+    suspend fun searchByKeyword(keyword: String): List<Task> = withContext(viewModelScope.coroutineContext) {
+        todoRepository.searchByKeyword(keyword)
+    }
 }

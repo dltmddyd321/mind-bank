@@ -19,4 +19,8 @@ class TodoRepository @Inject constructor(
             todoDao.insertOrUpdate(task)
         }
     }
+
+    suspend fun searchByKeyword(keyword: String): List<Task> = withContext(Dispatchers.IO) {
+        todoDao.searchByKeyword(keyword)
+    }
 }

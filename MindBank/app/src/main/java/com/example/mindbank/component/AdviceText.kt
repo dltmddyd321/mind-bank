@@ -75,15 +75,12 @@ fun AdviceScreen(adviceViewModel: AdviceViewModel, todoViewModel: TodoViewModel)
                 }
             }
         }
-
-        // 하단 체크리스트
-        ChecklistList(todoViewModel)
     }
 }
 
 
 @Composable
-fun ChecklistList(viewModel: TodoViewModel) {
+fun ChecklistList(viewModel: TodoViewModel, searchText: String, refreshTrigger: Boolean) {
     val checklistItems = remember { mutableStateOf<List<Task>>(emptyList()) }
 
     // 비동기로 데이터 가져오기
