@@ -332,7 +332,7 @@ fun MainScreen(viewModel: ViewModel) {
             if (viewModel is DataViewModel) {
                 MainGrid(viewModel, searchText, refreshTrigger.value)
             } else if (viewModel is TodoViewModel) {
-                ChecklistList(viewModel)
+                ChecklistList(viewModel, searchText, refreshTrigger.value)
             }
         }
     }

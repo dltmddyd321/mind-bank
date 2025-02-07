@@ -29,16 +29,20 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.example.mindbank.data.SaveData
 import com.example.mindbank.data.Task
 import com.example.mindbank.state.AdviceState
 import com.example.mindbank.viewmodel.AdviceViewModel
 import com.example.mindbank.viewmodel.TodoViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 @Composable
 fun AdviceScreen(adviceViewModel: AdviceViewModel, todoViewModel: TodoViewModel) {
@@ -75,28 +79,36 @@ fun AdviceScreen(adviceViewModel: AdviceViewModel, todoViewModel: TodoViewModel)
                 }
             }
         }
-
-        // 하단 체크리스트
-        ChecklistList(todoViewModel)
     }
 }
 
 
 @Composable
-fun ChecklistList(viewModel: TodoViewModel) {
-    val checklistItems = remember { mutableStateOf<List<Task>>(emptyList()) }
+fun ChecklistList(viewModel: TodoViewModel, searchText: String, refreshTrigger: Boolean) {
 
-    // 비동기로 데이터 가져오기
-    LaunchedEffect(Unit) {
-        checklistItems.value = viewModel.getAllData()
+    val isLoading = remember { mutableStateOf(true) }
+    val itemList = remember { mutableStateListOf<Task>() }
+
+    LaunchedEffect(key1 = refreshTrigger) {
+        withContext(Dispatchers.IO) {
+            val data = if (searchText.isNotEmpty()) viewModel.searchByKeyword(searchText)
+            else viewModel.getAllData()
+            itemList.clear()
+            itemList.addAll(data)
+        }
+        isLoading.value = false // 로딩 상태 업데이트
     }
+
+    val filteredList = if (searchText.isNotEmpty()) itemList.filter {
+        it.title.contains(searchText, ignoreCase = true)
+    } else itemList
 
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        items(checklistItems.value) {
+        items(filteredList) {
             ChecklistItem(item = it) { todo ->
                 viewModel.updateTodo(todo)
             }
