@@ -2,33 +2,24 @@ package com.example.mindbank.activity
 
 import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.animation.AnticipateInterpolator
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import androidx.biometric.BiometricManager
+import androidx.biometric.BiometricPrompt
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material3.Icon
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -39,13 +30,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.core.animation.doOnEnd
+import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.fragment.app.FragmentActivity
 import com.example.mindbank.activity.ui.theme.MindBankTheme
 import com.example.mindbank.viewmodel.DataStoreViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -54,6 +44,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import java.util.concurrent.Executor
 
 @AndroidEntryPoint
 class PasswordActivity : ComponentActivity() {
@@ -69,12 +60,11 @@ class PasswordActivity : ComponentActivity() {
         fetchPassword {
             setContent {
                 MindBankTheme {
-                    // A surface container using the 'background' color from the theme
                     Surface(
                         modifier = Modifier.fillMaxSize(),
                         color = MaterialTheme.colorScheme.background
                     ) {
-                        PasswordScreen()
+                        BiometricAuthScreen()
                     }
                 }
             }
@@ -120,101 +110,77 @@ class PasswordActivity : ComponentActivity() {
 }
 
 @Composable
-fun PasswordScreen() {
-    var password by remember {
-        mutableStateOf("")
+fun BiometricAuthScreen() {
+    fun isBiometricAvailable(context: Context): Boolean {
+        val biometricManager = BiometricManager.from(context)
+        return biometricManager.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG) ==
+                BiometricManager.BIOMETRIC_SUCCESS
     }
+
+    fun showBiometricPrompt(
+        context: Context,
+        onSuccess: () -> Unit,
+        onFailure: (String) -> Unit
+    ) {
+        val executor: Executor = ContextCompat.getMainExecutor(context)
+        val biometricPrompt = BiometricPrompt(
+            context as FragmentActivity,
+            executor,
+            object : BiometricPrompt.AuthenticationCallback() {
+                override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
+                    super.onAuthenticationSucceeded(result)
+                    onSuccess()
+                }
+
+                override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
+                    super.onAuthenticationError(errorCode, errString)
+                    onFailure(errString.toString())
+                }
+
+                override fun onAuthenticationFailed() {
+                    super.onAuthenticationFailed()
+                    onFailure("Authentication failed")
+                }
+            }
+        )
+
+        val promptInfo = BiometricPrompt.PromptInfo.Builder()
+            .setTitle("지문 인증")
+            .setSubtitle("앱을 사용하려면 지문을 인증하세요")
+            .setNegativeButtonText("취소")
+            .build()
+
+        biometricPrompt.authenticate(promptInfo)
+    }
+
+    val context = LocalContext.current
+    var authMessage by remember { mutableStateOf("지문 인증을 진행해주세요.") }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Black),
+            .padding(16.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(text = "비밀번호 입력", color = Color.White, fontSize = 24.sp)
-        Spacer(modifier = Modifier.height(16.dp))
-        PasswordDots(length = password.length)
-        Spacer(modifier = Modifier.height(32.dp))
-        NumberPad { number ->
-            password += number
-        }
-    }
-}
+        Text(text = authMessage)
 
-@Composable
-fun PasswordDots(length: Int) {
-    Row {
-        repeat(4) {
-            Icon(
-                imageVector = if (it <= length - 1) Icons.Filled.Info else Icons.Filled.CheckCircle,
-                contentDescription = null,
-                tint = Color.Blue,
-                modifier = Modifier.padding(4.dp)
-            )
-        }
-    }
-}
+        Spacer(modifier = Modifier.height(20.dp))
 
-@Composable
-fun NumberPad(onNumberClick: (String) -> Unit) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        // 숫자 버튼들
-        val numbers = arrayOf(
-            arrayOf("1", "2", "3"),
-            arrayOf("4", "5", "6"),
-            arrayOf("7", "8", "9")
-        )
-
-        // 숫자 버튼을 표시하는 그리드
-        numbers.forEach { row ->
-            Row(
-                horizontalArrangement = Arrangement.Center,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                row.forEach { number ->
-                    NumberButton(number) {
-                        onNumberClick(number)
-                    }
+        Button(
+            onClick = {
+                if (isBiometricAvailable(context)) {
+                    showBiometricPrompt(
+                        context,
+                        onSuccess = { authMessage = "인증 성공!" },
+                        onFailure = { errorMsg -> authMessage = "인증 실패: $errorMsg" }
+                    )
+                } else {
+                    authMessage = "지문 인증을 사용할 수 없습니다."
                 }
             }
-        }
-
-        Row(
-            horizontalArrangement = Arrangement.Center,
-            modifier = Modifier.fillMaxWidth()
         ) {
-            // 빈 공간
-            Spacer(modifier = Modifier.weight(1f))
-            // 숫자 0 버튼
-            NumberButton("0") {
-                onNumberClick("0")
-            }
-            // 빈 공간
-            Spacer(modifier = Modifier.weight(1f))
+            Text("지문 인증하기")
         }
-    }
-}
-
-@Composable
-fun NumberButton(num: String, onClick: () -> Unit) {
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier = Modifier
-            .size(84.dp)
-            .padding(8.dp)
-            .clip(CircleShape)
-            .clickable { onClick() }
-            .border(1.dp, Color.Gray, CircleShape)
-    ) {
-        Text(
-            text = num,
-            color = Color.White,
-            fontSize = 24.sp,
-            textAlign = TextAlign.Center
-        )
     }
 }

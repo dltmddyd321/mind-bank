@@ -2,6 +2,7 @@
 accompanistSystemuicontroller = "0.36.0"
 activityComposeVersion = "1.8.0-alpha07"
 agp = "8.5.0"
+biometric = "1.2.0-alpha05"
 converterGson = "2.9.0"
 glanceAppwidget = "1.1.1"
 hiltAndroid = "2.44"
@@ -20,6 +21,7 @@ timber = "5.0.1"
 [libraries]
 accompanist-systemuicontroller = { module = "com.google.accompanist:accompanist-systemuicontroller", version.ref = "accompanistSystemuicontroller" }
 androidx-activity-compose-v180alpha07 = { module = "androidx.activity:activity-compose", version.ref = "activityComposeVersion" }
+androidx-biometric = { module = "androidx.biometric:biometric", version.ref = "biometric" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-glance-appwidget = { module = "androidx.glance:glance-appwidget", version.ref = "glanceAppwidget" }
 converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "converterGson" }

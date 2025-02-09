@@ -37,10 +37,15 @@ import androidx.compose.ui.unit.sp
 fun SettingsScreen(onConfirmDelete: () -> Unit) {
     LazyColumn(contentPadding = PaddingValues(vertical = 4.dp)) {
         item {
-            VersionCheckButton(title = "Latest Version", onClick = { /* Handle click */ })
+            VersionCheckButton(title = "최신 버전 확인", onClick = { /* Handle click */ })
         }
         item {
-            DeleteButton(title = "Delete All Data", onConfirmDelete = onConfirmDelete)
+            DeleteButton(title = "전체 데이터 초기화", onConfirmDelete = onConfirmDelete)
+        }
+        item {
+            PasswordEditBtn(title = "비밀번호 변경", onClick = {
+                //TODO: 패스워드 변경 화면으로 이동
+            })
         }
     }
 }
@@ -108,6 +113,37 @@ fun DeleteButton(title: String, onConfirmDelete: () -> Unit) {
             },
             onDismiss = { showDialog = false }
         )
+    }
+}
+
+@Composable
+fun PasswordEditBtn(title: String, onClick: () -> Unit) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 12.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(48.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                text = title,
+                color = Color.Black,
+                fontSize = 18.sp
+            )
+
+            Icon(
+                imageVector = Icons.Default.ArrowForward,
+                contentDescription = "Go to $title",
+                tint = Color.Gray
+            )
+        }
+        Spacer(modifier = Modifier.height(8.dp))
+        Divider(color = Color.LightGray, thickness = 1.dp)
     }
 }
 

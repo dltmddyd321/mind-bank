@@ -52,7 +52,7 @@ android {
 }
 
 dependencies {
-    // Retrofit
+    implementation(libs.androidx.biometric)
     implementation (libs.retrofit)
     implementation (libs.converter.gson)
     implementation (libs.logging.interceptor)
