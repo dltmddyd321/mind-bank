@@ -1,5 +1,6 @@
 package com.example.mindbank.navigation
 
+import android.content.Intent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
@@ -40,6 +41,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.LocalTextInputService
@@ -48,9 +50,11 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.mindbank.activity.PasswordEditActivity
 
 @Composable
 fun SettingsScreen(onConfirmDelete: () -> Unit) {
+    val context = LocalContext.current
     LazyColumn(contentPadding = PaddingValues(vertical = 4.dp)) {
         item {
             VersionCheckButton(title = "최신 버전 확인", onClick = { /* Handle click */ })
@@ -60,7 +64,7 @@ fun SettingsScreen(onConfirmDelete: () -> Unit) {
         }
         item {
             PasswordEditBtn(title = "비밀번호 변경", onClick = {
-                //TODO: 패스워드 변경 화면으로 이동
+                context.startActivity(Intent(context, PasswordEditActivity::class.java))
             })
         }
     }
@@ -137,6 +141,7 @@ fun PasswordEditBtn(title: String, onClick: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
+            .clickable { onClick.invoke() }
             .padding(horizontal = 16.dp, vertical = 12.dp)
     ) {
         Row(
