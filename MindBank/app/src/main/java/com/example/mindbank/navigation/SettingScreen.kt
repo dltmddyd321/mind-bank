@@ -90,7 +90,7 @@ fun DeleteButton(title: String, onConfirmDelete: () -> Unit) {
         ) {
             Text(
                 text = title,
-                color = Color.Black,
+                color = Color.White,
                 fontSize = 18.sp
             )
 
@@ -153,7 +153,7 @@ fun PasswordEditBtn(title: String, onClick: () -> Unit) {
         ) {
             Text(
                 text = title,
-                color = Color.Black,
+                color = Color.White,
                 fontSize = 18.sp
             )
 
@@ -187,7 +187,7 @@ fun VersionCheckButton(title: String, onClick: () -> Unit) {
         ) {
             Text(
                 text = title,
-                color = Color.Black,
+                color = Color.White,
                 fontSize = 18.sp
             )
 

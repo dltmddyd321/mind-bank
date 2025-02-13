@@ -18,7 +18,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.ViewModel
 import com.example.mindbank.component.AdviceScreen
 import com.example.mindbank.state.DataType
 import com.example.mindbank.viewmodel.DataViewModel
