@@ -69,7 +69,6 @@ fun NotesScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(paddingValues: PaddingValues, onConfirmDelete: () -> Unit) {
     Box(
@@ -81,23 +80,7 @@ fun SettingsScreen(paddingValues: PaddingValues, onConfirmDelete: () -> Unit) {
         MindBankTheme {
             Scaffold(
                 topBar = {
-                    TopAppBar(
-                        title = {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(end = 20.dp),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.End
-                            ) {
-                                Text(text = "Settings")
-                            }
-                        },
-                        colors = TopAppBarDefaults.topAppBarColors(
-                            containerColor = MaterialTheme.colorScheme.background,
-                            titleContentColor = MaterialTheme.colorScheme.onBackground
-                        )
-                    )
+                    MainTopBar("Settings")
                 },
                 content = {
                     Surface(
@@ -107,7 +90,7 @@ fun SettingsScreen(paddingValues: PaddingValues, onConfirmDelete: () -> Unit) {
                         color = MaterialTheme.colorScheme.background
                     ) {
                         SettingsScreen(onConfirmDelete = {
-
+                            onConfirmDelete.invoke()
                         })
                     }
                 }

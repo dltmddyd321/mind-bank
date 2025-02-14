@@ -86,7 +86,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 @Composable
-fun MainTopBar() {
+fun MainTopBar(title: String = "Memos") {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -94,7 +94,7 @@ fun MainTopBar() {
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = "Memos",
+            text = title,
             fontWeight = FontWeight.Bold,
             style = MaterialTheme.typography.headlineMedium,
             modifier = Modifier
@@ -293,12 +293,12 @@ fun MainScreen(viewModel: ViewModel) {
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
     ) { _ -> refreshTrigger.value = !refreshTrigger.value }
-
+    val title = if (viewModel is TodoViewModel) "Todo" else "Memo"
     var searchText by remember { mutableStateOf("") }
     Scaffold(
         topBar = {
             Column {
-                MainTopBar()
+                MainTopBar(title)
                 SearchBar(
                     hint = "검색어를 입력하시오.",
                     onTextChange = { searchText = it }
