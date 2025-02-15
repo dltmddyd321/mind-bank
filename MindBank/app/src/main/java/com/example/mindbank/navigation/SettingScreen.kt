@@ -1,6 +1,15 @@
 package com.example.mindbank.navigation
 
 import android.content.Intent
+import android.graphics.Typeface
+import android.text.SpannableString
+import android.text.Spanned
+import android.text.TextPaint
+import android.text.method.LinkMovementMethod
+import android.text.style.ClickableSpan
+import android.text.style.StyleSpan
+import android.view.View
+import android.widget.TextView
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
@@ -244,4 +253,74 @@ fun ConfirmDeleteDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
             }
         }
     )
+}
+
+private fun setLinkedText(
+    textView: TextView,
+    map: MutableMap<String, List<String>>,
+    result: String,
+    onConfirm: (List<String>) -> Unit
+) {
+    val normalizedResult = result.replace(" ", "")
+    val spannableString = SpannableString(result)
+
+    map.forEach { (word, uidList) ->
+        val normalizedWord = word.replace(" ", "")
+        var normalizedStartIndex = 0
+
+        while (normalizedStartIndex < normalizedResult.length) {
+            val matchIndex = normalizedResult.indexOf(normalizedWord, normalizedStartIndex)
+            if (matchIndex == -1) break
+
+            var originalStartIndex = 0
+            var normalizedCount = 0
+
+            for (i in result.indices) {
+                if (!result[i].isWhitespace()) normalizedCount++
+                if (normalizedCount == matchIndex + 1) {
+                    originalStartIndex = i
+                    break
+                }
+            }
+
+            var originalEndIndex = originalStartIndex
+            var normalizedWordCount = 0
+            while (originalEndIndex < result.length && normalizedWordCount < normalizedWord.length) {
+                if (!result[originalEndIndex].isWhitespace()) normalizedWordCount++
+                originalEndIndex++
+            }
+
+            if (originalStartIndex < originalEndIndex) {
+                val clickableSpan = object : ClickableSpan() {
+                    override fun onClick(widget: View) {
+                        onConfirm(uidList)
+                    }
+
+                    override fun updateDrawState(ds: TextPaint) {
+                        super.updateDrawState(ds)
+                        ds.isUnderlineText = true
+                    }
+                }
+
+                spannableString.setSpan(
+                    clickableSpan,
+                    originalStartIndex,
+                    originalEndIndex,
+                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+
+                val boldStyle = StyleSpan(Typeface.BOLD)
+                spannableString.setSpan(
+                    boldStyle,
+                    originalStartIndex,
+                    originalEndIndex,
+                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+            }
+
+            normalizedStartIndex = matchIndex + normalizedWord.length
+        }
+    }
+    textView.text = spannableString
+    textView.movementMethod = LinkMovementMethod.getInstance()
 }
