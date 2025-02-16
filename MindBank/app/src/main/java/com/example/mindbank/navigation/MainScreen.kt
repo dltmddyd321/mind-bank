@@ -289,11 +289,12 @@ fun MemoItemView(data: SaveData, onDelete: () -> Unit) {
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun MainScreen(viewModel: ViewModel) {
+    val isTodoMode = viewModel is TodoViewModel
     val refreshTrigger = remember { mutableStateOf(false) }
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
     ) { _ -> refreshTrigger.value = !refreshTrigger.value }
-    val title = if (viewModel is TodoViewModel) "Todo" else "Memo"
+    val title = if (isTodoMode) "Todo" else "Memo"
     var searchText by remember { mutableStateOf("") }
     Scaffold(
         topBar = {
@@ -310,6 +311,10 @@ fun MainScreen(viewModel: ViewModel) {
             FloatingActionButton(
                 onClick = {
                     val intent = Intent(context, AddActivity::class.java)
+                    intent.putExtra(
+                        "mode",
+                        if (isTodoMode) Screen.Todo.title else Screen.Notes.title
+                    )
                     launcher.launch(intent)
                 },
                 containerColor = MaterialTheme.colorScheme.secondary,

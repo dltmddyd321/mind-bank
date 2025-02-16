@@ -58,6 +58,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.example.mindbank.data.SaveData
+import com.example.mindbank.navigation.Screen
 import com.example.mindbank.viewmodel.DataStoreViewModel
 import com.example.mindbank.viewmodel.DataViewModel
 import com.example.mindbank.ui.theme.MindBankTheme
@@ -84,7 +85,8 @@ class AddActivity : ComponentActivity() {
                 Surface(
                     modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
                 ) {
-                    val id = intent?.getIntExtra("id",  -1) ?: -1
+                    val mode = intent?.getStringExtra("mode") ?: Screen.Notes.title
+                    val id = intent?.getIntExtra("id", -1) ?: -1
                     var editingData by remember { mutableStateOf<SaveData?>(null) }
 
                     var title by remember { mutableStateOf("") }
@@ -105,13 +107,20 @@ class AddActivity : ComponentActivity() {
                         circleColor = hexToColor(backupColor)
                     }
                     BackHandlerWithQuestionDialog(false)
-                    InputScreen(title, memo, circleColor, onTitleChange = {
-                        title = it
-                    }, onTextChange = {
-                        memo = it
-                    }, onColorChange = {
-                        circleColor = it
-                    })
+                    InputScreen(
+                        title,
+                        memo,
+                        circleColor,
+                        isTodoInputMode = mode == Screen.Todo.title,
+                        onTitleChange = {
+                            title = it
+                        },
+                        onTextChange = {
+                            memo = it
+                        },
+                        onColorChange = {
+                            circleColor = it
+                        })
                 }
             }
         }
@@ -188,6 +197,7 @@ class AddActivity : ComponentActivity() {
         title: String,
         memo: String,
         circleColor: Color,
+        isTodoInputMode: Boolean,
         onTitleChange: (String) -> Unit,
         onTextChange: (String) -> Unit,
         onColorChange: (Color) -> Unit
@@ -266,9 +276,11 @@ class AddActivity : ComponentActivity() {
                 TitleInputField(title, onTitleChange = { value ->
                     onTitleChange.invoke(value)
                 })
-                InputField(memo, onTextChange = { value ->
-                    onTextChange.invoke(value)
-                })
+                if (!isTodoInputMode) {
+                    InputField(memo, onTextChange = { value ->
+                        onTextChange.invoke(value)
+                    })
+                }
             }
         }
     }

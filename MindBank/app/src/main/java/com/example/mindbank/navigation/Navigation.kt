@@ -22,7 +22,7 @@ import com.example.mindbank.viewmodel.DataViewModel
 import com.example.mindbank.viewmodel.TodoViewModel
 
 sealed class Screen(val route: String, val title: String, val icon: ImageVector) {
-    data object Home : Screen("todo", "Todo", Icons.Default.CheckCircle)
+    data object Todo : Screen("todo", "Todo", Icons.Default.CheckCircle)
     data object Notes : Screen("notes", "Notes", Icons.Default.Search)
     data object Settings : Screen("settings", "Settings", Icons.Default.Settings)
 }
@@ -30,7 +30,7 @@ sealed class Screen(val route: String, val title: String, val icon: ImageVector)
 @Composable
 fun BottomNavBar(navController: NavController) {
     val items = listOf(
-        Screen.Home,
+        Screen.Todo,
         Screen.Notes,
         Screen.Settings
     )
@@ -68,8 +68,8 @@ fun NavigationGraph(
     dataViewModel: DataViewModel,
     paddingValues: PaddingValues
 ) {
-    NavHost(navController, startDestination = Screen.Home.route) {
-        composable(Screen.Home.route) { NotesScreen(dataViewModel, todoViewModel, paddingValues, DataType.Todo) }
+    NavHost(navController, startDestination = Screen.Todo.route) {
+        composable(Screen.Todo.route) { NotesScreen(dataViewModel, todoViewModel, paddingValues, DataType.Todo) }
         composable(Screen.Notes.route) { NotesScreen(dataViewModel, todoViewModel, paddingValues, DataType.Memo) }
         composable(Screen.Settings.route) { SettingsScreen(paddingValues) { dataViewModel.clear() } }
     }

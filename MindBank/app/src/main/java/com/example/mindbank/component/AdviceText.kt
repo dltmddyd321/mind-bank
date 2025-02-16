@@ -21,6 +21,7 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardElevation
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -39,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import com.example.mindbank.data.SaveData
 import com.example.mindbank.data.Task
 import com.example.mindbank.state.AdviceState
+import com.example.mindbank.util.hexToColor
 import com.example.mindbank.viewmodel.AdviceViewModel
 import com.example.mindbank.viewmodel.TodoViewModel
 import kotlinx.coroutines.Dispatchers
@@ -138,7 +140,12 @@ fun ChecklistItem(item: Task, onChecked: (Task) -> Unit) {
                 onCheckedChange = {
                     item.isDone = it
                     onChecked.invoke(item)
-                }
+                },
+                colors = CheckboxDefaults.colors(
+                    checkedColor = hexToColor(item.color),
+                    uncheckedColor = hexToColor(item.color),
+                    checkmarkColor = hexToColor(item.color)
+                )
             )
             Spacer(modifier = Modifier.width(8.dp))
 
