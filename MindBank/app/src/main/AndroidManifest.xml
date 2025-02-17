@@ -46,7 +46,11 @@
             android:exported="false"
             android:theme="@style/Theme.MindBank" />
         <activity
-            android:name=".activity.AddActivity"
+            android:name=".activity.AddMemoActivity"
+            android:exported="false"
+            android:theme="@style/Theme.MindBank" />
+        <activity
+            android:name=".activity.AddTodoActivity"
             android:exported="false"
             android:theme="@style/Theme.MindBank" />
     </application>

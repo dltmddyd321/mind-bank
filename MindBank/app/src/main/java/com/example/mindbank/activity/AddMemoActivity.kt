@@ -64,6 +64,7 @@ import com.example.mindbank.viewmodel.DataViewModel
 import com.example.mindbank.ui.theme.MindBankTheme
 import com.example.mindbank.util.hexToColor
 import com.example.mindbank.util.toHex
+import com.example.mindbank.viewmodel.TodoViewModel
 import com.github.skydoves.colorpicker.compose.ColorEnvelope
 import com.github.skydoves.colorpicker.compose.HsvColorPicker
 import com.github.skydoves.colorpicker.compose.rememberColorPickerController
@@ -72,7 +73,7 @@ import kotlinx.coroutines.flow.debounce
 
 
 @AndroidEntryPoint
-class AddActivity : ComponentActivity() {
+class AddMemoActivity : ComponentActivity() {
 
     private val dataStoreViewModel: DataStoreViewModel by viewModels()
     private val dataViewModel: DataViewModel by viewModels()

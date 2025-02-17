@@ -73,7 +73,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.ViewModel
 import com.example.mindbank.R
-import com.example.mindbank.activity.AddActivity
+import com.example.mindbank.activity.AddMemoActivity
 import com.example.mindbank.activity.WebViewActivity
 import com.example.mindbank.component.ChecklistList
 import com.example.mindbank.component.HyperlinkText
@@ -198,7 +198,7 @@ fun MemoItemView(data: SaveData, onDelete: () -> Unit) {
 
                     IconButton(
                         onClick = {
-                            val intent = Intent(context, AddActivity::class.java)
+                            val intent = Intent(context, AddMemoActivity::class.java)
                                 .apply { putExtra("id", data.id) }
                             context.startActivity(intent)
                         },
@@ -310,7 +310,7 @@ fun MainScreen(viewModel: ViewModel) {
             val context = LocalContext.current
             FloatingActionButton(
                 onClick = {
-                    val intent = Intent(context, AddActivity::class.java)
+                    val intent = Intent(context, AddMemoActivity::class.java)
                     intent.putExtra(
                         "mode",
                         if (isTodoMode) Screen.Todo.title else Screen.Notes.title
