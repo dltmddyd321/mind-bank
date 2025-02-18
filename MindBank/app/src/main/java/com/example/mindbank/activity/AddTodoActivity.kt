@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package com.example.mindbank.activity
 
 import android.annotation.SuppressLint
@@ -54,7 +56,9 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.example.mindbank.data.SaveData
 import com.example.mindbank.data.Task
+import com.example.mindbank.navigation.Screen
 import com.example.mindbank.ui.theme.MindBankTheme
+import com.example.mindbank.util.hexToColor
 import com.example.mindbank.util.toHex
 import com.example.mindbank.viewmodel.TodoViewModel
 import com.github.skydoves.colorpicker.compose.ColorEnvelope
@@ -93,6 +97,7 @@ class AddTodoActivity : ComponentActivity() {
         BackHandler { showDialog = true }
     }
 
+    @OptIn(FlowPreview::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -100,7 +105,28 @@ class AddTodoActivity : ComponentActivity() {
                 Surface(
                     modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
                 ) {
+                    var title by remember { mutableStateOf("") }
+                    var circleColor by remember { mutableStateOf(Color.Red) }
+                    val id = intent?.getIntExtra("id", -1) ?: -1
+                    var editingData by remember { mutableStateOf<Task?>(null) }
+
+                    LaunchedEffect(id) {
+                        editingData = todoViewModel.searchById(id)
+                        title = editingData?.title ?: ""
+                        val lastColor = editingData?.color
+                        if (!lastColor.isNullOrEmpty()) circleColor = hexToColor(lastColor)
+                    }
+
                     BackHandlerWithQuestionDialog(false)
+                    InputScreen(
+                        title,
+                        circleColor,
+                        onTextChange = {
+                            title = it
+                        },
+                        onColorChange = {
+                            circleColor = it
+                        })
                 }
             }
         }
@@ -112,14 +138,10 @@ class AddTodoActivity : ComponentActivity() {
     @Composable
     fun InputScreen(
         title: String,
-        memo: String,
         circleColor: Color,
-        isTodoInputMode: Boolean,
-        onTitleChange: (String) -> Unit,
         onTextChange: (String) -> Unit,
         onColorChange: (Color) -> Unit
     ) {
-
         Scaffold(topBar = {
             val colorController = rememberColorPickerController()
             var showBackDialog by remember { mutableStateOf(false) }
@@ -191,7 +213,7 @@ class AddTodoActivity : ComponentActivity() {
             )
         }) {
             Column(modifier = Modifier.padding(it)) {
-                InputField(memo, onTextChange = { value ->
+                InputField(title, onTextChange = { value ->
                     onTextChange.invoke(value)
                 })
             }

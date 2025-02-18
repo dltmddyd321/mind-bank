@@ -23,4 +23,8 @@ class TodoRepository @Inject constructor(
     suspend fun searchByKeyword(keyword: String): List<Task> = withContext(Dispatchers.IO) {
         todoDao.searchByKeyword(keyword)
     }
+
+    suspend fun searchById(id: String): Task? = withContext(Dispatchers.IO) {
+        todoDao.searchByKeyword()
+    }
 }

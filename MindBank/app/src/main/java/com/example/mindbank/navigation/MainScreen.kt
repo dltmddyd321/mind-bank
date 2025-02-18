@@ -74,6 +74,7 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.ViewModel
 import com.example.mindbank.R
 import com.example.mindbank.activity.AddMemoActivity
+import com.example.mindbank.activity.AddTodoActivity
 import com.example.mindbank.activity.WebViewActivity
 import com.example.mindbank.component.ChecklistList
 import com.example.mindbank.component.HyperlinkText
@@ -310,11 +311,8 @@ fun MainScreen(viewModel: ViewModel) {
             val context = LocalContext.current
             FloatingActionButton(
                 onClick = {
-                    val intent = Intent(context, AddMemoActivity::class.java)
-                    intent.putExtra(
-                        "mode",
-                        if (isTodoMode) Screen.Todo.title else Screen.Notes.title
-                    )
+                    val intent = if (isTodoMode) Intent(context, AddTodoActivity::class.java)
+                    else Intent(context, AddMemoActivity::class.java)
                     launcher.launch(intent)
                 },
                 containerColor = MaterialTheme.colorScheme.secondary,
