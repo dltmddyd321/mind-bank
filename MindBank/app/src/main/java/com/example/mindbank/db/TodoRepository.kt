@@ -24,7 +24,13 @@ class TodoRepository @Inject constructor(
         todoDao.searchByKeyword(keyword)
     }
 
-    suspend fun searchById(id: String): Task? = withContext(Dispatchers.IO) {
-        todoDao.searchByKeyword()
+    suspend fun searchById(id: Int): Task? = withContext(Dispatchers.IO) {
+        todoDao.searchById(id)
+    }
+
+    fun delete(id: Int) {
+        CoroutineScope(Dispatchers.IO).launch {
+            todoDao.deleteById(id)
+        }
     }
 }

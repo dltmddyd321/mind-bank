@@ -24,4 +24,7 @@ interface TodoDao {
 
     @Query("SELECT * FROM todo_task WHERE title LIKE '%' || :keyword")
     fun searchByKeyword(keyword: String): List<Task>
+
+    @Query("SELECT * FROM todo_task WHERE id = :id LIMIT 1")
+    fun searchById(id: Int): Task?
 }

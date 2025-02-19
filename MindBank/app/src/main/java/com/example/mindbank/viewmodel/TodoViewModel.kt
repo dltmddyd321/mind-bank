@@ -25,7 +25,11 @@ class TodoViewModel @Inject constructor(
         todoRepository.searchByKeyword(keyword)
     }
 
-    suspend fun searchById(id: String): Task? = withContext(viewModelScope.coroutineContext) {
+    suspend fun searchById(id: Int): Task? = withContext(viewModelScope.coroutineContext) {
         todoRepository.searchById(id)
+    }
+
+    fun deleteTodo(id: Int) {
+        todoRepository.delete(id)
     }
 }
