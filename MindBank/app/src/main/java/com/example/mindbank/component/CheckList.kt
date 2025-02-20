@@ -29,10 +29,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.mindbank.R
 import com.example.mindbank.data.Task
+import com.example.mindbank.util.hexToColor
 import com.example.mindbank.viewmodel.TodoViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -96,6 +98,7 @@ fun ChecklistItem(
         ) {
             Image(
                 painter = painterResource(id = if (item.isDone) R.drawable.checked_img else R.drawable.unchecked_img),
+                colorFilter = ColorFilter.tint(hexToColor(item.color)),
                 contentDescription = "Checkbox",
                 modifier = Modifier
                     .size(24.dp)

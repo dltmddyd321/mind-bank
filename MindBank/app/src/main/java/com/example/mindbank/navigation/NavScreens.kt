@@ -41,33 +41,6 @@ fun HomeScreen(
     }
 }
 
-@Composable
-fun NotesScreen(
-    dataViewModel: DataViewModel,
-    todoViewModel: TodoViewModel,
-    paddingValues: PaddingValues,
-    dataType: DataType
-) {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(paddingValues),
-        contentAlignment = Alignment.Center
-    ) {
-        MindBankTheme {
-            Surface(
-                modifier = Modifier.fillMaxSize(),
-                color = MaterialTheme.colorScheme.background
-            ) {
-                if (dataType == DataType.Todo) {
-                    MainScreen(todoViewModel)
-                } else {
-                    MainScreen(dataViewModel)
-                }
-            }
-        }
-    }
-}
 
 @Composable
 fun SettingsScreen(paddingValues: PaddingValues, onConfirmDelete: () -> Unit) {

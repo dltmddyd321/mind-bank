@@ -5,6 +5,7 @@ package com.example.mindbank.activity
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
@@ -48,6 +49,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
@@ -142,6 +144,7 @@ class AddTodoActivity : ComponentActivity() {
         onTextChange: (String) -> Unit,
         onColorChange: (Color) -> Unit
     ) {
+        val context = LocalContext.current
         Scaffold(topBar = {
             val colorController = rememberColorPickerController()
             var showBackDialog by remember { mutableStateOf(false) }
@@ -188,6 +191,10 @@ class AddTodoActivity : ComponentActivity() {
                         )
                     }
                     Button(onClick = {
+                        if (title.isBlank()) {
+                            Toast.makeText(context, "내용을 입력해주세요!", Toast.LENGTH_SHORT).show()
+                            return@Button
+                        }
                         val currentTime = System.currentTimeMillis()
                         todoViewModel.updateTodo(
                             Task(
@@ -242,11 +249,15 @@ class AddTodoActivity : ComponentActivity() {
         )
 
         BasicTextField(
-            value = text, onValueChange = onTextChange, modifier = textFieldModifier,
+            value = text,
+            onValueChange = onTextChange,
+            modifier = textFieldModifier,
+            cursorBrush = SolidColor(Color.White),
             decorationBox = { innerTextField ->
                 if (text.isEmpty()) Text("What's happening?", color = placeholderColor)
                 innerTextField()
-            }, textStyle = textStyle
+            },
+            textStyle = textStyle
         )
     }
 }

@@ -60,17 +60,3 @@ fun BottomNavBar(navController: NavController) {
         }
     }
 }
-
-@Composable
-fun NavigationGraph(
-    navController: NavHostController,
-    todoViewModel: TodoViewModel,
-    dataViewModel: DataViewModel,
-    paddingValues: PaddingValues
-) {
-    NavHost(navController, startDestination = Screen.Todo.route) {
-        composable(Screen.Todo.route) { NotesScreen(dataViewModel, todoViewModel, paddingValues, DataType.Todo) }
-        composable(Screen.Notes.route) { NotesScreen(dataViewModel, todoViewModel, paddingValues, DataType.Memo) }
-        composable(Screen.Settings.route) { SettingsScreen(paddingValues) { dataViewModel.clear() } }
-    }
-}
