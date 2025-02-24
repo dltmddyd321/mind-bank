@@ -76,14 +76,10 @@ class PasswordActivity : ComponentActivity() {
         CoroutineScope(Dispatchers.IO).launch {
             password = dataStoreViewModel.getPassWord()
             withContext(Dispatchers.Main) {
-                if (password.isEmpty()) startActivity(
-                    Intent(
-                        this@PasswordActivity,
-                        MainActivity::class.java
-                    )
-                ) else {
-                    onCheckPassword.invoke()
+                val intent = Intent(this@PasswordActivity, MainActivity::class.java).apply {
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                 }
+                if (password.isEmpty()) startActivity(intent) else { onCheckPassword.invoke() }
                 Timber.tag("패스워드").e(password)
             }
         }

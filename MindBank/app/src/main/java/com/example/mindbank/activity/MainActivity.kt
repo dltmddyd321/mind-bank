@@ -4,7 +4,9 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
@@ -58,6 +60,7 @@ class MainActivity : ComponentActivity() {
 
     private val todoViewModel: TodoViewModel by viewModels()
     private val dataViewModel: DataViewModel by viewModels()
+    private var backPressedTime: Long = 0
     private var isTodoMode = false
 
     @SuppressLint("SourceLockedOrientationActivity")
@@ -99,6 +102,18 @@ class MainActivity : ComponentActivity() {
             }
         }
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                val currentTime = System.currentTimeMillis()
+                if (currentTime - backPressedTime < 2000) { // 2초 내에 다시 눌렀다면 종료
+                    finish()
+                } else {
+                    backPressedTime = currentTime
+                    Toast.makeText(this@MainActivity, "한번 더 클릭하면 종료됩니다.", Toast.LENGTH_SHORT).show()
+                }
+            }
+        })
     }
 
     @Composable

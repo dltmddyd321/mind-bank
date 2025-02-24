@@ -1,5 +1,6 @@
 package com.example.mindbank.component
 
+import android.content.Intent
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -30,9 +31,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.mindbank.R
+import com.example.mindbank.activity.AddMemoActivity
+import com.example.mindbank.activity.AddTodoActivity
 import com.example.mindbank.data.Task
 import com.example.mindbank.util.hexToColor
 import com.example.mindbank.viewmodel.TodoViewModel
@@ -42,6 +46,7 @@ import kotlinx.coroutines.withContext
 @Composable
 fun ChecklistList(viewModel: TodoViewModel, searchText: String, refreshTrigger: Boolean) {
 
+    val context = LocalContext.current
     val isLoading = remember { mutableStateOf(true) }
     val itemList = remember { mutableStateListOf<Task>() }
 
@@ -69,6 +74,10 @@ fun ChecklistList(viewModel: TodoViewModel, searchText: String, refreshTrigger: 
                 val index = itemList.indexOfFirst { item -> item.id == todo.id }
                 if (index != -1) itemList[index] = todo
                 viewModel.updateTodo(todo)
+            }, onEdit = { todo ->
+                val intent = Intent(context, AddTodoActivity::class.java)
+                    .apply { putExtra("id", todo.id) }
+                context.startActivity(intent)
             }, onDelete = { todo ->
                 viewModel.deleteTodo(todo.id)
             })
@@ -80,6 +89,7 @@ fun ChecklistList(viewModel: TodoViewModel, searchText: String, refreshTrigger: 
 fun ChecklistItem(
     item: Task,
     onChecked: (Task) -> Unit,
+    onEdit: (Task) -> Unit,
     onDelete: (Task) -> Unit // 삭제 이벤트 추가
 ) {
     Card(
