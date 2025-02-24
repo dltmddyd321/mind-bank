@@ -40,11 +40,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.mindbank.component.ChecklistList
+import com.example.mindbank.component.SearchBar
 import com.example.mindbank.navigation.BottomNavBar
 import com.example.mindbank.navigation.MainGrid
 import com.example.mindbank.navigation.MainTopBar
 import com.example.mindbank.navigation.Screen
-import com.example.mindbank.navigation.SearchBar
 import com.example.mindbank.navigation.SettingsScreen
 import com.example.mindbank.state.DataType
 import com.example.mindbank.ui.theme.MindBankTheme
