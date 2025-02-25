@@ -1,9 +1,11 @@
 package com.example.mindbank.activity
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -19,6 +21,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -26,6 +29,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -44,8 +48,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.mindbank.activity.ui.theme.MindBankTheme
+import com.example.mindbank.viewmodel.DataStoreViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 class PasswordEditActivity : ComponentActivity() {
+    private val dataStoreViewModel: DataStoreViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -56,7 +67,19 @@ class PasswordEditActivity : ComponentActivity() {
                         modifier = Modifier.fillMaxSize(),
                         color = MaterialTheme.colorScheme.background
                     ) {
-                        PinCodeScreen()
+                        var password by remember { mutableStateOf("") }
+                        var isLoading by remember { mutableStateOf(true) }
+
+                        LaunchedEffect(Unit) {
+                            password = dataStoreViewModel.getPassWord()
+                            isLoading = false
+                        }
+
+                        if (isLoading) {
+                            CircularProgressIndicator()
+                        } else {
+                            PinCodeScreen(password)
+                        }
                     }
                 }
             }
@@ -65,10 +88,11 @@ class PasswordEditActivity : ComponentActivity() {
 }
 
 @Composable
-fun PinCodeScreen() {
+fun PinCodeScreen(initPassword: String) {
     val pin = remember { mutableStateListOf("", "", "", "", "", "") }
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
+    var editingPassword = initPassword
 
     Column(
         modifier = Modifier
@@ -91,6 +115,7 @@ fun PinCodeScreen() {
         Spacer(modifier = Modifier.height(30.dp))
 
         Button(onClick = {
+            editingPassword = pin.joinToString("")
             keyboardController?.hide()
         }) {
             Text("Submit")
