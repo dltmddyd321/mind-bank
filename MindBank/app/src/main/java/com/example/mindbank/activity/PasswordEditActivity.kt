@@ -83,99 +83,101 @@ class PasswordEditActivity : ComponentActivity() {
             }
         }
     }
-}
 
-@Composable
-fun PinCodeScreen(initPassword: String) {
-    val pin = remember { mutableStateListOf("", "", "", "", "", "") }
-    val focusManager = LocalFocusManager.current
-    val keyboardController = LocalSoftwareKeyboardController.current
-    var editingPassword = initPassword
+    @Composable
+    fun PinCodeScreen(initPassword: String) {
+        val pin = remember { mutableStateListOf("", "", "", "", "", "") }
+        val focusManager = LocalFocusManager.current
+        val keyboardController = LocalSoftwareKeyboardController.current
+        var editingPassword = initPassword
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(20.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text("Enter PIN", fontSize = 18.sp, color = Color.White)
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(20.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text("Enter PIN", fontSize = 18.sp, color = Color.White)
 
-        Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
-        PinInputField(pin) { index, value ->
-            pin[index] = value  // 변경된 값을 직접 업데이트
-            if (value.isNotEmpty() && index < 5) {
-                focusManager.moveFocus(androidx.compose.ui.focus.FocusDirection.Next)
+            PinInputField(pin) { index, value ->
+                pin[index] = value  // 변경된 값을 직접 업데이트
+                if (value.isNotEmpty() && index < 5) {
+                    focusManager.moveFocus(androidx.compose.ui.focus.FocusDirection.Next)
+                }
+            }
+
+            Spacer(modifier = Modifier.height(30.dp))
+
+            Button(onClick = {
+                editingPassword = pin.joinToString("")
+                dataStoreViewModel.setPassword(editingPassword)
+                keyboardController?.hide()
+            }) {
+                Text("Submit")
             }
         }
+    }
 
-        Spacer(modifier = Modifier.height(30.dp))
-
-        Button(onClick = {
-            editingPassword = pin.joinToString("")
-            keyboardController?.hide()
-        }) {
-            Text("Submit")
+    @Composable
+    fun PinInputField(pin: List<String>, onValueChange: (Int, String) -> Unit) {
+        val textFieldRefs = remember { List(6) { FocusRequester() } }
+        Row(
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight()
+                .padding(horizontal = 16.dp)
+        ) {
+            repeat(6) { index ->
+                TextField(
+                    value = pin.getOrElse(index) { "" },
+                    onValueChange = { value ->
+                        when {
+                            value.length == 1 && value.all { it.isDigit() } -> {
+                                onValueChange(index, value)
+                                if (index < 5) {
+                                    textFieldRefs[index + 1].requestFocus() // 🎯 다음 칸으로 이동
+                                }
+                            }
+                            value.isEmpty() -> {
+                                onValueChange(index, "")
+                            }
+                        }
+                    },
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        keyboardType = KeyboardType.Number,
+                        imeAction = if (index == 5) ImeAction.Done else ImeAction.Next
+                    ),
+                    singleLine = true,
+                    textStyle = LocalTextStyle.current.copy(
+                        fontSize = 24.sp,
+                        textAlign = TextAlign.Center,
+                        color = Color.White
+                    ),
+                    modifier = Modifier
+                        .weight(1f)
+                        .border(2.dp, if (pin.getOrElse(index) { "" }.isNotEmpty()) Color.White else Color.Gray)
+                        .background(Color.Black)
+                        .focusRequester(textFieldRefs[index]) // 🎯 각 칸의 포커스 제어
+                        .onKeyEvent { keyEvent ->
+                            if (keyEvent.type == KeyEventType.KeyUp && keyEvent.key == Key.Backspace) {
+                                if (pin[index].isEmpty() && index > 0) {
+                                    textFieldRefs[index - 1].requestFocus() // 🎯 이전 칸으로 이동
+                                    onValueChange(index - 1, "") // 🎯 이전 칸 값 삭제
+                                }
+                                true
+                            } else {
+                                false
+                            }
+                        }
+                )
+            }
         }
     }
 }
 
-@Composable
-fun PinInputField(pin: List<String>, onValueChange: (Int, String) -> Unit) {
-    val focusManager = LocalFocusManager.current
-    val textFieldRefs = remember { List(6) { FocusRequester() } }
-    Row(
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .fillMaxWidth()
-            .wrapContentHeight()
-            .padding(horizontal = 16.dp)
-    ) {
-        repeat(6) { index ->
-            TextField(
-                value = pin.getOrElse(index) { "" },
-                onValueChange = { value ->
-                    when {
-                        value.length == 1 && value.all { it.isDigit() } -> {
-                            onValueChange(index, value)
-                            if (index < 5) {
-                                textFieldRefs[index + 1].requestFocus() // 🎯 다음 칸으로 이동
-                            }
-                        }
-                        value.isEmpty() -> {
-                            onValueChange(index, "")
-                        }
-                    }
-                },
-                keyboardOptions = KeyboardOptions.Default.copy(
-                    keyboardType = KeyboardType.Number,
-                    imeAction = if (index == 5) ImeAction.Done else ImeAction.Next
-                ),
-                singleLine = true,
-                textStyle = LocalTextStyle.current.copy(
-                    fontSize = 24.sp,
-                    textAlign = TextAlign.Center,
-                    color = Color.White
-                ),
-                modifier = Modifier
-                    .weight(1f)
-                    .border(2.dp, if (pin.getOrElse(index) { "" }.isNotEmpty()) Color.White else Color.Gray)
-                    .background(Color.Black)
-                    .focusRequester(textFieldRefs[index]) // 🎯 각 칸의 포커스 제어
-                    .onKeyEvent { keyEvent ->
-                        if (keyEvent.type == KeyEventType.KeyUp && keyEvent.key == Key.Backspace) {
-                            if (pin[index].isEmpty() && index > 0) {
-                                textFieldRefs[index - 1].requestFocus() // 🎯 이전 칸으로 이동
-                                onValueChange(index - 1, "") // 🎯 이전 칸 값 삭제
-                            }
-                            true
-                        } else {
-                            false
-                        }
-                    }
-            )
-        }
-    }
-}
+
