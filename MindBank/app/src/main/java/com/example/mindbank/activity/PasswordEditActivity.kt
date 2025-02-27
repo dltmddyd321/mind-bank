@@ -1,6 +1,8 @@
 package com.example.mindbank.activity
 
+import android.content.Context
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -27,12 +29,14 @@ import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
@@ -41,6 +45,7 @@ import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.type
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
@@ -76,7 +81,12 @@ class PasswordEditActivity : ComponentActivity() {
                         if (isLoading) {
                             CircularProgressIndicator()
                         } else {
-                            PinCodeScreen(password)
+                            PasswordFlowScreen(
+                                savedPassword = password,
+                                onSavePassword = { newPassword ->
+                                    dataStoreViewModel.setPassword(newPassword)
+                                }
+                            )
                         }
                     }
                 }
@@ -85,11 +95,42 @@ class PasswordEditActivity : ComponentActivity() {
     }
 
     @Composable
-    fun PinCodeScreen(initPassword: String) {
+    fun PasswordFlowScreen(savedPassword: String, onSavePassword: (String) -> Unit) {
+        var currentStep by remember { mutableIntStateOf(0) } // 0: 입력 단계, 1: 재확인 단계
+        var enteredPassword by remember { mutableStateOf("") }
+        val context = LocalContext.current
+
+        PinCodeScreen(context,
+            title = if (currentStep == 0) "Enter PIN" else "Confirm PIN",
+            onComplete = { pin ->
+                if (currentStep == 0) {
+                    enteredPassword = pin
+                    currentStep = 1 // 재확인 단계로 이동
+                } else {
+                    if (enteredPassword == pin) {
+                        onSavePassword(pin) // 저장
+                    } else {
+                        Toast.makeText(context, "Passwords do not match!", Toast.LENGTH_SHORT)
+                            .show()
+                    }
+                }
+            },
+            onBack = {
+                if (currentStep == 1) currentStep = 0 // 재확인 단계에서만 뒤로 가기 가능
+            }
+        )
+    }
+
+    @Composable
+    fun PinCodeScreen(
+        context: Context,
+        title: String,
+        onComplete: (String) -> Unit,
+        onBack: () -> Unit
+    ) {
         val pin = remember { mutableStateListOf("", "", "", "", "", "") }
         val focusManager = LocalFocusManager.current
         val keyboardController = LocalSoftwareKeyboardController.current
-        var editingPassword = initPassword
 
         Column(
             modifier = Modifier
@@ -98,25 +139,39 @@ class PasswordEditActivity : ComponentActivity() {
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("Enter PIN", fontSize = 18.sp, color = Color.White)
-
+            Text(title, fontSize = 18.sp, color = Color.White)
             Spacer(modifier = Modifier.height(20.dp))
 
             PinInputField(pin) { index, value ->
-                pin[index] = value  // 변경된 값을 직접 업데이트
+                pin[index] = value
                 if (value.isNotEmpty() && index < 5) {
-                    focusManager.moveFocus(androidx.compose.ui.focus.FocusDirection.Next)
+                    focusManager.moveFocus(FocusDirection.Next)
                 }
             }
 
             Spacer(modifier = Modifier.height(30.dp))
 
-            Button(onClick = {
-                editingPassword = pin.joinToString("")
-                dataStoreViewModel.setPassword(editingPassword)
-                keyboardController?.hide()
-            }) {
-                Text("Submit")
+            Row {
+                if (title == "Confirm PIN") {
+                    Button(onClick = onBack, modifier = Modifier.padding(end = 8.dp)) {
+                        Text("Back")
+                    }
+                }
+                Button(onClick = {
+                    val enteredPin = pin.joinToString("")
+                    if (enteredPin.length == 6) {
+                        onComplete(enteredPin)
+                        keyboardController?.hide()
+                    } else {
+                        Toast.makeText(
+                            context,
+                            "Please enter all 6 digits",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }) {
+                    Text("Submit")
+                }
             }
         }
     }
