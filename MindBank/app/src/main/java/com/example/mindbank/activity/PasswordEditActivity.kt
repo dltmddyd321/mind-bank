@@ -98,6 +98,7 @@ class PasswordEditActivity : ComponentActivity() {
     fun PasswordFlowScreen(savedPassword: String, onSavePassword: (String) -> Unit) {
         var currentStep by remember { mutableIntStateOf(0) } // 0: 입력 단계, 1: 재확인 단계
         var enteredPassword by remember { mutableStateOf("") }
+        var errorMessage by remember { mutableStateOf("") }
         val context = LocalContext.current
 
         PinCodeScreen(context,
@@ -106,18 +107,22 @@ class PasswordEditActivity : ComponentActivity() {
                 if (currentStep == 0) {
                     enteredPassword = pin
                     currentStep = 1 // 재확인 단계로 이동
+                    errorMessage = ""
                 } else {
                     if (enteredPassword == pin) {
                         onSavePassword(pin) // 저장
                     } else {
-                        Toast.makeText(context, "Passwords do not match!", Toast.LENGTH_SHORT)
-                            .show()
+                        errorMessage = "비밀번호가 일치하지 않습니다."
                     }
                 }
             },
             onBack = {
-                if (currentStep == 1) currentStep = 0 // 재확인 단계에서만 뒤로 가기 가능
-            }
+                if (currentStep == 1) {
+                    currentStep = 0 // 재확인 단계에서 뒤로 가기 가능
+                    errorMessage = "" // 🔴 뒤로 갈 때 에러 메시지 초기화
+                }
+            },
+            errorMessage = errorMessage
         )
     }
 
@@ -126,7 +131,8 @@ class PasswordEditActivity : ComponentActivity() {
         context: Context,
         title: String,
         onComplete: (String) -> Unit,
-        onBack: () -> Unit
+        onBack: () -> Unit,
+        errorMessage: String = ""
     ) {
         val pin = remember { mutableStateListOf("", "", "", "", "", "") }
         val focusManager = LocalFocusManager.current
@@ -147,6 +153,15 @@ class PasswordEditActivity : ComponentActivity() {
                 if (value.isNotEmpty() && index < 5) {
                     focusManager.moveFocus(FocusDirection.Next)
                 }
+            }
+
+            if (errorMessage.isNotEmpty()) {
+                Text(
+                    text = errorMessage,
+                    color = Color.Red,
+                    fontSize = 14.sp,
+                    modifier = Modifier.padding(top = 4.dp)
+                )
             }
 
             Spacer(modifier = Modifier.height(30.dp))
