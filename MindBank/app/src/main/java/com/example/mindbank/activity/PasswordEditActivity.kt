@@ -96,30 +96,47 @@ class PasswordEditActivity : ComponentActivity() {
 
     @Composable
     fun PasswordFlowScreen(savedPassword: String, onSavePassword: (String) -> Unit) {
-        var currentStep by remember { mutableIntStateOf(0) } // 0: 입력 단계, 1: 재확인 단계
+        var currentStep by remember { mutableIntStateOf(if (savedPassword.isEmpty()) 1 else 0) }
         var enteredPassword by remember { mutableStateOf("") }
         var errorMessage by remember { mutableStateOf("") }
         val context = LocalContext.current
 
+        val title = when (currentStep) {
+            0 -> "현재 비밀번호 입력"
+            1 -> "새 비밀번호 입력"
+            else -> "새 비밀번호 확인"
+        }
+
         PinCodeScreen(context,
-            title = if (currentStep == 0) "Enter PIN" else "Confirm PIN",
+            title = title,
             onComplete = { pin ->
-                if (currentStep == 0) {
-                    enteredPassword = pin
-                    currentStep = 1 // 재확인 단계로 이동
-                    errorMessage = ""
-                } else {
-                    if (enteredPassword == pin) {
-                        onSavePassword(pin) // 저장
-                    } else {
-                        errorMessage = "비밀번호가 일치하지 않습니다."
+                when (currentStep) {
+                    0 -> { // 🔵 기존 비밀번호 확인 단계
+                        if (pin != savedPassword) {
+                            errorMessage = "비밀번호가 일치하지 않습니다."
+                        } else {
+                            currentStep = 1 // 새 비밀번호 입력 단계로 이동
+                            errorMessage = ""
+                        }
+                    }
+                    1 -> { // 🟢 새 비밀번호 입력 단계
+                        enteredPassword = pin
+                        currentStep = 2 // 새 비밀번호 재확인 단계로 이동
+                        errorMessage = ""
+                    }
+                    2 -> { // 🔴 새 비밀번호 재확인 단계
+                        if (enteredPassword == pin) {
+                            onSavePassword(pin) // 저장
+                        } else {
+                            errorMessage = "비밀번호가 일치하지 않습니다."
+                        }
                     }
                 }
             },
             onBack = {
-                if (currentStep == 1) {
-                    currentStep = 0 // 재확인 단계에서 뒤로 가기 가능
-                    errorMessage = "" // 🔴 뒤로 갈 때 에러 메시지 초기화
+                if (currentStep > 1 || (savedPassword.isNotEmpty() && currentStep > 0)) {
+                    currentStep -= 1 // 이전 단계로 이동
+                    errorMessage = "" // 🔴 에러 메시지 초기화
                 }
             },
             errorMessage = errorMessage
@@ -167,7 +184,7 @@ class PasswordEditActivity : ComponentActivity() {
             Spacer(modifier = Modifier.height(30.dp))
 
             Row {
-                if (title == "Confirm PIN") {
+                if (title != "새 비밀번호 입력") { // 첫 단계에서는 뒤로가기 버튼 없음
                     Button(onClick = onBack, modifier = Modifier.padding(end = 8.dp)) {
                         Text("Back")
                     }
