@@ -80,6 +80,7 @@ fun ChecklistList(viewModel: TodoViewModel, searchText: String, refreshTrigger: 
                 context.startActivity(intent)
             }, onDelete = { todo ->
                 viewModel.deleteTodo(todo.id)
+                itemList.remove(todo)
             })
         }
     }
@@ -131,7 +132,7 @@ fun ChecklistItem(
                 contentDescription = "Edit",
                 modifier = Modifier
                     .size(20.dp)
-                    .clickable { /* 편집 기능 추가 가능 */ }
+                    .clickable { onEdit.invoke(item) }
             )
 
             Spacer(modifier = Modifier.width(8.dp))

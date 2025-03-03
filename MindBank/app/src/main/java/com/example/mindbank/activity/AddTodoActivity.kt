@@ -16,6 +16,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -46,6 +47,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
@@ -154,17 +156,37 @@ class AddTodoActivity : ComponentActivity() {
             }
 
             if (showColorPicker) {
+                var selectedColor by remember { mutableStateOf(Color.Red) }
+
                 Dialog(onDismissRequest = { showColorPicker = false }) {
-                    HsvColorPicker(
+                    Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(450.dp)
                             .padding(10.dp),
-                        controller = colorController,
-                        onColorChanged = { colorEnvelope: ColorEnvelope ->
-                            onColorChange.invoke(colorEnvelope.color)
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        HsvColorPicker(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(450.dp),
+                            controller = colorController,
+                            onColorChanged = { colorEnvelope: ColorEnvelope ->
+                                selectedColor = colorEnvelope.color
+                            }
+                        )
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        Button(
+                            onClick = {
+                                onColorChange.invoke(selectedColor)
+                                showColorPicker = false
+                            },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text("확인", fontSize = 18.sp)
                         }
-                    )
+                    }
                 }
             }
 
