@@ -96,7 +96,7 @@ class MainActivity : ComponentActivity() {
                 }
             ) { paddingValues ->
                 NavHost(navController, startDestination = Screen.Todo.route) {
-                    composable(Screen.Home.route) { HomeScreen(refreshTrigger.value, dataViewModel, todoViewModel, paddingValues) }
+                    composable(Screen.Home.route) { HomeScreen(dataViewModel, todoViewModel, paddingValues) }
                     composable(Screen.Todo.route) { NotesScreen(refreshTrigger.value, dataViewModel, todoViewModel, paddingValues, DataType.Todo) }
                     composable(Screen.Notes.route) { NotesScreen(refreshTrigger.value, dataViewModel, todoViewModel, paddingValues, DataType.Memo) }
                     composable(Screen.Settings.route) { SettingsScreen(paddingValues, dataViewModel) { dataViewModel.clear() } }
