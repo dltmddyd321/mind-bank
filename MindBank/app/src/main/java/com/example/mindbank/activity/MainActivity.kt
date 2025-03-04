@@ -44,6 +44,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.mindbank.component.ChecklistList
 import com.example.mindbank.component.SearchBar
 import com.example.mindbank.navigation.BottomNavBar
+import com.example.mindbank.navigation.HomeScreen
 import com.example.mindbank.navigation.MainGrid
 import com.example.mindbank.navigation.MainTopBar
 import com.example.mindbank.navigation.Screen
@@ -95,6 +96,7 @@ class MainActivity : ComponentActivity() {
                 }
             ) { paddingValues ->
                 NavHost(navController, startDestination = Screen.Todo.route) {
+                    composable(Screen.Home.route) { HomeScreen(refreshTrigger.value, dataViewModel, todoViewModel, paddingValues) }
                     composable(Screen.Todo.route) { NotesScreen(refreshTrigger.value, dataViewModel, todoViewModel, paddingValues, DataType.Todo) }
                     composable(Screen.Notes.route) { NotesScreen(refreshTrigger.value, dataViewModel, todoViewModel, paddingValues, DataType.Memo) }
                     composable(Screen.Settings.route) { SettingsScreen(paddingValues, dataViewModel) { dataViewModel.clear() } }

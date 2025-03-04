@@ -35,7 +35,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.mindbank.R
-import com.example.mindbank.activity.AddMemoActivity
 import com.example.mindbank.activity.AddTodoActivity
 import com.example.mindbank.data.Task
 import com.example.mindbank.util.hexToColor
