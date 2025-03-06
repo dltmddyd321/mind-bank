@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import com.example.mindbank.data.Task
 import com.example.mindbank.db.TodoRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -13,8 +12,11 @@ import javax.inject.Inject
 class TodoViewModel @Inject constructor(
     private val todoRepository: TodoRepository
 ): ViewModel() {
+
+    private val taskComparator = compareByDescending<Task> { it.position }
+
     suspend fun getAllData(): List<Task> = withContext(viewModelScope.coroutineContext) {
-        todoRepository.getAllTodos()
+        todoRepository.getAllTodos().sortedWith(taskComparator)
     }
 
     fun updateTodo(task: Task) {
@@ -22,7 +24,7 @@ class TodoViewModel @Inject constructor(
     }
 
     suspend fun searchByKeyword(keyword: String): List<Task> = withContext(viewModelScope.coroutineContext) {
-        todoRepository.searchByKeyword(keyword)
+        todoRepository.searchByKeyword(keyword).sortedWith(taskComparator)
     }
 
     suspend fun searchById(id: Int): Task? = withContext(viewModelScope.coroutineContext) {
@@ -31,5 +33,9 @@ class TodoViewModel @Inject constructor(
 
     fun deleteTodo(id: Int) {
         todoRepository.delete(id)
+    }
+
+    fun clear() {
+        todoRepository.clear()
     }
 }

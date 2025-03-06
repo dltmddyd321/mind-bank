@@ -12,12 +12,15 @@ import javax.inject.Inject
 class DataViewModel @Inject constructor(
     private val dataRepository: DataRepository
 ) : ViewModel() {
+
+    private val memoComparator = compareByDescending<SaveData> { it.dtCreated }
+
     suspend fun getAllData(): List<SaveData> = withContext(viewModelScope.coroutineContext) {
-        dataRepository.getAllData()
+        dataRepository.getAllData().sortedWith(memoComparator)
     }
 
     suspend fun searchByKeyword(keyword: String): List<SaveData> = withContext(viewModelScope.coroutineContext) {
-        dataRepository.searchByKeyword(keyword)
+        dataRepository.searchByKeyword(keyword).sortedWith(memoComparator)
     }
 
     suspend fun searchById(id: Int): SaveData? = withContext(viewModelScope.coroutineContext) {

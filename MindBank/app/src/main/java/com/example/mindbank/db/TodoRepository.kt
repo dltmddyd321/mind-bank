@@ -33,4 +33,10 @@ class TodoRepository @Inject constructor(
             todoDao.deleteById(id)
         }
     }
+
+    fun clear() {
+        CoroutineScope(Dispatchers.IO).launch {
+            todoDao.deleteAll()
+        }
+    }
 }

@@ -99,7 +99,10 @@ class MainActivity : ComponentActivity() {
                     composable(Screen.Home.route) { HomeScreen(dataViewModel, todoViewModel, paddingValues) }
                     composable(Screen.Todo.route) { NotesScreen(refreshTrigger.value, dataViewModel, todoViewModel, paddingValues, DataType.Todo) }
                     composable(Screen.Notes.route) { NotesScreen(refreshTrigger.value, dataViewModel, todoViewModel, paddingValues, DataType.Memo) }
-                    composable(Screen.Settings.route) { SettingsScreen(paddingValues, dataViewModel) { dataViewModel.clear() } }
+                    composable(Screen.Settings.route) { SettingsScreen(paddingValues, dataViewModel) {
+                        todoViewModel.clear()
+                        dataViewModel.clear() }
+                    }
                 }
             }
         }
