@@ -28,8 +28,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
-import androidx.compose.material.icons.filled.ArrowForward
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -56,12 +54,10 @@ import androidx.compose.ui.unit.sp
 import com.example.mindbank.R
 import com.example.mindbank.activity.PasswordEditActivity
 import com.example.mindbank.ui.theme.MindBankTheme
-import com.example.mindbank.viewmodel.DataViewModel
 
 @Composable
 fun SettingsScreen(
     paddingValues: PaddingValues,
-    dataViewModel: DataViewModel,
     onConfirmDelete: () -> Unit
 ) {
     Box(

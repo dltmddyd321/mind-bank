@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -19,6 +18,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -43,106 +43,113 @@ import kotlinx.coroutines.withContext
 
 @Composable
 fun HomeScreen(
-    dataViewModel: DataViewModel,
-    todoViewModel: TodoViewModel,
-    paddingValues: PaddingValues
+    dataViewModel: DataViewModel, todoViewModel: TodoViewModel, paddingValues: PaddingValues
 ) {
-    MindBankTheme {
-        Surface(
-            modifier = Modifier.fillMaxSize(),
-            color = MaterialTheme.colorScheme.background
-        ) {
-            val context = LocalContext.current
-            val isLoading = remember { mutableStateOf(true) }
-            val todoList = remember { mutableStateListOf<Task>() }
-            val memoList = remember { mutableStateListOf<SaveData>() }
-
-            LaunchedEffect(Unit) {
-                withContext(Dispatchers.IO) {
-                    memoList.clear()
-                    memoList.addAll(dataViewModel.getAllData())
-                    todoList.clear()
-                    todoList.addAll(todoViewModel.getAllData())
-                }
-                isLoading.value = false
-            }
-
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues),
-                contentAlignment = Alignment.Center
-            ) {
-                Column {
-                    Card(
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(paddingValues),
+        contentAlignment = Alignment.Center
+    ) {
+        MindBankTheme {
+            Scaffold(
+                topBar = {
+                    MainTopBar("Home")
+                },
+                content = {
+                    Surface(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .height(300.dp)
-                            .padding(16.dp),
-                        shape = RoundedCornerShape(16.dp),
-                        border = BorderStroke(2.dp, Color.Gray.copy(alpha = 0.5f)),
-                        colors = CardDefaults.cardColors(containerColor = Color.Transparent)
+                            .fillMaxSize()
+                            .padding(it),
+                        color = MaterialTheme.colorScheme.background
                     ) {
+                        val context = LocalContext.current
+                        val isLoading = remember { mutableStateOf(true) }
+                        val todoList = remember { mutableStateListOf<Task>() }
+                        val memoList = remember { mutableStateListOf<SaveData>() }
+
+                        LaunchedEffect(Unit) {
+                            withContext(Dispatchers.IO) {
+                                memoList.clear()
+                                memoList.addAll(dataViewModel.getAllData())
+                                todoList.clear()
+                                todoList.addAll(todoViewModel.getAllData())
+                            }
+                            isLoading.value = false
+                        }
+
                         Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .fillMaxHeight()
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
                         ) {
-                            LazyColumn(
-                                modifier = Modifier.fillMaxSize(),
-                                verticalArrangement = Arrangement.spacedBy(8.dp)
-                            ) {
-                                items(memoList.toList()) { memo ->
-                                    MemoItemView(
-                                        data = memo,
-                                        onDelete = {
-                                            dataViewModel.deleteData(memo)
-                                            memoList.removeAll { it.id == memo.id }
+                            Column {
+                                Card(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(300.dp)
+                                        .padding(16.dp),
+                                    shape = RoundedCornerShape(16.dp),
+                                    border = BorderStroke(2.dp, Color.Gray.copy(alpha = 0.5f)),
+                                    colors = CardDefaults.cardColors(containerColor = Color.Transparent)
+                                ) {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .fillMaxHeight()
+                                    ) {
+                                        LazyColumn(
+                                            modifier = Modifier.fillMaxSize(),
+                                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                                        ) {
+                                            items(memoList.toList()) { memo ->
+                                                MemoItemView(data = memo, onDelete = {
+                                                    dataViewModel.deleteData(memo)
+                                                    memoList.removeAll { it.id == memo.id }
+                                                })
+                                            }
                                         }
-                                    )
+                                    }
+                                }
+
+                                Spacer(modifier = Modifier.height(16.dp))
+
+                                Card(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(300.dp)
+                                        .padding(16.dp),
+                                    shape = RoundedCornerShape(16.dp),
+                                    border = BorderStroke(2.dp, Color.Gray.copy(alpha = 0.5f)),
+                                    colors = CardDefaults.cardColors(containerColor = Color.Transparent)
+                                ) {
+                                    LazyColumn(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                                    ) {
+                                        items(todoList.toList()) { task ->
+                                            ChecklistItem(item = task, onChecked = { todo ->
+                                                val index =
+                                                    todoList.indexOfFirst { it.id == todo.id }
+                                                if (index != -1) todoList[index] = todo
+                                                todoViewModel.updateTodo(todo)
+                                            }, onEdit = { todo ->
+                                                val intent = Intent(
+                                                    context,
+                                                    AddTodoActivity::class.java
+                                                ).apply { putExtra("id", todo.id) }
+                                                context.startActivity(intent)
+                                            }, onDelete = { todo ->
+                                                todoList.removeAll { it.id == todo.id }
+                                                todoViewModel.deleteTodo(todo.id)
+                                            })
+                                        }
+                                    }
                                 }
                             }
                         }
                     }
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(300.dp)
-                            .padding(16.dp),
-                        shape = RoundedCornerShape(16.dp),
-                        border = BorderStroke(2.dp, Color.Gray.copy(alpha = 0.5f)),
-                        colors = CardDefaults.cardColors(containerColor = Color.Transparent)
-                    ) {
-                        LazyColumn(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            items(todoList.toList()) { task ->
-                                ChecklistItem(
-                                    item = task,
-                                    onChecked = { todo ->
-                                        val index = todoList.indexOfFirst { it.id == todo.id }
-                                        if (index != -1) todoList[index] = todo
-                                        todoViewModel.updateTodo(todo)
-                                    },
-                                    onEdit = { todo ->
-                                        val intent = Intent(context, AddTodoActivity::class.java)
-                                            .apply { putExtra("id", todo.id) }
-                                        context.startActivity(intent)
-                                    },
-                                    onDelete = { todo ->
-                                        todoList.removeAll { it.id == todo.id }
-                                        todoViewModel.deleteTodo(todo.id)
-                                    }
-                                )
-                            }
-                        }
-                    }
                 }
-            }
+            )
         }
     }
 }
