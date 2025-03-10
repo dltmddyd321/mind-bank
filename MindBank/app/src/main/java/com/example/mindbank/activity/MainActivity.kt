@@ -1,6 +1,7 @@
 package com.example.mindbank.activity
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.os.Bundle
@@ -63,6 +64,12 @@ class MainActivity : ComponentActivity() {
     private val dataViewModel: DataViewModel by viewModels()
     private var backPressedTime: Long = 0
     private var isTodoMode = false
+
+    private val todoLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            todoViewModel.loadTodoList()
+        }
+    }
 
     @SuppressLint("SourceLockedOrientationActivity")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -169,7 +176,11 @@ class MainActivity : ComponentActivity() {
                 if (viewModel is DataViewModel) {
                     MainGrid(viewModel, searchText, refreshTrigger)
                 } else if (viewModel is TodoViewModel) {
-                    ChecklistList(viewModel, searchText, refreshTrigger)
+                    ChecklistList(viewModel, searchText) { todo ->
+                        val intent = Intent(this@MainActivity, AddTodoActivity::class.java)
+                            .apply { putExtra("id", todo.id) }
+                        todoLauncher.launch(intent)
+                    }
                 }
             }
         }

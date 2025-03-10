@@ -76,6 +76,7 @@ import kotlinx.coroutines.flow.debounce
 class AddTodoActivity : ComponentActivity() {
 
     private val todoViewModel: TodoViewModel by viewModels()
+    private var editId = -1
 
     @Composable
     fun BackHandlerWithQuestionDialog(initValue: Boolean) {
@@ -111,20 +112,23 @@ class AddTodoActivity : ComponentActivity() {
                 ) {
                     var title by remember { mutableStateOf("") }
                     var circleColor by remember { mutableStateOf(Color.Red) }
-                    val id = intent?.getIntExtra("id", -1) ?: -1
+                    editId = intent?.getIntExtra("id", -1) ?: -1
                     var editingData by remember { mutableStateOf<Task?>(null) }
+                    var isEditMode by remember { mutableStateOf(false) }
 
-                    LaunchedEffect(id) {
-                        editingData = todoViewModel.searchById(id)
+                    LaunchedEffect(editId) {
+                        editingData = todoViewModel.searchById(editId)
                         title = editingData?.title ?: ""
                         val lastColor = editingData?.color
                         if (!lastColor.isNullOrEmpty()) circleColor = hexToColor(lastColor)
+                        if (editingData != null) isEditMode = true
                     }
 
                     BackHandlerWithQuestionDialog(false)
                     InputScreen(
                         title,
                         circleColor,
+                        isEditMode,
                         onTextChange = {
                             title = it
                         },
@@ -143,6 +147,7 @@ class AddTodoActivity : ComponentActivity() {
     fun InputScreen(
         title: String,
         circleColor: Color,
+        isEditMode: Boolean,
         onTextChange: (String) -> Unit,
         onColorChange: (Color) -> Unit
     ) {
@@ -218,7 +223,17 @@ class AddTodoActivity : ComponentActivity() {
                             return@Button
                         }
                         val currentTime = System.currentTimeMillis()
-                        todoViewModel.updateTodo(
+                        val task = if (isEditMode) {
+                            Task(
+                                id = editId,
+                                title = title,
+                                dtCreated = currentTime,
+                                dtUpdated = currentTime,
+                                color = circleColor.toHex(),
+                                isDone = false,
+                                position = currentTime
+                            )
+                        } else {
                             Task(
                                 title = title,
                                 dtCreated = currentTime,
@@ -227,7 +242,9 @@ class AddTodoActivity : ComponentActivity() {
                                 isDone = false,
                                 position = currentTime
                             )
-                        )
+                        }
+                        todoViewModel.updateTodo(task)
+                        setResult(RESULT_OK)
                         finish()
                     }) {
                         Text("Save")

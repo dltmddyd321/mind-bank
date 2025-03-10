@@ -1,6 +1,5 @@
 package com.example.mindbank.component
 
-import android.content.Intent
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -23,41 +22,22 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.mindbank.R
-import com.example.mindbank.activity.AddTodoActivity
 import com.example.mindbank.data.Task
 import com.example.mindbank.util.hexToColor
 import com.example.mindbank.viewmodel.TodoViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 @Composable
-fun ChecklistList(viewModel: TodoViewModel, searchText: String, refreshTrigger: Boolean) {
-
-    val context = LocalContext.current
-    val isLoading = remember { mutableStateOf(true) }
-    val itemList = remember { mutableStateListOf<Task>() }
-
-    LaunchedEffect(key1 = refreshTrigger) {
-        withContext(Dispatchers.IO) {
-            val data = if (searchText.isNotEmpty()) viewModel.searchByKeyword(searchText)
-            else viewModel.getAllData()
-            itemList.clear()
-            itemList.addAll(data)
-        }
-        isLoading.value = false // 로딩 상태 업데이트
-    }
+fun ChecklistList(viewModel: TodoViewModel, searchText: String, onEdit: (Task) -> Unit) {
+    val itemList by viewModel.todos.collectAsState()
 
     val filteredList = if (searchText.isNotEmpty()) itemList.filter {
         it.title.contains(searchText, ignoreCase = true)
@@ -69,18 +49,9 @@ fun ChecklistList(viewModel: TodoViewModel, searchText: String, refreshTrigger: 
             .padding(16.dp)
     ) {
         items(filteredList) {
-            ChecklistItem(item = it, onChecked = { todo ->
-                val index = itemList.indexOfFirst { item -> item.id == todo.id }
-                if (index != -1) itemList[index] = todo
-                viewModel.updateTodo(todo)
-            }, onEdit = { todo ->
-                val intent = Intent(context, AddTodoActivity::class.java)
-                    .apply { putExtra("id", todo.id) }
-                context.startActivity(intent)
-            }, onDelete = { todo ->
-                viewModel.deleteTodo(todo.id)
-                itemList.remove(todo)
-            })
+            ChecklistItem(item = it, onChecked = { todo -> viewModel.updateTodo(todo)
+            }, onEdit = { todo -> onEdit.invoke(todo)
+            }, onDelete = { todo -> viewModel.deleteTodo(todo.id) })
         }
     }
 }
