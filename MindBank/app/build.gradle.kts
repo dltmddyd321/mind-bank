@@ -52,6 +52,8 @@ android {
 }
 
 dependencies {
+    implementation(libs.tedpermission.normal)
+    implementation(libs.tedpermission.coroutine)
     implementation(libs.androidx.biometric)
     implementation (libs.retrofit)
     implementation (libs.converter.gson)
