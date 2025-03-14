@@ -34,12 +34,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import com.example.mindbank.activity.AddMemoActivity
 import com.example.mindbank.activity.WebViewActivity
-import com.example.mindbank.data.SaveData
+import com.example.mindbank.data.Memo
+import com.example.mindbank.data.Task
 import com.example.mindbank.util.hexToColor
 import com.example.mindbank.util.isDarkColor
 
 @Composable
-fun MemoItemView(data: SaveData, onDelete: () -> Unit) {
+fun MemoItemView(data: Memo, onEdit: (Memo) -> Unit, onDelete: (Memo) -> Unit) {
     Box(
         modifier = Modifier
             .padding(8.dp)
@@ -75,13 +76,10 @@ fun MemoItemView(data: SaveData, onDelete: () -> Unit) {
                     )
 
                     var showDialog by remember { mutableStateOf(false) }
-                    val context = LocalContext.current
 
                     IconButton(
                         onClick = {
-                            val intent = Intent(context, AddMemoActivity::class.java)
-                                .apply { putExtra("id", data.id) }
-                            context.startActivity(intent)
+                            onEdit.invoke(data)
                         },
                         modifier = Modifier.size(24.dp)
                     ) {
@@ -114,7 +112,7 @@ fun MemoItemView(data: SaveData, onDelete: () -> Unit) {
                                 confirmButton = {
                                     TextButton(
                                         onClick = {
-                                            onDelete() // 삭제 확인 시 onDelete 실행
+                                            onDelete(data) // 삭제 확인 시 onDelete 실행
                                             showDialog = false // 다이얼로그 닫기
                                         }
                                     ) {

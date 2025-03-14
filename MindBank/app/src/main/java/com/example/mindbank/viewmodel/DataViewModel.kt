@@ -2,8 +2,7 @@ package com.example.mindbank.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.mindbank.data.SaveData
-import com.example.mindbank.data.Task
+import com.example.mindbank.data.Memo
 import com.example.mindbank.db.DataRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -19,8 +18,8 @@ class DataViewModel @Inject constructor(
     private val dataRepository: DataRepository
 ) : ViewModel() {
 
-    private val _memos = MutableStateFlow<List<SaveData>>(emptyList())
-    val memos: StateFlow<List<SaveData>> = _memos.asStateFlow()
+    private val _memos = MutableStateFlow<List<Memo>>(emptyList())
+    val memos: StateFlow<List<Memo>> = _memos.asStateFlow()
 
     init {
         loadMemoList()
@@ -33,28 +32,28 @@ class DataViewModel @Inject constructor(
         }
     }
 
-    private val memoComparator = compareByDescending<SaveData> { it.dtCreated }
+    private val memoComparator = compareByDescending<Memo> { it.dtCreated }
 
-    suspend fun getAllData(): List<SaveData> = withContext(viewModelScope.coroutineContext) {
+    suspend fun getAllData(): List<Memo> = withContext(viewModelScope.coroutineContext) {
         dataRepository.getAllData().sortedWith(memoComparator)
     }
 
-    suspend fun searchByKeyword(keyword: String): List<SaveData> = withContext(viewModelScope.coroutineContext) {
+    suspend fun searchByKeyword(keyword: String): List<Memo> = withContext(viewModelScope.coroutineContext) {
         dataRepository.searchByKeyword(keyword).sortedWith(memoComparator)
     }
 
-    suspend fun searchById(id: Int): SaveData? = withContext(viewModelScope.coroutineContext) {
+    suspend fun searchById(id: Int): Memo? = withContext(viewModelScope.coroutineContext) {
         dataRepository.searchById(id)
     }
 
-    fun insertData(data: SaveData) {
+    fun insertData(data: Memo) {
         viewModelScope.launch(Dispatchers.IO) {
             dataRepository.insertOrUpdate(data)
             loadMemoList()
         }
     }
 
-    fun deleteData(data: SaveData) {
+    fun deleteData(data: Memo) {
         viewModelScope.launch(Dispatchers.IO) {
             dataRepository.delete(data)
             loadMemoList()

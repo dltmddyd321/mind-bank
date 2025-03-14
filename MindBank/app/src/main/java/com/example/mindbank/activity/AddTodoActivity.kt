@@ -46,10 +46,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalContext
@@ -58,9 +56,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import com.example.mindbank.data.SaveData
 import com.example.mindbank.data.Task
-import com.example.mindbank.navigation.Screen
 import com.example.mindbank.ui.theme.MindBankTheme
 import com.example.mindbank.util.hexToColor
 import com.example.mindbank.util.toHex
@@ -70,7 +66,6 @@ import com.github.skydoves.colorpicker.compose.HsvColorPicker
 import com.github.skydoves.colorpicker.compose.rememberColorPickerController
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.debounce
 
 @AndroidEntryPoint
 class AddTodoActivity : ComponentActivity() {

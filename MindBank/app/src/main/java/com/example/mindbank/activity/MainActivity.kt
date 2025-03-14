@@ -70,6 +70,11 @@ class MainActivity : ComponentActivity() {
             todoViewModel.loadTodoList()
         }
     }
+    private val memoLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            dataViewModel.loadMemoList()
+        }
+    }
 
     @SuppressLint("SourceLockedOrientationActivity")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -103,9 +108,28 @@ class MainActivity : ComponentActivity() {
                 }
             ) { paddingValues ->
                 NavHost(navController, startDestination = Screen.Todo.route) {
-                    composable(Screen.Home.route) { HomeScreen(dataViewModel, todoViewModel, paddingValues) }
-                    composable(Screen.Todo.route) { NotesScreen(refreshTrigger.value, dataViewModel, todoViewModel, paddingValues, DataType.Todo) }
-                    composable(Screen.Notes.route) { NotesScreen(refreshTrigger.value, dataViewModel, todoViewModel, paddingValues, DataType.Memo) }
+                    composable(Screen.Home.route) { HomeScreen(dataViewModel, todoViewModel,
+                    paddingValues, onEditTodo = { todo ->
+                        val intent = Intent(this@MainActivity, AddTodoActivity::class.java)
+                            .apply { putExtra("id", todo.id) }
+                        todoLauncher.launch(intent)
+                    }, onEditMemo = { memo ->
+                        val intent = Intent(this@MainActivity, AddMemoActivity::class.java)
+                            .apply { putExtra("id", memo.id) }
+                        memoLauncher.launch(intent)
+                    }) }
+                    composable(Screen.Todo.route) { NotesScreen(
+                        dataViewModel,
+                        todoViewModel,
+                        paddingValues,
+                        DataType.Todo
+                    ) }
+                    composable(Screen.Notes.route) { NotesScreen(
+                        dataViewModel,
+                        todoViewModel,
+                        paddingValues,
+                        DataType.Memo
+                    ) }
                     composable(Screen.Settings.route) { SettingsScreen(paddingValues) {
                         todoViewModel.clear()
                         dataViewModel.clear() }
@@ -130,7 +154,6 @@ class MainActivity : ComponentActivity() {
 
     @Composable
     fun NotesScreen(
-        refreshTrigger: Boolean,
         dataViewModel: DataViewModel,
         todoViewModel: TodoViewModel,
         paddingValues: PaddingValues,
@@ -142,9 +165,9 @@ class MainActivity : ComponentActivity() {
                 color = MaterialTheme.colorScheme.background
             ) {
                 if (dataType == DataType.Todo) {
-                    MainScreen(todoViewModel, paddingValues, refreshTrigger)
+                    MainScreen(todoViewModel, paddingValues)
                 } else {
-                    MainScreen(dataViewModel, paddingValues, refreshTrigger)
+                    MainScreen(dataViewModel, paddingValues)
                 }
             }
         }
@@ -152,7 +175,7 @@ class MainActivity : ComponentActivity() {
 
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     @Composable
-    fun MainScreen(viewModel: ViewModel, paddingValues: PaddingValues, refreshTrigger: Boolean) {
+    fun MainScreen(viewModel: ViewModel, paddingValues: PaddingValues) {
         isTodoMode = viewModel is TodoViewModel
         val title = if (isTodoMode) "Todo" else "Memo"
         var searchText by remember { mutableStateOf("") }
@@ -174,7 +197,11 @@ class MainActivity : ComponentActivity() {
                     .padding(innerPadding)
             ) {
                 if (viewModel is DataViewModel) {
-                    MainGrid(viewModel, searchText, refreshTrigger)
+                    MainGrid(viewModel, searchText) { memo ->
+                        val intent = Intent(this@MainActivity, AddMemoActivity::class.java)
+                            .apply { putExtra("id", memo.id) }
+                        memoLauncher.launch(intent)
+                    }
                 } else if (viewModel is TodoViewModel) {
                     ChecklistList(viewModel, searchText) { todo ->
                         val intent = Intent(this@MainActivity, AddTodoActivity::class.java)

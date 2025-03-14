@@ -57,14 +57,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import com.example.mindbank.data.SaveData
+import com.example.mindbank.data.Memo
 import com.example.mindbank.navigation.Screen
 import com.example.mindbank.viewmodel.DataStoreViewModel
 import com.example.mindbank.viewmodel.DataViewModel
 import com.example.mindbank.ui.theme.MindBankTheme
 import com.example.mindbank.util.hexToColor
 import com.example.mindbank.util.toHex
-import com.example.mindbank.viewmodel.TodoViewModel
 import com.github.skydoves.colorpicker.compose.ColorEnvelope
 import com.github.skydoves.colorpicker.compose.HsvColorPicker
 import com.github.skydoves.colorpicker.compose.rememberColorPickerController
@@ -88,7 +87,7 @@ class AddMemoActivity : ComponentActivity() {
                 ) {
                     val mode = intent?.getStringExtra("mode") ?: Screen.Notes.title
                     val id = intent?.getIntExtra("id", -1) ?: -1
-                    var editingData by remember { mutableStateOf<SaveData?>(null) }
+                    var editingData by remember { mutableStateOf<Memo?>(null) }
 
                     var title by remember { mutableStateOf("") }
                     var memo by remember { mutableStateOf("") }
@@ -252,7 +251,7 @@ class AddMemoActivity : ComponentActivity() {
                     }
                     Button(onClick = {
                         dataViewModel.insertData(
-                            SaveData(
+                            Memo(
                                 title = title,
                                 detail = memo,
                                 dtCreated = System.currentTimeMillis(),

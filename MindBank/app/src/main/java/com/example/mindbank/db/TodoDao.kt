@@ -4,7 +4,6 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.example.mindbank.data.SaveData
 import com.example.mindbank.data.Task
 
 @Dao
