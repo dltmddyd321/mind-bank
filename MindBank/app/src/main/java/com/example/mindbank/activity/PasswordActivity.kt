@@ -7,7 +7,6 @@ import android.app.AlarmManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ActivityInfo
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
@@ -15,6 +14,7 @@ import android.view.animation.AnticipateInterpolator
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
@@ -57,6 +57,20 @@ import androidx.core.net.toUri
 @AndroidEntryPoint
 class PasswordActivity : ComponentActivity() {
 
+    @SuppressLint("InlinedApi")
+    private val permissionLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            val permission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                listOf(Manifest.permission.SCHEDULE_EXACT_ALARM)
+            } else listOf(Manifest.permission.SCHEDULE_EXACT_ALARM,
+                Manifest.permission.POST_NOTIFICATIONS)
+
+            TedPermission.create()
+                .setPermissionListener(permissionListener)
+                .setPermissions(*permission.toTypedArray())
+                .setDeniedMessage("알람을 사용하려면 권한을 허용해야 합니다.")
+                .check()
+        }
     private lateinit var splash: androidx.core.splashscreen.SplashScreen
     private val dataStoreViewModel: DataStoreViewModel by viewModels()
     private var password = ""
@@ -82,22 +96,12 @@ class PasswordActivity : ComponentActivity() {
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
     }
 
-    @SuppressLint("InlinedApi")
     private fun fetchPassword() {
         CoroutineScope(Dispatchers.IO).launch {
             password = dataStoreViewModel.getPassWord()
             withContext(Dispatchers.Main) {
                 requestAlarmPermission(this@PasswordActivity)
-                val permission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                    listOf(Manifest.permission.SCHEDULE_EXACT_ALARM)
-                } else listOf(Manifest.permission.SCHEDULE_EXACT_ALARM,
-                    Manifest.permission.POST_NOTIFICATIONS)
 
-                TedPermission.create()
-                .setPermissionListener(permissionListener)
-                .setPermissions(*permission.toTypedArray())
-                .setDeniedMessage("알람을 사용하려면 권한을 허용해야 합니다.")
-                .check()
             }
         }
     }
@@ -117,7 +121,7 @@ class PasswordActivity : ComponentActivity() {
         }
     }
 
-    fun requestAlarmPermission(context: Context) {
+    private fun requestAlarmPermission(context: Context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
@@ -125,8 +129,12 @@ class PasswordActivity : ComponentActivity() {
                 val intent = Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM).apply {
                     data = "package:${context.packageName}".toUri()
                 }
-                context.startActivity(intent)
+                permissionLauncher.launch(intent)
+            } else {
+                start { onCheckPassword?.invoke() }
             }
+        } else {
+            start { onCheckPassword?.invoke() }
         }
     }
 
