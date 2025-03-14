@@ -1,13 +1,18 @@
 package com.example.mindbank.activity
 
+import android.Manifest
 import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
+import android.app.AlarmManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ActivityInfo
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import android.view.animation.AnticipateInterpolator
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -38,13 +43,16 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.fragment.app.FragmentActivity
 import com.example.mindbank.activity.ui.theme.MindBankTheme
 import com.example.mindbank.viewmodel.DataStoreViewModel
+import com.gun0912.tedpermission.PermissionListener
+import com.gun0912.tedpermission.normal.TedPermission
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 import java.util.concurrent.Executor
+import androidx.core.net.toUri
+
 
 @AndroidEntryPoint
 class PasswordActivity : ComponentActivity() {
@@ -52,12 +60,13 @@ class PasswordActivity : ComponentActivity() {
     private lateinit var splash: androidx.core.splashscreen.SplashScreen
     private val dataStoreViewModel: DataStoreViewModel by viewModels()
     private var password = ""
+    private var onCheckPassword: (() -> Unit?)? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         splash = installSplashScreen()
         startSplash()
-        fetchPassword {
+        onCheckPassword = {
             setContent {
                 MindBankTheme {
                     Surface(
@@ -69,20 +78,63 @@ class PasswordActivity : ComponentActivity() {
                 }
             }
         }
+        fetchPassword()
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
     }
 
-    private fun fetchPassword(onCheckPassword: () -> Unit) {
+    @SuppressLint("InlinedApi")
+    private fun fetchPassword() {
         CoroutineScope(Dispatchers.IO).launch {
             password = dataStoreViewModel.getPassWord()
             withContext(Dispatchers.Main) {
-                val intent = Intent(this@PasswordActivity, MainActivity::class.java).apply {
-                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                }
-                if (password.isEmpty()) startActivity(intent) else { onCheckPassword.invoke() }
-                Timber.tag("패스워드").e(password)
+                requestAlarmPermission(this@PasswordActivity)
+                val permission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    listOf(Manifest.permission.SCHEDULE_EXACT_ALARM)
+                } else listOf(Manifest.permission.SCHEDULE_EXACT_ALARM,
+                    Manifest.permission.POST_NOTIFICATIONS)
+
+                TedPermission.create()
+                .setPermissionListener(permissionListener)
+                .setPermissions(*permission.toTypedArray())
+                .setDeniedMessage("알람을 사용하려면 권한을 허용해야 합니다.")
+                .check()
             }
         }
+    }
+
+    private var permissionListener: PermissionListener = object : PermissionListener {
+        override fun onPermissionGranted() {
+            Toast.makeText(this@PasswordActivity, "Permission Granted", Toast.LENGTH_SHORT).show()
+            start { onCheckPassword?.invoke() }
+        }
+
+        override fun onPermissionDenied(deniedPermissions: List<String>) {
+            Toast.makeText(
+                this@PasswordActivity,
+                "Permission Denied\n$deniedPermissions", Toast.LENGTH_SHORT
+            ).show()
+            start { onCheckPassword?.invoke() }
+        }
+    }
+
+    fun requestAlarmPermission(context: Context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+
+            if (!alarmManager.canScheduleExactAlarms()) {
+                val intent = Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM).apply {
+                    data = "package:${context.packageName}".toUri()
+                }
+                context.startActivity(intent)
+            }
+        }
+    }
+
+    private fun start(onCheckPassword: () -> Unit) {
+        val intent = Intent(this@PasswordActivity, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        }
+        if (password.isEmpty()) startActivity(intent) else { onCheckPassword.invoke() }
     }
 
     @SuppressLint("Recycle")
