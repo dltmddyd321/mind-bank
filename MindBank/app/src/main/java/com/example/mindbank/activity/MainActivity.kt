@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.mindbank.component.ChecklistList
 import com.example.mindbank.component.SearchBar
@@ -87,27 +88,31 @@ class MainActivity : ComponentActivity() {
             ) { _ -> refreshTrigger.value = !refreshTrigger.value }
             ChangeSystemBarsTheme(!isSystemInDarkTheme())
             val navController = rememberNavController()
+            val navBackStackEntry by navController.currentBackStackEntryAsState()
+            val currentRoute = navBackStackEntry?.destination?.route
             Scaffold(
                 bottomBar = { BottomNavBar(navController = navController) }, floatingActionButton = {
-                    val context = LocalContext.current
-                    FloatingActionButton(
-                        onClick = {
-                            val intent = if (isTodoMode) Intent(context, AddTodoActivity::class.java)
-                            else Intent(context, AddMemoActivity::class.java)
-                            launcher.launch(intent)
-                        },
-                        containerColor = MaterialTheme.colorScheme.secondary,
-                        shape = RoundedCornerShape(16.dp),
-                    ) {
-                        Icon(
-                            imageVector = Icons.Rounded.Add,
-                            contentDescription = "Add FAB",
-                            tint = Color.White,
-                        )
+                    if (currentRoute == Screen.Todo.route || currentRoute == Screen.Notes.route) {
+                        val context = LocalContext.current
+                        FloatingActionButton(
+                            onClick = {
+                                val intent = if (isTodoMode) Intent(context, AddTodoActivity::class.java)
+                                else Intent(context, AddMemoActivity::class.java)
+                                launcher.launch(intent)
+                            },
+                            containerColor = MaterialTheme.colorScheme.secondary,
+                            shape = RoundedCornerShape(16.dp),
+                        ) {
+                            Icon(
+                                imageVector = Icons.Rounded.Add,
+                                contentDescription = "Add FAB",
+                                tint = Color.White,
+                            )
+                        }
                     }
                 }
             ) { paddingValues ->
-                NavHost(navController, startDestination = Screen.Todo.route) {
+                NavHost(navController, startDestination = Screen.Home.route) {
                     composable(Screen.Home.route) { HomeScreen(memoViewModel, todoViewModel,
                     paddingValues, onEditTodo = { todo ->
                         val intent = Intent(this@MainActivity, AddTodoActivity::class.java)
