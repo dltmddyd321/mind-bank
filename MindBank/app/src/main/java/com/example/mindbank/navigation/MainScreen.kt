@@ -16,12 +16,14 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.example.mindbank.R
 import com.example.mindbank.component.MemoItemView
 import com.example.mindbank.data.Memo
-import com.example.mindbank.viewmodel.DataViewModel
+import com.example.mindbank.viewmodel.MemoViewModel
 
 @Composable
 fun MainTopBar(title: String = "Memos") {
@@ -43,9 +45,8 @@ fun MainTopBar(title: String = "Memos") {
 }
 
 @Composable
-fun MainGrid(dataViewModel: DataViewModel, searchText: String, onEdit: (Memo) -> Unit) {
-    val itemList by dataViewModel.memos.collectAsState()
-
+fun MainGrid(memoViewModel: MemoViewModel, searchText: String, onEdit: (Memo) -> Unit) {
+    val itemList by memoViewModel.memos.collectAsState()
     val filteredList = if (searchText.isNotEmpty()) itemList.filter {
         it.title.contains(searchText, ignoreCase = true) || it.detail.contains(
             searchText,
@@ -63,7 +64,7 @@ fun MainGrid(dataViewModel: DataViewModel, searchText: String, onEdit: (Memo) ->
                 MemoItemView(item, onEdit = {
                     onEdit.invoke(it)
                 }, onDelete = {
-                    dataViewModel.deleteData(item)
+                    memoViewModel.deleteData(item)
                 })
             }
         }
@@ -71,7 +72,7 @@ fun MainGrid(dataViewModel: DataViewModel, searchText: String, onEdit: (Memo) ->
         Box(
             contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()
         ) {
-            Text(text = "메모가 없습니다.", textAlign = TextAlign.Center)
+            Text(text = stringResource(R.string.empty_memo), textAlign = TextAlign.Center)
         }
     }
 }

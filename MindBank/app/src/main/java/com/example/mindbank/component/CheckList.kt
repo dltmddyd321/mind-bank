@@ -4,6 +4,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -29,6 +30,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.mindbank.R
 import com.example.mindbank.data.Task
@@ -38,20 +41,27 @@ import com.example.mindbank.viewmodel.TodoViewModel
 @Composable
 fun ChecklistList(viewModel: TodoViewModel, searchText: String, onEdit: (Task) -> Unit) {
     val itemList by viewModel.todos.collectAsState()
-
     val filteredList = if (searchText.isNotEmpty()) itemList.filter {
         it.title.contains(searchText, ignoreCase = true)
     } else itemList
 
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-    ) {
-        items(filteredList) {
-            ChecklistItem(item = it, onChecked = { todo -> viewModel.updateTodo(todo)
-            }, onEdit = { todo -> onEdit.invoke(todo)
-            }, onDelete = { todo -> viewModel.deleteTodo(todo.id) })
+    if (filteredList.isNotEmpty()) {
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp)
+        ) {
+            items(filteredList) {
+                ChecklistItem(item = it, onChecked = { todo -> viewModel.updateTodo(todo)
+                }, onEdit = { todo -> onEdit.invoke(todo)
+                }, onDelete = { todo -> viewModel.deleteTodo(todo.id) })
+            }
+        }
+    } else {
+        Box(
+            contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()
+        ) {
+            Text(text = stringResource(R.string.empty_todo), textAlign = TextAlign.Center)
         }
     }
 }
@@ -61,7 +71,7 @@ fun ChecklistItem(
     item: Task,
     onChecked: (Task) -> Unit,
     onEdit: (Task) -> Unit,
-    onDelete: (Task) -> Unit // 삭제 이벤트 추가
+    onDelete: (Task) -> Unit
 ) {
     Card(
         modifier = Modifier
@@ -84,8 +94,8 @@ fun ChecklistItem(
                 modifier = Modifier
                     .size(24.dp)
                     .clickable {
-                        val updatedTask = item.copy(isDone = !item.isDone) // 새로운 객체 생성
-                        onChecked.invoke(updatedTask) // ViewModel 업데이트
+                        val updatedTask = item.copy(isDone = !item.isDone)
+                        onChecked.invoke(updatedTask)
                     }
             )
 

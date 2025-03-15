@@ -54,13 +54,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.example.mindbank.data.Memo
 import com.example.mindbank.navigation.Screen
 import com.example.mindbank.viewmodel.DataStoreViewModel
-import com.example.mindbank.viewmodel.DataViewModel
+import com.example.mindbank.viewmodel.MemoViewModel
 import com.example.mindbank.ui.theme.MindBankTheme
 import com.example.mindbank.util.hexToColor
 import com.example.mindbank.util.toHex
@@ -75,7 +76,7 @@ import kotlinx.coroutines.flow.debounce
 class AddMemoActivity : ComponentActivity() {
 
     private val dataStoreViewModel: DataStoreViewModel by viewModels()
-    private val dataViewModel: DataViewModel by viewModels()
+    private val memoViewModel: MemoViewModel by viewModels()
 
     @OptIn(ExperimentalMaterial3Api::class, FlowPreview::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -85,7 +86,6 @@ class AddMemoActivity : ComponentActivity() {
                 Surface(
                     modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
                 ) {
-                    val mode = intent?.getStringExtra("mode") ?: Screen.Notes.title
                     val id = intent?.getIntExtra("id", -1) ?: -1
                     var editingData by remember { mutableStateOf<Memo?>(null) }
 
@@ -94,7 +94,7 @@ class AddMemoActivity : ComponentActivity() {
                     var circleColor by remember { mutableStateOf(Color.Red) }
 
                     LaunchedEffect(id) {
-                        editingData = dataViewModel.searchById(id)
+                        editingData = memoViewModel.searchById(id)
                         title = editingData?.title ?: ""
                         memo = editingData?.detail ?: ""
                         val lastColor = editingData?.color
@@ -111,7 +111,6 @@ class AddMemoActivity : ComponentActivity() {
                         title,
                         memo,
                         circleColor,
-                        isTodoInputMode = mode == Screen.Todo.title,
                         onTitleChange = {
                             title = it
                         },
@@ -120,7 +119,8 @@ class AddMemoActivity : ComponentActivity() {
                         },
                         onColorChange = {
                             circleColor = it
-                        })
+                        }
+                    )
                 }
             }
         }
@@ -197,7 +197,6 @@ class AddMemoActivity : ComponentActivity() {
         title: String,
         memo: String,
         circleColor: Color,
-        isTodoInputMode: Boolean,
         onTitleChange: (String) -> Unit,
         onTextChange: (String) -> Unit,
         onColorChange: (Color) -> Unit
@@ -227,7 +226,8 @@ class AddMemoActivity : ComponentActivity() {
                 }
             }
 
-            TopAppBar(title = {
+            TopAppBar(
+                title = {
                 Text(text = "Memo", color = MaterialTheme.colorScheme.onPrimary)
             }, navigationIcon = {
                 IconButton(onClick = { showBackDialog = true }) {
@@ -250,7 +250,7 @@ class AddMemoActivity : ComponentActivity() {
                         )
                     }
                     Button(onClick = {
-                        dataViewModel.insertData(
+                        memoViewModel.insertData(
                             Memo(
                                 title = title,
                                 detail = memo,
@@ -276,11 +276,9 @@ class AddMemoActivity : ComponentActivity() {
                 TitleInputField(title, onTitleChange = { value ->
                     onTitleChange.invoke(value)
                 })
-                if (!isTodoInputMode) {
-                    InputField(memo, onTextChange = { value ->
-                        onTextChange.invoke(value)
-                    })
-                }
+                InputField(memo, onTextChange = { value ->
+                    onTextChange.invoke(value)
+                })
             }
         }
     }

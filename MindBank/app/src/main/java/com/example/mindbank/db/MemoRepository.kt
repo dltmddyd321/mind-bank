@@ -8,7 +8,7 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import kotlin.system.exitProcess
 
-class DataRepository @Inject constructor(
+class MemoRepository @Inject constructor(
     private val dataDao: SaveDataDao
 ) {
     suspend fun getAllData(): List<Memo> = withContext(Dispatchers.IO) {
@@ -40,34 +40,4 @@ class DataRepository @Inject constructor(
             dataDao.deleteAll()
         }
     }
-}
-
-fun main() {
-    val n = readLine()!!.toInt()
-    val result = StringBuilder()
-
-    fun isGoodSequence(seq: String): Boolean {
-        for (len in 1..(seq.length / 2)) {
-            if (seq.substring(seq.length - len * 2, seq.length - len) == seq.substring(seq.length - len)) {
-                return false
-            }
-        }
-        return true
-    }
-
-    fun backtrack(sequence: String) {
-        if (sequence.length == n) {
-            println(sequence)
-            exitProcess(0) // 첫 번째로 찾은 결과 출력 후 종료
-        }
-
-        for (i in 1..3) {
-            val newSequence = sequence + i
-            if (isGoodSequence(newSequence)) {
-                backtrack(newSequence)
-            }
-        }
-    }
-
-    backtrack("")
 }

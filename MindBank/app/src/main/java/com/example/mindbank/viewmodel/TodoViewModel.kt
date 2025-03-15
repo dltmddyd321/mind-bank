@@ -34,7 +34,7 @@ class TodoViewModel @Inject constructor(
 
     private val taskComparator = compareByDescending<Task> { it.position }
 
-    suspend fun getAllData(): List<Task> = withContext(viewModelScope.coroutineContext) {
+    private suspend fun getAllData(): List<Task> = withContext(viewModelScope.coroutineContext) {
         todoRepository.getAllTodos().sortedWith(taskComparator)
     }
 

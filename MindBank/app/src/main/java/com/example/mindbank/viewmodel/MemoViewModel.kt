@@ -3,7 +3,7 @@ package com.example.mindbank.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mindbank.data.Memo
-import com.example.mindbank.db.DataRepository
+import com.example.mindbank.db.MemoRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,8 +14,8 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
-class DataViewModel @Inject constructor(
-    private val dataRepository: DataRepository
+class MemoViewModel @Inject constructor(
+    private val memoRepository: MemoRepository
 ) : ViewModel() {
 
     private val _memos = MutableStateFlow<List<Memo>>(emptyList())
@@ -34,33 +34,33 @@ class DataViewModel @Inject constructor(
 
     private val memoComparator = compareByDescending<Memo> { it.dtCreated }
 
-    suspend fun getAllData(): List<Memo> = withContext(viewModelScope.coroutineContext) {
-        dataRepository.getAllData().sortedWith(memoComparator)
+    private suspend fun getAllData(): List<Memo> = withContext(viewModelScope.coroutineContext) {
+        memoRepository.getAllData().sortedWith(memoComparator)
     }
 
     suspend fun searchByKeyword(keyword: String): List<Memo> = withContext(viewModelScope.coroutineContext) {
-        dataRepository.searchByKeyword(keyword).sortedWith(memoComparator)
+        memoRepository.searchByKeyword(keyword).sortedWith(memoComparator)
     }
 
     suspend fun searchById(id: Int): Memo? = withContext(viewModelScope.coroutineContext) {
-        dataRepository.searchById(id)
+        memoRepository.searchById(id)
     }
 
     fun insertData(data: Memo) {
         viewModelScope.launch(Dispatchers.IO) {
-            dataRepository.insertOrUpdate(data)
+            memoRepository.insertOrUpdate(data)
             loadMemoList()
         }
     }
 
     fun deleteData(data: Memo) {
         viewModelScope.launch(Dispatchers.IO) {
-            dataRepository.delete(data)
+            memoRepository.delete(data)
             loadMemoList()
         }
     }
 
     fun clear() {
-        dataRepository.clear()
+        memoRepository.clear()
     }
 }

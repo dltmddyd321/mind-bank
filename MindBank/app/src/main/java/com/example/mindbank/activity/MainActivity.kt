@@ -52,7 +52,7 @@ import com.example.mindbank.navigation.Screen
 import com.example.mindbank.navigation.SettingsScreen
 import com.example.mindbank.state.DataType
 import com.example.mindbank.ui.theme.MindBankTheme
-import com.example.mindbank.viewmodel.DataViewModel
+import com.example.mindbank.viewmodel.MemoViewModel
 import com.example.mindbank.viewmodel.TodoViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -61,7 +61,7 @@ import dagger.hilt.android.AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
     private val todoViewModel: TodoViewModel by viewModels()
-    private val dataViewModel: DataViewModel by viewModels()
+    private val memoViewModel: MemoViewModel by viewModels()
     private var backPressedTime: Long = 0
     private var isTodoMode = false
 
@@ -72,7 +72,7 @@ class MainActivity : ComponentActivity() {
     }
     private val memoLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
-            dataViewModel.loadMemoList()
+            memoViewModel.loadMemoList()
         }
     }
 
@@ -108,7 +108,7 @@ class MainActivity : ComponentActivity() {
                 }
             ) { paddingValues ->
                 NavHost(navController, startDestination = Screen.Todo.route) {
-                    composable(Screen.Home.route) { HomeScreen(dataViewModel, todoViewModel,
+                    composable(Screen.Home.route) { HomeScreen(memoViewModel, todoViewModel,
                     paddingValues, onEditTodo = { todo ->
                         val intent = Intent(this@MainActivity, AddTodoActivity::class.java)
                             .apply { putExtra("id", todo.id) }
@@ -119,20 +119,20 @@ class MainActivity : ComponentActivity() {
                         memoLauncher.launch(intent)
                     }) }
                     composable(Screen.Todo.route) { NotesScreen(
-                        dataViewModel,
+                        memoViewModel,
                         todoViewModel,
                         paddingValues,
                         DataType.Todo
                     ) }
                     composable(Screen.Notes.route) { NotesScreen(
-                        dataViewModel,
+                        memoViewModel,
                         todoViewModel,
                         paddingValues,
                         DataType.Memo
                     ) }
                     composable(Screen.Settings.route) { SettingsScreen(paddingValues) {
                         todoViewModel.clear()
-                        dataViewModel.clear() }
+                        memoViewModel.clear() }
                     }
                 }
             }
@@ -154,7 +154,7 @@ class MainActivity : ComponentActivity() {
 
     @Composable
     fun NotesScreen(
-        dataViewModel: DataViewModel,
+        memoViewModel: MemoViewModel,
         todoViewModel: TodoViewModel,
         paddingValues: PaddingValues,
         dataType: DataType
@@ -167,7 +167,7 @@ class MainActivity : ComponentActivity() {
                 if (dataType == DataType.Todo) {
                     MainScreen(todoViewModel, paddingValues)
                 } else {
-                    MainScreen(dataViewModel, paddingValues)
+                    MainScreen(memoViewModel, paddingValues)
                 }
             }
         }
@@ -196,7 +196,7 @@ class MainActivity : ComponentActivity() {
                     .fillMaxSize()
                     .padding(innerPadding)
             ) {
-                if (viewModel is DataViewModel) {
+                if (viewModel is MemoViewModel) {
                     MainGrid(viewModel, searchText) { memo ->
                         val intent = Intent(this@MainActivity, AddMemoActivity::class.java)
                             .apply { putExtra("id", memo.id) }
