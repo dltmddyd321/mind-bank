@@ -82,10 +82,6 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            val refreshTrigger = remember { mutableStateOf(false) }
-            val launcher = rememberLauncherForActivityResult(
-                contract = ActivityResultContracts.StartActivityForResult()
-            ) { _ -> refreshTrigger.value = !refreshTrigger.value }
             ChangeSystemBarsTheme(!isSystemInDarkTheme())
             val navController = rememberNavController()
             val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -96,9 +92,13 @@ class MainActivity : ComponentActivity() {
                         val context = LocalContext.current
                         FloatingActionButton(
                             onClick = {
-                                val intent = if (isTodoMode) Intent(context, AddTodoActivity::class.java)
-                                else Intent(context, AddMemoActivity::class.java)
-                                launcher.launch(intent)
+                                if (isTodoMode) {
+                                    val intent =Intent(context, AddTodoActivity::class.java)
+                                    todoLauncher.launch(intent)
+                                } else {
+                                    val intent =Intent(context, AddMemoActivity::class.java)
+                                    memoLauncher.launch(intent)
+                                }
                             },
                             containerColor = MaterialTheme.colorScheme.secondary,
                             shape = RoundedCornerShape(16.dp),
@@ -112,6 +112,7 @@ class MainActivity : ComponentActivity() {
                     }
                 }
             ) { paddingValues ->
+                isTodoMode = currentRoute == Screen.Todo.route
                 NavHost(navController, startDestination = Screen.Home.route) {
                     composable(Screen.Home.route) { HomeScreen(memoViewModel, todoViewModel,
                     paddingValues, onEditTodo = { todo ->
@@ -181,7 +182,6 @@ class MainActivity : ComponentActivity() {
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     @Composable
     fun MainScreen(viewModel: ViewModel, paddingValues: PaddingValues) {
-        isTodoMode = viewModel is TodoViewModel
         val title = if (isTodoMode) "Todo" else "Memo"
         var searchText by remember { mutableStateOf("") }
         Scaffold(
