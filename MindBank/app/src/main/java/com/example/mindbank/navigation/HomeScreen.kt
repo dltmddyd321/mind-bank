@@ -6,11 +6,13 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -85,6 +87,7 @@ fun HomeScreen(
                                         modifier = Modifier
                                             .fillMaxWidth()
                                             .fillMaxHeight()
+                                            .padding(8.dp)
                                     ) {
                                         if (memoList.isNotEmpty()) {
                                             LazyColumn(
@@ -101,9 +104,13 @@ fun HomeScreen(
                                             }
                                         } else {
                                             Box(
-                                                contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()
+                                                contentAlignment = Alignment.Center,
+                                                modifier = Modifier.fillMaxSize()
                                             ) {
-                                                Text(text = stringResource(R.string.empty_memo), textAlign = TextAlign.Center)
+                                                Text(
+                                                    text = stringResource(R.string.empty_memo),
+                                                    textAlign = TextAlign.Center
+                                                )
                                             }
                                         }
                                     }
@@ -114,7 +121,8 @@ fun HomeScreen(
                                 Card(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .height(300.dp)
+                                        .wrapContentHeight()
+                                        .defaultMinSize(minHeight = 300.dp)
                                         .padding(16.dp),
                                     shape = RoundedCornerShape(16.dp),
                                     border = BorderStroke(2.dp, Color.Gray.copy(alpha = 0.5f)),
@@ -122,7 +130,11 @@ fun HomeScreen(
                                 ) {
                                     if (todoList.isNotEmpty()) {
                                         LazyColumn(
-                                            modifier = Modifier.fillMaxWidth(),
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .fillMaxHeight()
+                                                .defaultMinSize(minHeight = 300.dp)
+                                                .padding(8.dp),
                                             verticalArrangement = Arrangement.spacedBy(8.dp)
                                         ) {
                                             items(todoList.toList()) { task ->
@@ -137,9 +149,13 @@ fun HomeScreen(
                                         }
                                     } else {
                                         Box(
-                                            contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()
+                                            contentAlignment = Alignment.Center,
+                                            modifier = Modifier.fillMaxSize()
                                         ) {
-                                            Text(text = stringResource(R.string.empty_todo), textAlign = TextAlign.Center)
+                                            Text(
+                                                text = stringResource(R.string.empty_todo),
+                                                textAlign = TextAlign.Center
+                                            )
                                         }
                                     }
                                 }

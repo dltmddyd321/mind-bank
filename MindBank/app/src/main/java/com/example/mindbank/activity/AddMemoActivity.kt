@@ -259,6 +259,7 @@ class AddMemoActivity : ComponentActivity() {
                                 color = circleColor.toHex()
                             )
                         )
+                        setResult(RESULT_OK)
                         finish()
                     }) {
                         Text("Save")

@@ -32,10 +32,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
-import com.example.mindbank.activity.AddMemoActivity
 import com.example.mindbank.activity.WebViewActivity
 import com.example.mindbank.data.Memo
-import com.example.mindbank.data.Task
 import com.example.mindbank.util.hexToColor
 import com.example.mindbank.util.isDarkColor
 
