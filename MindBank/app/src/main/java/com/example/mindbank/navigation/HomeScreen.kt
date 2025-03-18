@@ -69,64 +69,65 @@ fun HomeScreen(
                         val todoList by todoViewModel.todos.collectAsState()
                         val memoList by memoViewModel.memos.collectAsState()
 
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Column {
-                                Card(
+                        Column {
+                            Card(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(300.dp)
+                                    .padding(16.dp),
+                                shape = RoundedCornerShape(16.dp),
+                                border = BorderStroke(2.dp, Color.Gray.copy(alpha = 0.5f)),
+                                colors = CardDefaults.cardColors(containerColor = Color.Transparent)
+                            ) {
+                                Box(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .height(300.dp)
-                                        .padding(16.dp),
-                                    shape = RoundedCornerShape(16.dp),
-                                    border = BorderStroke(2.dp, Color.Gray.copy(alpha = 0.5f)),
-                                    colors = CardDefaults.cardColors(containerColor = Color.Transparent)
+                                        .fillMaxHeight()
+                                        .padding(8.dp)
                                 ) {
-                                    Box(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .fillMaxHeight()
-                                            .padding(8.dp)
-                                    ) {
-                                        if (memoList.isNotEmpty()) {
-                                            LazyColumn(
-                                                modifier = Modifier.fillMaxSize(),
-                                                verticalArrangement = Arrangement.spacedBy(8.dp)
-                                            ) {
-                                                items(memoList.toList()) { memo ->
-                                                    MemoItemView(data = memo, onEdit = {
-                                                        onEditMemo.invoke(memo)
-                                                    }, onDelete = {
-                                                        memoViewModel.deleteData(memo)
-                                                    })
-                                                }
+                                    if (memoList.isNotEmpty()) {
+                                        LazyColumn(
+                                            modifier = Modifier.fillMaxSize(),
+                                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                                        ) {
+                                            items(memoList.toList()) { memo ->
+                                                MemoItemView(data = memo, onEdit = {
+                                                    onEditMemo.invoke(memo)
+                                                }, onDelete = {
+                                                    memoViewModel.deleteData(memo)
+                                                })
                                             }
-                                        } else {
-                                            Box(
-                                                contentAlignment = Alignment.Center,
-                                                modifier = Modifier.fillMaxSize()
-                                            ) {
-                                                Text(
-                                                    text = stringResource(R.string.empty_memo),
-                                                    textAlign = TextAlign.Center
-                                                )
-                                            }
+                                        }
+                                    } else {
+                                        Box(
+                                            contentAlignment = Alignment.Center,
+                                            modifier = Modifier.fillMaxSize()
+                                        ) {
+                                            Text(
+                                                text = stringResource(R.string.empty_memo),
+                                                textAlign = TextAlign.Center
+                                            )
                                         }
                                     }
                                 }
+                            }
 
-                                Spacer(modifier = Modifier.height(16.dp))
+                            Spacer(modifier = Modifier.height(16.dp))
 
-                                Card(
+                            Card(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(300.dp)
+                                    .padding(16.dp),
+                                shape = RoundedCornerShape(16.dp),
+                                border = BorderStroke(2.dp, Color.Gray.copy(alpha = 0.5f)),
+                                colors = CardDefaults.cardColors(containerColor = Color.Transparent)
+                            ) {
+                                Box(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .wrapContentHeight()
-                                        .defaultMinSize(minHeight = 300.dp)
-                                        .padding(16.dp),
-                                    shape = RoundedCornerShape(16.dp),
-                                    border = BorderStroke(2.dp, Color.Gray.copy(alpha = 0.5f)),
-                                    colors = CardDefaults.cardColors(containerColor = Color.Transparent)
+                                        .fillMaxHeight()
+                                        .padding(8.dp)
                                 ) {
                                     if (todoList.isNotEmpty()) {
                                         LazyColumn(
