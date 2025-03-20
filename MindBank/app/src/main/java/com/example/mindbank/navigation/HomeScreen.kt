@@ -50,7 +50,8 @@ fun HomeScreen(
 ) {
     Box(
         modifier = Modifier
-            .fillMaxSize()
+            .fillMaxWidth()
+            .wrapContentHeight()
             .padding(paddingValues),
         contentAlignment = Alignment.Center
     ) {
@@ -66,97 +67,90 @@ fun HomeScreen(
                             .padding(it),
                         color = MaterialTheme.colorScheme.background
                     ) {
-                        val todoList by todoViewModel.todos.collectAsState()
-                        val memoList by memoViewModel.memos.collectAsState()
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(horizontal = 16.dp),
+                            verticalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            item {
+                                val memoList by memoViewModel.memos.collectAsState()
 
-                        Column {
-                            Card(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(300.dp)
-                                    .padding(16.dp),
-                                shape = RoundedCornerShape(16.dp),
-                                border = BorderStroke(2.dp, Color.Gray.copy(alpha = 0.5f)),
-                                colors = CardDefaults.cardColors(containerColor = Color.Transparent)
-                            ) {
-                                Box(
+                                Card(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .fillMaxHeight()
-                                        .padding(8.dp)
+                                        .wrapContentHeight(),
+                                    shape = RoundedCornerShape(16.dp),
+                                    border = BorderStroke(2.dp, Color.Gray.copy(alpha = 0.5f)),
+                                    colors = CardDefaults.cardColors(containerColor = Color.Transparent)
                                 ) {
-                                    if (memoList.isNotEmpty()) {
-                                        LazyColumn(
-                                            modifier = Modifier.fillMaxSize(),
-                                            verticalArrangement = Arrangement.spacedBy(8.dp)
-                                        ) {
-                                            items(memoList.toList()) { memo ->
-                                                MemoItemView(data = memo, onEdit = {
-                                                    onEditMemo.invoke(memo)
-                                                }, onDelete = {
-                                                    memoViewModel.deleteData(memo)
-                                                })
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(8.dp)
+                                    ) {
+                                        if (memoList.isNotEmpty()) {
+                                            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                                                memoList.forEach { memo ->
+                                                    MemoItemView(
+                                                        data = memo,
+                                                        onEdit = { onEditMemo.invoke(memo) },
+                                                        onDelete = { memoViewModel.deleteData(memo) }
+                                                    )
+                                                }
                                             }
-                                        }
-                                    } else {
-                                        Box(
-                                            contentAlignment = Alignment.Center,
-                                            modifier = Modifier.fillMaxSize()
-                                        ) {
-                                            Text(
-                                                text = stringResource(R.string.empty_memo),
-                                                textAlign = TextAlign.Center
-                                            )
+                                        } else {
+                                            Box(
+                                                contentAlignment = Alignment.Center,
+                                                modifier = Modifier.fillMaxSize()
+                                            ) {
+                                                Text(
+                                                    text = stringResource(R.string.empty_memo),
+                                                    textAlign = TextAlign.Center
+                                                )
+                                            }
                                         }
                                     }
                                 }
                             }
 
-                            Spacer(modifier = Modifier.height(16.dp))
+                            item {
+                                val todoList by todoViewModel.todos.collectAsState()
 
-                            Card(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(300.dp)
-                                    .padding(16.dp),
-                                shape = RoundedCornerShape(16.dp),
-                                border = BorderStroke(2.dp, Color.Gray.copy(alpha = 0.5f)),
-                                colors = CardDefaults.cardColors(containerColor = Color.Transparent)
-                            ) {
-                                Box(
+                                Card(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .fillMaxHeight()
-                                        .padding(8.dp)
+                                        .wrapContentHeight(),
+                                    shape = RoundedCornerShape(16.dp),
+                                    border = BorderStroke(2.dp, Color.Gray.copy(alpha = 0.5f)),
+                                    colors = CardDefaults.cardColors(containerColor = Color.Transparent)
                                 ) {
-                                    if (todoList.isNotEmpty()) {
-                                        LazyColumn(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .fillMaxHeight()
-                                                .defaultMinSize(minHeight = 300.dp)
-                                                .padding(8.dp),
-                                            verticalArrangement = Arrangement.spacedBy(8.dp)
-                                        ) {
-                                            items(todoList.toList()) { task ->
-                                                ChecklistItem(item = task, onChecked = {
-                                                    todoViewModel.updateTodo(task)
-                                                }, onEdit = {
-                                                    onEditTodo.invoke(task)
-                                                }, onDelete = {
-                                                    todoViewModel.deleteTodo(task.id)
-                                                })
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(8.dp)
+                                    ) {
+                                        if (todoList.isNotEmpty()) {
+                                            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                                                todoList.forEach { task ->
+                                                    ChecklistItem(
+                                                        item = task,
+                                                        onChecked = { todoViewModel.updateTodo(task) },
+                                                        onEdit = { onEditTodo.invoke(task) },
+                                                        onDelete = { todoViewModel.deleteTodo(task.id) }
+                                                    )
+                                                }
                                             }
-                                        }
-                                    } else {
-                                        Box(
-                                            contentAlignment = Alignment.Center,
-                                            modifier = Modifier.fillMaxSize()
-                                        ) {
-                                            Text(
-                                                text = stringResource(R.string.empty_todo),
-                                                textAlign = TextAlign.Center
-                                            )
+                                        } else {
+                                            Box(
+                                                contentAlignment = Alignment.Center,
+                                                modifier = Modifier.fillMaxSize()
+                                            ) {
+                                                Text(
+                                                    text = stringResource(R.string.empty_todo),
+                                                    textAlign = TextAlign.Center
+                                                )
+                                            }
                                         }
                                     }
                                 }
