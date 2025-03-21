@@ -10,11 +10,14 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -26,6 +29,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -53,6 +57,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -228,55 +233,63 @@ class AddMemoActivity : ComponentActivity() {
 
             TopAppBar(
                 title = {
-                Text(text = "Memo", color = MaterialTheme.colorScheme.onPrimary)
-            }, navigationIcon = {
-                IconButton(onClick = { showBackDialog = true }) {
-                    Icon(imageVector = Icons.Default.Close, contentDescription = "Close")
-                }
-            }, actions = {
-                Row {
-                    Canvas(
-                        modifier = Modifier
-                            .size(40.dp)
-                            .padding(8.dp)
-                            .offset(y = 4.dp)
-                            .clickable {
-                                showColorPicker = true
-                            }
-                    ) {
-                        drawCircle(
-                            color = circleColor,
-                            radius = size.minDimension / 2
-                        )
+                    Text(text = "Memo", color = MaterialTheme.colorScheme.onPrimary)
+                }, navigationIcon = {
+                    IconButton(onClick = { showBackDialog = true }) {
+                        Icon(imageVector = Icons.Default.Close, contentDescription = "Close")
                     }
-                    Button(onClick = {
-                        memoViewModel.insertData(
-                            Memo(
-                                title = title,
-                                detail = memo,
-                                dtCreated = System.currentTimeMillis(),
-                                dtUpdated = System.currentTimeMillis(),
-                                color = circleColor.toHex()
+                }, actions = {
+                    Row {
+                        Canvas(
+                            modifier = Modifier
+                                .size(40.dp)
+                                .padding(8.dp)
+                                .offset(y = 4.dp)
+                                .clickable {
+                                    showColorPicker = true
+                                }
+                        ) {
+                            drawCircle(
+                                color = circleColor,
+                                radius = size.minDimension / 2
                             )
-                        )
-                        setResult(RESULT_OK)
-                        finish()
-                    }) {
-                        Text("Save")
+                        }
+                        Button(onClick = {
+                            memoViewModel.insertData(
+                                Memo(
+                                    title = title,
+                                    detail = memo,
+                                    dtCreated = System.currentTimeMillis(),
+                                    dtUpdated = System.currentTimeMillis(),
+                                    color = circleColor.toHex()
+                                )
+                            )
+                            setResult(RESULT_OK)
+                            finish()
+                        }) {
+                            Text("Save")
+                        }
                     }
-                }
-            }, colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = MaterialTheme.colorScheme.primary,
-                titleContentColor = MaterialTheme.colorScheme.onPrimary,
-                navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
-                actionIconContentColor = MaterialTheme.colorScheme.onSecondary
-            )
+                }, colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimary,
+                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
+                    actionIconContentColor = MaterialTheme.colorScheme.onSecondary
+                )
             )
         }) {
             Column(modifier = Modifier.padding(it)) {
+
+                TextStyleToolbar()
+
+                Spacer(modifier = Modifier.height(16.dp))
+
                 TitleInputField(title, onTitleChange = { value ->
                     onTitleChange.invoke(value)
                 })
+
+                Spacer(modifier = Modifier.height(8.dp))
+
                 InputField(memo, onTextChange = { value ->
                     onTextChange.invoke(value)
                 })
@@ -284,23 +297,64 @@ class AddMemoActivity : ComponentActivity() {
         }
     }
 
-    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+    fun TextStyleToolbar() {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp)
+                .background(Color.White, RoundedCornerShape(12.dp))
+                .padding(8.dp),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            IconButton(onClick = { /* Bold 기능 추가 */ }) {
+                Icon(imageVector = Icons.Default.Edit, contentDescription = "Bold")
+            }
+            IconButton(onClick = { /* Italic 기능 추가 */ }) {
+                Icon(imageVector = Icons.Default.Edit, contentDescription = "Italic")
+            }
+            IconButton(onClick = { /* Underline 기능 추가 */ }) {
+                Icon(imageVector = Icons.Default.Edit, contentDescription = "Underline")
+            }
+            IconButton(onClick = { /* 왼쪽 정렬 */ }) {
+                Icon(imageVector = Icons.Default.Edit, contentDescription = "Align Left")
+            }
+            IconButton(onClick = { /* 가운데 정렬 */ }) {
+                Icon(imageVector = Icons.Default.Edit, contentDescription = "Align Center")
+            }
+            IconButton(onClick = { /* 오른쪽 정렬 */ }) {
+                Icon(imageVector = Icons.Default.Edit, contentDescription = "Align Right")
+            }
+        }
+    }
+
     @Composable
     fun TitleInputField(title: String, onTitleChange: (String) -> Unit) {
-        TextField(
+        BasicTextField(
             value = title,
             onValueChange = onTitleChange,
-            label = { Text("Title") },
-            maxLines = 1,  // 제목 필드가 한 줄만 입력 가능하도록 제한
+            textStyle = TextStyle(
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onBackground
+            ),
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 8.dp)
                 .onFocusChanged {
                     if (!it.isFocused) dataStoreViewModel.setUnSavedTitle(title)
                 },
-            colors = TextFieldDefaults.textFieldColors(
-                containerColor = Color.Transparent
-            ),
+            decorationBox = { innerTextField ->
+                if (title.isEmpty()) {
+                    Text(
+                        "Title",
+                        color = Color.Gray,
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+                innerTextField()
+            }
         )
     }
 
@@ -314,7 +368,6 @@ class AddMemoActivity : ComponentActivity() {
             .padding(16.dp)
             .fillMaxWidth()
             .fillMaxHeight()
-            .border(1.dp, Color.Gray, RoundedCornerShape(4.dp))
             .onFocusChanged {
                 if (!it.isFocused) dataStoreViewModel.setUnSavedMemo(text)
             }
@@ -330,18 +383,21 @@ class AddMemoActivity : ComponentActivity() {
         val textColor = MaterialTheme.colorScheme.onBackground
         val placeholderColor = if (!isSystemInDarkTheme()) Color.Gray else Color.LightGray
 
-        val textStyle = TextStyle(
-            fontSize = 20.sp,
-            fontFamily = FontFamily.Monospace,
-            color = textColor
-        )
-
         BasicTextField(
-            value = text, onValueChange = onTextChange, modifier = textFieldModifier,
+            value = text,
+            onValueChange = onTextChange,
+            modifier = textFieldModifier,
+            textStyle = TextStyle(
+                fontSize = 18.sp,
+                lineHeight = 24.sp,
+                color = textColor
+            ),
             decorationBox = { innerTextField ->
-                if (text.isEmpty()) Text("What's happening?", color = placeholderColor)
+                if (text.isEmpty()) {
+                    Text("Write your memo here...", color = placeholderColor, fontSize = 18.sp)
+                }
                 innerTextField()
-            }, textStyle = textStyle
+            }
         )
     }
 }
