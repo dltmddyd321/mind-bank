@@ -32,6 +32,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -75,6 +76,9 @@ import com.github.skydoves.colorpicker.compose.HsvColorPicker
 import com.github.skydoves.colorpicker.compose.rememberColorPickerController
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.debounce
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 
 @AndroidEntryPoint
@@ -293,6 +297,35 @@ class AddMemoActivity : ComponentActivity() {
                 InputField(memo, onTextChange = { value ->
                     onTextChange.invoke(value)
                 })
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Divider(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
+                    color = Color.Gray.copy(alpha = 0.3f),
+                    thickness = 1.dp
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                //TODO: 수정과 생성에 따른 분기처리 진행하기
+                val updatedAt = System.currentTimeMillis()
+                val formattedDate = remember(updatedAt) {
+                    val sdf = SimpleDateFormat("yyyy년 MM월 dd일 HH시 mm분", Locale.getDefault())
+                    sdf.format(Date(updatedAt))
+                }
+
+                Text(
+                    text = "마지막 업데이트: $formattedDate",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
+                    textAlign = TextAlign.End
+                )
             }
         }
     }
