@@ -1,17 +1,15 @@
 package com.example.mindbank.activity
 
-import androidx.activity.ComponentActivity
-import dagger.hilt.android.AndroidEntryPoint
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.pm.ActivityInfo
 import android.os.Bundle
+import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -41,8 +39,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -57,23 +53,21 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.example.mindbank.data.Memo
-import com.example.mindbank.navigation.Screen
-import com.example.mindbank.viewmodel.DataStoreViewModel
-import com.example.mindbank.viewmodel.MemoViewModel
 import com.example.mindbank.ui.theme.MindBankTheme
 import com.example.mindbank.util.hexToColor
 import com.example.mindbank.util.toHex
+import com.example.mindbank.viewmodel.DataStoreViewModel
+import com.example.mindbank.viewmodel.MemoViewModel
 import com.github.skydoves.colorpicker.compose.ColorEnvelope
 import com.github.skydoves.colorpicker.compose.HsvColorPicker
 import com.github.skydoves.colorpicker.compose.rememberColorPickerController
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.debounce
 import java.text.SimpleDateFormat
@@ -86,6 +80,8 @@ class AddMemoActivity : ComponentActivity() {
 
     private val dataStoreViewModel: DataStoreViewModel by viewModels()
     private val memoViewModel: MemoViewModel by viewModels()
+    private var lastUpdatedTime = System.currentTimeMillis()
+    private var isEditMode = false
 
     @OptIn(ExperimentalMaterial3Api::class, FlowPreview::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -106,14 +102,19 @@ class AddMemoActivity : ComponentActivity() {
                         editingData = memoViewModel.searchById(id)
                         title = editingData?.title ?: ""
                         memo = editingData?.detail ?: ""
+                        lastUpdatedTime = editingData?.dtUpdated ?: System.currentTimeMillis()
                         val lastColor = editingData?.color
-                        if (!lastColor.isNullOrEmpty()) circleColor = hexToColor(lastColor)
+                        if (!lastColor.isNullOrEmpty()) {
+                            isEditMode = true
+                            circleColor = hexToColor(lastColor)
+                        }
                     }
 
                     AutoBackUpCheckDialog(dataStoreViewModel) { backupTitle, backupMemo, backupColor ->
                         title = backupTitle
                         memo = backupMemo
                         circleColor = hexToColor(backupColor)
+                        isEditMode = true
                     }
                     BackHandlerWithQuestionDialog(false)
                     InputScreen(
@@ -310,22 +311,22 @@ class AddMemoActivity : ComponentActivity() {
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                //TODO: 수정과 생성에 따른 분기처리 진행하기
-                val updatedAt = System.currentTimeMillis()
-                val formattedDate = remember(updatedAt) {
-                    val sdf = SimpleDateFormat("yyyy년 MM월 dd일 HH시 mm분", Locale.getDefault())
-                    sdf.format(Date(updatedAt))
-                }
+                if (isEditMode) {
+                    val formattedDate = remember(lastUpdatedTime) {
+                        val sdf = SimpleDateFormat("yyyy년 MM월 dd일 HH시 mm분", Locale.getDefault())
+                        sdf.format(Date(lastUpdatedTime))
+                    }
 
-                Text(
-                    text = "마지막 업데이트: $formattedDate",
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
-                    textAlign = TextAlign.End
-                )
+                    Text(
+                        text = "마지막 업데이트: $formattedDate",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
+                        textAlign = TextAlign.End
+                    )
+                }
             }
         }
     }
