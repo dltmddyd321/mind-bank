@@ -16,15 +16,24 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SheetState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -39,7 +48,38 @@ import com.example.mindbank.data.Task
 import com.example.mindbank.ui.theme.MindBankTheme
 import com.example.mindbank.viewmodel.MemoViewModel
 import com.example.mindbank.viewmodel.TodoViewModel
+import kotlinx.coroutines.launch
 
+@ExperimentalMaterial3Api
+@Composable
+fun DataSheet(title: String, detail: String, sheetState: SheetState, onDismiss: () -> Unit) {
+    ModalBottomSheet(
+        onDismissRequest = {
+            onDismiss.invoke()
+        },
+        sheetState = sheetState
+    ) {
+        Column(
+            Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            Text(text = "메모 상세보기", style = MaterialTheme.typography.titleLarge)
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(text = title)
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(text = detail)
+            Spacer(modifier = Modifier.height(12.dp))
+            Button(onClick = {
+                onDismiss.invoke()
+            }) {
+                Text("닫기")
+            }
+        }
+    }
+}
+
+@ExperimentalMaterial3Api
 @Composable
 fun HomeScreen(
     memoViewModel: MemoViewModel,
@@ -61,6 +101,14 @@ fun HomeScreen(
                         .padding(it),
                     color = MaterialTheme.colorScheme.background
                 ) {
+                    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+                    val coroutineScope = rememberCoroutineScope()
+                    var selectedMemo by remember { mutableStateOf<Memo?>(null) }
+
+                    selectedMemo?.let { memo ->
+
+                    }
+
                     LazyColumn(
                         modifier = Modifier
                             .fillMaxSize()
@@ -88,6 +136,10 @@ fun HomeScreen(
                                             memoList.forEach { memo ->
                                                 MemoItemView(
                                                     data = memo,
+                                                    onClick = {
+                                                        selectedMemo = it
+                                                        coroutineScope.launch { sheetState.show() }
+                                                    },
                                                     onEdit = { onEditMemo.invoke(memo) },
                                                     onDelete = { memoViewModel.deleteData(memo) }
                                                 )

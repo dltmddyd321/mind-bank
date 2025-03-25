@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
@@ -401,7 +402,7 @@ class AddMemoActivity : ComponentActivity() {
         val textFieldModifier = Modifier
             .padding(16.dp)
             .fillMaxWidth()
-            .fillMaxHeight()
+            .wrapContentHeight()
             .onFocusChanged {
                 if (!it.isFocused) dataStoreViewModel.setUnSavedMemo(text)
             }

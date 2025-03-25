@@ -2,6 +2,7 @@ package com.example.mindbank.component
 
 import android.app.Activity
 import android.content.Intent
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -38,11 +39,12 @@ import com.example.mindbank.util.hexToColor
 import com.example.mindbank.util.isDarkColor
 
 @Composable
-fun MemoItemView(data: Memo, onEdit: (Memo) -> Unit, onDelete: (Memo) -> Unit) {
+fun MemoItemView(data: Memo, onClick: (Memo) -> Unit, onEdit: (Memo) -> Unit, onDelete: (Memo) -> Unit) {
     Box(
         modifier = Modifier
             .padding(8.dp)
             .fillMaxWidth()
+            .clickable { onClick.invoke(data) }
     ) {
         val backgroundColor = hexToColor(data.color)
         Card(
