@@ -52,7 +52,13 @@ import kotlinx.coroutines.launch
 
 @ExperimentalMaterial3Api
 @Composable
-fun DataSheet(title: String, detail: String, sheetState: SheetState, onDismiss: () -> Unit) {
+fun DataSheet(
+    isMemo: Boolean,
+    title: String,
+    detail: String,
+    sheetState: SheetState,
+    onDismiss: () -> Unit
+) {
     ModalBottomSheet(
         onDismissRequest = {
             onDismiss.invoke()
@@ -64,7 +70,7 @@ fun DataSheet(title: String, detail: String, sheetState: SheetState, onDismiss: 
                 .fillMaxWidth()
                 .padding(16.dp)
         ) {
-            Text(text = "메모 상세보기", style = MaterialTheme.typography.titleLarge)
+            Text(text = if (isMemo) "메모 상세보기" else "할일 상세보기", style = MaterialTheme.typography.titleLarge)
             Spacer(modifier = Modifier.height(8.dp))
             Text(text = title)
             Spacer(modifier = Modifier.height(4.dp))
