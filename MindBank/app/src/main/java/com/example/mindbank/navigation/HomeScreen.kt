@@ -53,9 +53,7 @@ import kotlinx.coroutines.launch
 @ExperimentalMaterial3Api
 @Composable
 fun DataSheet(
-    isMemo: Boolean,
-    title: String,
-    detail: String,
+    memo: Memo,
     sheetState: SheetState,
     onDismiss: () -> Unit
 ) {
@@ -70,11 +68,11 @@ fun DataSheet(
                 .fillMaxWidth()
                 .padding(16.dp)
         ) {
-            Text(text = if (isMemo) "메모 상세보기" else "할일 상세보기", style = MaterialTheme.typography.titleLarge)
+            Text("메모 상세보기", style = MaterialTheme.typography.titleLarge)
             Spacer(modifier = Modifier.height(8.dp))
-            Text(text = title)
+            Text(text = memo.title)
             Spacer(modifier = Modifier.height(4.dp))
-            Text(text = detail)
+            Text(text = memo.detail)
             Spacer(modifier = Modifier.height(12.dp))
             Button(onClick = {
                 onDismiss.invoke()
@@ -112,7 +110,13 @@ fun HomeScreen(
                     var selectedMemo by remember { mutableStateOf<Memo?>(null) }
 
                     selectedMemo?.let { memo ->
+                        DataSheet(
+                            true,
+                            memo.title,
+                            memo.detail,
+                            sheetState) {
 
+                        }
                     }
 
                     LazyColumn(
@@ -143,7 +147,7 @@ fun HomeScreen(
                                                 MemoItemView(
                                                     data = memo,
                                                     onClick = {
-                                                        selectedMemo = it
+                                                        selectedMemo = memo
                                                         coroutineScope.launch { sheetState.show() }
                                                     },
                                                     onEdit = { onEditMemo.invoke(memo) },
