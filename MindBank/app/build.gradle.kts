@@ -3,6 +3,8 @@ plugins {
     id("com.google.dagger.hilt.android")
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
+    id("com.google.gms.google-services")
+    id("com.google.firebase.crashlytics")
 }
 
 android {
@@ -55,11 +57,14 @@ dependencies {
     implementation(libs.tedpermission.normal)
     implementation(libs.tedpermission.coroutine)
     implementation(libs.androidx.biometric)
-    implementation (libs.retrofit)
-    implementation (libs.converter.gson)
-    implementation (libs.logging.interceptor)
-    implementation (libs.timber)
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
+    implementation(libs.logging.interceptor)
+    implementation(libs.timber)
+    implementation(libs.firebase.crashlytics.gradle)
     implementation(libs.androidx.activity.compose.v180alpha07)
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.analytics)
     implementation("androidx.navigation:navigation-compose:2.8.1")
     implementation("com.github.skydoves:colorpicker-compose:1.1.1")
     implementation("androidx.core:core-splashscreen:1.0.1")

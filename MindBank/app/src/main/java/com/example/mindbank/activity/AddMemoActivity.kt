@@ -9,6 +9,7 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -53,12 +54,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import com.example.mindbank.R
 import com.example.mindbank.data.Memo
 import com.example.mindbank.ui.theme.MindBankTheme
 import com.example.mindbank.util.hexToColor
@@ -285,10 +288,10 @@ class AddMemoActivity : ComponentActivity() {
             )
         }) {
             Column(modifier = Modifier.padding(it)) {
-
-                TextStyleToolbar()
-
-                Spacer(modifier = Modifier.height(16.dp))
+//
+//                TextStyleToolbar()
+//
+//                Spacer(modifier = Modifier.height(16.dp))
 
                 TitleInputField(title, onTitleChange = { value ->
                     onTitleChange.invoke(value)
@@ -343,22 +346,22 @@ class AddMemoActivity : ComponentActivity() {
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             IconButton(onClick = { /* Bold 기능 추가 */ }) {
-                Icon(imageVector = Icons.Default.Edit, contentDescription = "Bold")
+                Image(painter = painterResource(R.drawable.bold_icon), contentDescription = null)
             }
             IconButton(onClick = { /* Italic 기능 추가 */ }) {
-                Icon(imageVector = Icons.Default.Edit, contentDescription = "Italic")
+                Image(painter = painterResource(R.drawable.italick), contentDescription = null)
             }
             IconButton(onClick = { /* Underline 기능 추가 */ }) {
-                Icon(imageVector = Icons.Default.Edit, contentDescription = "Underline")
+                Image(painter = painterResource(R.drawable.powerline), contentDescription = null)
             }
             IconButton(onClick = { /* 왼쪽 정렬 */ }) {
-                Icon(imageVector = Icons.Default.Edit, contentDescription = "Align Left")
+                Image(painter = painterResource(R.drawable.left), contentDescription = null)
             }
             IconButton(onClick = { /* 가운데 정렬 */ }) {
-                Icon(imageVector = Icons.Default.Edit, contentDescription = "Align Center")
+                Image(painter = painterResource(R.drawable.middle), contentDescription = null)
             }
             IconButton(onClick = { /* 오른쪽 정렬 */ }) {
-                Icon(imageVector = Icons.Default.Edit, contentDescription = "Align Right")
+                Image(painter = painterResource(R.drawable.right), contentDescription = null)
             }
         }
     }
