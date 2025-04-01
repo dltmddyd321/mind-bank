@@ -242,6 +242,7 @@ class AddMemoActivity : ComponentActivity() {
                             controller = colorController,
                             onColorChanged = { colorEnvelope: ColorEnvelope ->
                                 selectedColor = colorEnvelope.color
+                                onColorChange.invoke(selectedColor)
                             }
                         )
 
@@ -310,8 +311,8 @@ class AddMemoActivity : ComponentActivity() {
             Column(modifier = Modifier.padding(it)) {
 //
 //                TextStyleToolbar()
-//
-//                Spacer(modifier = Modifier.height(16.dp))
+
+                Spacer(modifier = Modifier.height(16.dp))
 
                 TitleInputField(title, onTitleChange = { value ->
                     onTitleChange.invoke(value)

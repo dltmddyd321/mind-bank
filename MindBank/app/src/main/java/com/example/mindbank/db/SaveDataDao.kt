@@ -26,4 +26,22 @@ interface SaveDataDao {
 
     @Query("SELECT * FROM save_model WHERE id = :id LIMIT 1")
     fun getSaveDataById(id: Int): Memo?
+
+    @Query(
+        """
+    UPDATE save_model 
+    SET title = :title, 
+        detail = :detail, 
+        dtUpdated = :dtUpdated, 
+        color = :color 
+    WHERE id = :id
+"""
+    )
+    fun updateMemoById(
+        id: Int,
+        title: String,
+        detail: String,
+        dtUpdated: Long,
+        color: String
+    )
 }

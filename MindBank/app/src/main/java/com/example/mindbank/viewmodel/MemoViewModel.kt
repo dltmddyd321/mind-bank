@@ -48,7 +48,7 @@ class MemoViewModel @Inject constructor(
 
     fun insertData(data: Memo) {
         viewModelScope.launch(Dispatchers.IO) {
-            memoRepository.insertOrUpdate(data)
+            memoRepository.insert(data)
             loadMemoList()
         }
     }

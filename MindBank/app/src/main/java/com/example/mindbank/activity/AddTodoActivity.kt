@@ -172,6 +172,7 @@ class AddTodoActivity : ComponentActivity() {
                             controller = colorController,
                             onColorChanged = { colorEnvelope: ColorEnvelope ->
                                 selectedColor = colorEnvelope.color
+                                onColorChange.invoke(selectedColor)
                             }
                         )
 

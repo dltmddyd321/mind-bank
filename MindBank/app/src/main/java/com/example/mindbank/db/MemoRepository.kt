@@ -6,7 +6,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
-import kotlin.system.exitProcess
 
 class MemoRepository @Inject constructor(
     private val dataDao: SaveDataDao
@@ -23,9 +22,21 @@ class MemoRepository @Inject constructor(
         dataDao.getSaveDataById(id)
     }
 
-    fun insertOrUpdate(data: Memo) {
+    fun insert(data: Memo) {
         CoroutineScope(Dispatchers.IO).launch {
             dataDao.insertOrUpdate(data)
+        }
+    }
+
+    fun update(data: Memo) {
+        CoroutineScope(Dispatchers.IO).launch {
+            dataDao.updateMemoById(
+                data.id,
+                data.title,
+                data.detail,
+                data.dtUpdated,
+                data.color
+            )
         }
     }
 
