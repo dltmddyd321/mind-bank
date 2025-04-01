@@ -61,7 +61,9 @@ fun MainGrid(memoViewModel: MemoViewModel, searchText: String, onEdit: (Memo) ->
             modifier = Modifier.fillMaxSize()
         ) {
             items(filteredList) { item ->
-                MemoItemView(item, onEdit = {
+                MemoItemView(item, onClick = {
+
+                }, onEdit = {
                     onEdit.invoke(it)
                 }, onDelete = {
                     memoViewModel.deleteData(item)

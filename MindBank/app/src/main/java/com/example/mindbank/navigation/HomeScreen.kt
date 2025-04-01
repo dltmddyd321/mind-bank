@@ -110,12 +110,8 @@ fun HomeScreen(
                     var selectedMemo by remember { mutableStateOf<Memo?>(null) }
 
                     selectedMemo?.let { memo ->
-                        DataSheet(
-                            true,
-                            memo.title,
-                            memo.detail,
-                            sheetState) {
-
+                        DataSheet(memo, sheetState) {
+                            coroutineScope.launch { sheetState.hide() }
                         }
                     }
 
