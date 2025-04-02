@@ -86,6 +86,8 @@ class AddMemoActivity : ComponentActivity() {
     private val dataStoreViewModel: DataStoreViewModel by viewModels()
     private val memoViewModel: MemoViewModel by viewModels()
     private var lastUpdatedTime = System.currentTimeMillis()
+    private var editMemo: Memo? = null
+    private var editId = -1
     private var isEditMode = false
 
     @OptIn(ExperimentalMaterial3Api::class, FlowPreview::class)
@@ -96,19 +98,17 @@ class AddMemoActivity : ComponentActivity() {
                 Surface(
                     modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
                 ) {
-                    val id = intent?.getIntExtra("id", -1) ?: -1
-                    var editingData by remember { mutableStateOf<Memo?>(null) }
-
+                    editId = intent?.getIntExtra("id", -1) ?: -1
                     var title by remember { mutableStateOf("") }
                     var memo by remember { mutableStateOf("") }
                     var circleColor by remember { mutableStateOf(Color.Red) }
 
-                    LaunchedEffect(id) {
-                        editingData = memoViewModel.searchById(id)
-                        title = editingData?.title ?: ""
-                        memo = editingData?.detail ?: ""
-                        lastUpdatedTime = editingData?.dtUpdated ?: System.currentTimeMillis()
-                        val lastColor = editingData?.color
+                    LaunchedEffect(editId) {
+                        editMemo = memoViewModel.searchById(editId)
+                        title = editMemo?.title ?: ""
+                        memo = editMemo?.detail ?: ""
+                        lastUpdatedTime = editMemo?.dtUpdated ?: System.currentTimeMillis()
+                        val lastColor = editMemo?.color
                         if (!lastColor.isNullOrEmpty()) {
                             isEditMode = true
                             circleColor = hexToColor(lastColor)
@@ -285,15 +285,25 @@ class AddMemoActivity : ComponentActivity() {
                             )
                         }
                         Button(onClick = {
-                            memoViewModel.insertData(
-                                Memo(
-                                    title = title,
-                                    detail = memo,
-                                    dtCreated = System.currentTimeMillis(),
-                                    dtUpdated = System.currentTimeMillis(),
-                                    color = circleColor.toHex()
+                            if (editId != -1) {
+                                editMemo?.let {
+                                    it.title = title
+                                    it.detail = memo
+                                    it.dtUpdated = System.currentTimeMillis()
+                                    it.color = circleColor.toHex()
+                                    memoViewModel.insertData(it)
+                                }
+                            } else {
+                                memoViewModel.insertData(
+                                    Memo(
+                                        title = title,
+                                        detail = memo,
+                                        dtCreated = System.currentTimeMillis(),
+                                        dtUpdated = System.currentTimeMillis(),
+                                        color = circleColor.toHex()
+                                    )
                                 )
-                            )
+                            }
                             setResult(RESULT_OK)
                             finish()
                         }) {

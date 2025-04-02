@@ -6,10 +6,10 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "save_model")
 data class Memo(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
-    val title: String,
-    val detail: String,
+    var title: String,
+    var detail: String,
     val dtCreated: Long,
-    val dtUpdated: Long,
-    val color: String
+    var dtUpdated: Long,
+    var color: String
 )
 

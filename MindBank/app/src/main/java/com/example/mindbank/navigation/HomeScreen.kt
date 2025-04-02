@@ -111,6 +111,7 @@ fun HomeScreen(
 
                     selectedMemo?.let { memo ->
                         DataSheet(memo, sheetState) {
+                            selectedMemo = null
                             coroutineScope.launch { sheetState.hide() }
                         }
                     }
