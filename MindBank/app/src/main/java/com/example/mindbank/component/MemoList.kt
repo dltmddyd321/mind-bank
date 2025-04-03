@@ -42,7 +42,7 @@ import com.example.mindbank.util.isDarkColor
 fun MemoItemView(data: Memo, onClick: (Memo) -> Unit, onEdit: (Memo) -> Unit, onDelete: (Memo) -> Unit) {
     Box(
         modifier = Modifier
-            .padding(8.dp)
+            .padding(horizontal = 8.dp)
             .fillMaxWidth()
             .clickable { onClick.invoke(data) }
     ) {
