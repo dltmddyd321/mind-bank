@@ -26,4 +26,24 @@ interface TodoDao {
 
     @Query("SELECT * FROM todo_task WHERE id = :id LIMIT 1")
     fun searchById(id: Int): Task?
+
+    @Query(
+        """
+    UPDATE todo_task 
+    SET title = :title,
+        dtUpdated = :dtUpdated, 
+        color = :color,
+        isDone = :isDone,
+        position = :position
+    WHERE id = :id
+"""
+    )
+    fun updateMemoById(
+        id: Int,
+        title: String,
+        dtUpdated: Long,
+        color: String,
+        isDone: Boolean,
+        position: Long
+    )
 }
