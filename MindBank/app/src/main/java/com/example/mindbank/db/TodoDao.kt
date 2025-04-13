@@ -38,7 +38,7 @@ interface TodoDao {
     WHERE id = :id
 """
     )
-    fun updateMemoById(
+    fun updateTodo(
         id: Int,
         title: String,
         dtUpdated: Long,

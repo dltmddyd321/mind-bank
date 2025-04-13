@@ -14,7 +14,7 @@ class TodoRepository @Inject constructor(
         todoDao.getAllSaveData()
     }
 
-    fun updateTodo(task: Task) {
+    fun saveTodo(task: Task) {
         CoroutineScope(Dispatchers.IO).launch {
             todoDao.insertOrUpdate(task)
         }
@@ -37,6 +37,19 @@ class TodoRepository @Inject constructor(
     fun clear() {
         CoroutineScope(Dispatchers.IO).launch {
             todoDao.deleteAll()
+        }
+    }
+
+    fun update(task: Task) {
+        CoroutineScope(Dispatchers.IO).launch {
+            todoDao.updateTodo(
+                task.id,
+                task.title,
+                task.dtUpdated,
+                task.color,
+                task.isDone,
+                task.position
+            )
         }
     }
 }

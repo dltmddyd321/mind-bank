@@ -38,9 +38,16 @@ class TodoViewModel @Inject constructor(
         todoRepository.getAllTodos().sortedWith(taskComparator)
     }
 
+    fun saveTodo(task: Task) {
+        viewModelScope.launch(Dispatchers.IO) {
+            todoRepository.saveTodo(task)
+            loadTodoList()
+        }
+    }
+
     fun updateTodo(task: Task) {
         viewModelScope.launch(Dispatchers.IO) {
-            todoRepository.updateTodo(task)
+            todoRepository.update(task)
             loadTodoList()
         }
     }

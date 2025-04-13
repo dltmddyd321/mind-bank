@@ -219,8 +219,8 @@ class AddTodoActivity : ComponentActivity() {
                             return@Button
                         }
                         val currentTime = System.currentTimeMillis()
-                        val task = if (isEditMode) {
-                            Task(
+                        if (isEditMode) {
+                            val task = Task(
                                 id = editId,
                                 title = title,
                                 dtCreated = currentTime,
@@ -229,8 +229,9 @@ class AddTodoActivity : ComponentActivity() {
                                 isDone = false,
                                 position = currentTime
                             )
+                            todoViewModel.updateTodo(task)
                         } else {
-                            Task(
+                            val task = Task(
                                 title = title,
                                 dtCreated = currentTime,
                                 dtUpdated = currentTime,
@@ -238,8 +239,8 @@ class AddTodoActivity : ComponentActivity() {
                                 isDone = false,
                                 position = currentTime
                             )
+                            todoViewModel.saveTodo(task)
                         }
-                        todoViewModel.updateTodo(task)
                         setResult(RESULT_OK)
                         finish()
                     }) {
