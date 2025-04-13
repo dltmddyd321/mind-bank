@@ -68,16 +68,18 @@ class MainActivity : ComponentActivity() {
     private var backPressedTime: Long = 0
     private var isTodoMode = false
 
-    private val todoLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            todoViewModel.loadTodoList()
+    private val todoLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                todoViewModel.loadTodoList()
+            }
         }
-    }
-    private val memoLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            memoViewModel.loadMemoList()
+    private val memoLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                memoViewModel.loadMemoList()
+            }
         }
-    }
 
     @SuppressLint("SourceLockedOrientationActivity")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -89,16 +91,17 @@ class MainActivity : ComponentActivity() {
             val navBackStackEntry by navController.currentBackStackEntryAsState()
             val currentRoute = navBackStackEntry?.destination?.route
             Scaffold(
-                bottomBar = { BottomNavBar(navController = navController) }, floatingActionButton = {
+                bottomBar = { BottomNavBar(navController = navController) },
+                floatingActionButton = {
                     if (currentRoute == Screen.Todo.route || currentRoute == Screen.Notes.route) {
                         val context = LocalContext.current
                         FloatingActionButton(
                             onClick = {
                                 if (isTodoMode) {
-                                    val intent =Intent(context, AddTodoActivity::class.java)
+                                    val intent = Intent(context, AddTodoActivity::class.java)
                                     todoLauncher.launch(intent)
                                 } else {
-                                    val intent =Intent(context, AddMemoActivity::class.java)
+                                    val intent = Intent(context, AddMemoActivity::class.java)
                                     memoLauncher.launch(intent)
                                 }
                             },
@@ -116,31 +119,40 @@ class MainActivity : ComponentActivity() {
             ) { paddingValues ->
                 isTodoMode = currentRoute == Screen.Todo.route
                 NavHost(navController, startDestination = Screen.Home.route) {
-                    composable(Screen.Home.route) { HomeScreen(memoViewModel, todoViewModel,
-                    paddingValues, onEditTodo = { todo ->
-                        val intent = Intent(this@MainActivity, AddTodoActivity::class.java)
-                            .apply { putExtra("id", todo.id) }
-                        todoLauncher.launch(intent)
-                    }, onEditMemo = { memo ->
-                        val intent = Intent(this@MainActivity, AddMemoActivity::class.java)
-                            .apply { putExtra("id", memo.id) }
-                        memoLauncher.launch(intent)
-                    }) }
-                    composable(Screen.Todo.route) { NotesScreen(
-                        memoViewModel,
-                        todoViewModel,
-                        paddingValues,
-                        DataType.Todo
-                    ) }
-                    composable(Screen.Notes.route) { NotesScreen(
-                        memoViewModel,
-                        todoViewModel,
-                        paddingValues,
-                        DataType.Memo
-                    ) }
-                    composable(Screen.Settings.route) { SettingsScreen(paddingValues) {
-                        todoViewModel.clear()
-                        memoViewModel.clear() }
+                    composable(Screen.Home.route) {
+                        HomeScreen(
+                            navController, memoViewModel, todoViewModel,
+                            paddingValues, onEditTodo = { todo ->
+                                val intent = Intent(this@MainActivity, AddTodoActivity::class.java)
+                                    .apply { putExtra("id", todo.id) }
+                                todoLauncher.launch(intent)
+                            }, onEditMemo = { memo ->
+                                val intent = Intent(this@MainActivity, AddMemoActivity::class.java)
+                                    .apply { putExtra("id", memo.id) }
+                                memoLauncher.launch(intent)
+                            })
+                    }
+                    composable(Screen.Todo.route) {
+                        NotesScreen(
+                            memoViewModel,
+                            todoViewModel,
+                            paddingValues,
+                            DataType.Todo
+                        )
+                    }
+                    composable(Screen.Notes.route) {
+                        NotesScreen(
+                            memoViewModel,
+                            todoViewModel,
+                            paddingValues,
+                            DataType.Memo
+                        )
+                    }
+                    composable(Screen.Settings.route) {
+                        SettingsScreen(paddingValues) {
+                            todoViewModel.clear()
+                            memoViewModel.clear()
+                        }
                     }
                 }
             }
