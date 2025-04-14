@@ -6,9 +6,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -29,7 +29,6 @@ import androidx.compose.ui.unit.dp
 import com.example.mindbank.R
 import com.example.mindbank.data.Memo
 import com.example.mindbank.viewmodel.MemoViewModel
-import com.google.accompanist.flowlayout.FlowRow
 import kotlinx.coroutines.launch
 
 @Composable
@@ -74,8 +73,8 @@ fun MainGrid(memoViewModel: MemoViewModel, searchText: String, onEdit: (Memo) ->
     }
 
     if (filteredList.isNotEmpty()) {
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(2),
+        LazyVerticalStaggeredGrid (
+            columns = StaggeredGridCells.Fixed(2),
             contentPadding = PaddingValues(8.dp),
             modifier = Modifier.fillMaxSize()
         ) {
@@ -95,24 +94,6 @@ fun MainGrid(memoViewModel: MemoViewModel, searchText: String, onEdit: (Memo) ->
             contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()
         ) {
             Text(text = stringResource(R.string.empty_memo), textAlign = TextAlign.Center)
-        }
-    }
-}
-
-@Composable
-fun StaggeredGridMemos(memos: List<Memo>, onClick: (Memo) -> Unit, onEdit: (Memo) -> Unit, onDelete: (Memo) -> Unit) {
-    FlowRow(
-        mainAxisSpacing = 8.dp,
-        crossAxisSpacing = 8.dp,
-        modifier = Modifier.padding(8.dp)
-    ) {
-        memos.forEach { memo ->
-            MemoItemView(
-                data = memo,
-                onClick = { onClick(memo) },
-                onEdit = { onEdit(memo) },
-                onDelete = { onDelete(memo) }
-            )
         }
     }
 }
