@@ -1,4 +1,4 @@
-package com.example.mindbank.presentation.navigation
+package com.example.mindbank.presentation.navigation.component
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
@@ -44,8 +44,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.mindbank.R
-import com.example.mindbank.presentation.navigation.component.ChecklistItem
-import com.example.mindbank.presentation.navigation.component.MemoItemView
 import com.example.mindbank.data.Memo
 import com.example.mindbank.data.Task
 import com.example.mindbank.presentation.navigation.theme.MindBankTheme

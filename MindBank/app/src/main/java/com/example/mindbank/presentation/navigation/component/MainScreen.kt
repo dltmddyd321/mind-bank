@@ -1,4 +1,4 @@
-package com.example.mindbank.presentation.navigation
+package com.example.mindbank.presentation.navigation.component
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -27,9 +27,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.mindbank.R
-import com.example.mindbank.presentation.navigation.component.MemoItemView
 import com.example.mindbank.data.Memo
 import com.example.mindbank.viewmodel.MemoViewModel
+import com.google.accompanist.flowlayout.FlowRow
 import kotlinx.coroutines.launch
 
 @Composable
@@ -95,6 +95,24 @@ fun MainGrid(memoViewModel: MemoViewModel, searchText: String, onEdit: (Memo) ->
             contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()
         ) {
             Text(text = stringResource(R.string.empty_memo), textAlign = TextAlign.Center)
+        }
+    }
+}
+
+@Composable
+fun StaggeredGridMemos(memos: List<Memo>, onClick: (Memo) -> Unit, onEdit: (Memo) -> Unit, onDelete: (Memo) -> Unit) {
+    FlowRow(
+        mainAxisSpacing = 8.dp,
+        crossAxisSpacing = 8.dp,
+        modifier = Modifier.padding(8.dp)
+    ) {
+        memos.forEach { memo ->
+            MemoItemView(
+                data = memo,
+                onClick = { onClick(memo) },
+                onEdit = { onEdit(memo) },
+                onDelete = { onDelete(memo) }
+            )
         }
     }
 }

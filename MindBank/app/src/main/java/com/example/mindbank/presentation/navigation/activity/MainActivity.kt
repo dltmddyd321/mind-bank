@@ -9,7 +9,6 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.SystemBarStyle
-import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
@@ -46,12 +45,12 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.mindbank.presentation.navigation.component.ChecklistList
 import com.example.mindbank.presentation.navigation.component.SearchBar
-import com.example.mindbank.presentation.navigation.BottomNavBar
-import com.example.mindbank.presentation.navigation.HomeScreen
-import com.example.mindbank.presentation.navigation.MainGrid
-import com.example.mindbank.presentation.navigation.MainTopBar
-import com.example.mindbank.presentation.navigation.Screen
-import com.example.mindbank.presentation.navigation.SettingsScreen
+import com.example.mindbank.presentation.navigation.component.BottomNavBar
+import com.example.mindbank.presentation.navigation.component.HomeScreen
+import com.example.mindbank.presentation.navigation.component.MainGrid
+import com.example.mindbank.presentation.navigation.component.MainTopBar
+import com.example.mindbank.presentation.navigation.component.Screen
+import com.example.mindbank.presentation.navigation.component.SettingsScreen
 import com.example.mindbank.state.DataType
 import com.example.mindbank.presentation.navigation.theme.MindBankTheme
 import com.example.mindbank.viewmodel.MemoViewModel

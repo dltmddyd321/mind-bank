@@ -1,4 +1,4 @@
-package com.example.mindbank.presentation.navigation
+package com.example.mindbank.presentation.navigation.component
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle

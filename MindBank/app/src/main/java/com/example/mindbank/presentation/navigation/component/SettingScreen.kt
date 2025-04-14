@@ -1,4 +1,4 @@
-package com.example.mindbank.presentation.navigation
+package com.example.mindbank.presentation.navigation.component
 
 import android.content.Intent
 import android.graphics.Typeface
