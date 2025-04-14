@@ -12,7 +12,7 @@
         android:required="false" />
 
     <application
-        android:name=".CoreApplication"
+        android:name=".util.CoreApplication"
         android:allowBackup="false"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -24,17 +24,17 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
-            android:name=".activity.PasswordEditActivity"
+            android:name=".presentation.navigation.activity.PasswordEditActivity"
             android:exported="false"
             android:label="@string/title_activity_password_edit"
             android:theme="@style/Theme.App.Starting" />
         <activity
-            android:name=".activity.WebViewActivity"
+            android:name=".presentation.navigation.activity.WebViewActivity"
             android:exported="false"
             android:label="@string/title_activity_web_view"
             android:theme="@style/Theme.App.Starting" />
         <activity
-            android:name=".activity.PasswordActivity"
+            android:name=".presentation.navigation.activity.PasswordActivity"
             android:exported="true"
             android:theme="@style/Theme.App.Starting">
             <intent-filter>
@@ -44,15 +44,15 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activity.MainActivity"
+            android:name=".presentation.navigation.activity.MainActivity"
             android:exported="false"
             android:theme="@style/Theme.MindBank" />
         <activity
-            android:name=".activity.AddMemoActivity"
+            android:name=".presentation.navigation.activity.AddMemoActivity"
             android:exported="false"
             android:theme="@style/Theme.MindBank" />
         <activity
-            android:name=".activity.AddTodoActivity"
+            android:name=".presentation.navigation.activity.AddTodoActivity"
             android:exported="false"
             android:theme="@style/Theme.MindBank" />
 
