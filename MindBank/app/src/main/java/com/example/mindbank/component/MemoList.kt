@@ -33,7 +33,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
-import com.example.mindbank.activity.WebViewActivity
+import androidx.core.net.toUri
 import com.example.mindbank.data.Memo
 import com.example.mindbank.util.hexToColor
 import com.example.mindbank.util.isDarkColor
@@ -49,7 +49,7 @@ fun MemoItemView(data: Memo, onClick: (Memo) -> Unit, onEdit: (Memo) -> Unit, on
         val backgroundColor = hexToColor(data.color)
         Card(
             shape = RoundedCornerShape(10.dp),
-            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp), // 그림자 깊이
+            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
             modifier = Modifier
                 .padding(8.dp)
                 .fillMaxWidth(),
@@ -61,18 +61,16 @@ fun MemoItemView(data: Memo, onClick: (Memo) -> Unit, onEdit: (Memo) -> Unit, on
                     .padding(horizontal = 16.dp, vertical = 8.dp)
                     .fillMaxWidth()
             ) {
-                // 제목과 닫기 버튼을 한 줄에 배치
                 Row(
                     modifier = Modifier
                         .fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically // 세로 가운데 정렬
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // 제목 텍스트
                     Text(
                         text = data.title,
                         color = textColor,
                         style = MaterialTheme.typography.labelMedium,
-                        modifier = Modifier.weight(1f) // Text가 Row 안에서 남은 공간을 채움
+                        modifier = Modifier.weight(1f)
                     )
 
                     var showDialog by remember { mutableStateOf(false) }
@@ -104,7 +102,7 @@ fun MemoItemView(data: Memo, onClick: (Memo) -> Unit, onEdit: (Memo) -> Unit, on
                         if (showDialog) {
                             AlertDialog(
                                 onDismissRequest = {
-                                    showDialog = false // 다이얼로그 닫기
+                                    showDialog = false
                                 },
                                 title = {
                                     Text(text = "삭제하시겠습니까?")
@@ -112,8 +110,8 @@ fun MemoItemView(data: Memo, onClick: (Memo) -> Unit, onEdit: (Memo) -> Unit, on
                                 confirmButton = {
                                     TextButton(
                                         onClick = {
-                                            onDelete(data) // 삭제 확인 시 onDelete 실행
-                                            showDialog = false // 다이얼로그 닫기
+                                            onDelete(data)
+                                            showDialog = false
                                         }
                                     ) {
                                         Text("확인")
@@ -122,19 +120,18 @@ fun MemoItemView(data: Memo, onClick: (Memo) -> Unit, onEdit: (Memo) -> Unit, on
                                 dismissButton = {
                                     TextButton(
                                         onClick = {
-                                            showDialog = false // 취소 시 다이얼로그 닫기
+                                            showDialog = false
                                         }
                                     ) {
                                         Text("취소")
                                     }
                                 },
-                                properties = DialogProperties(dismissOnClickOutside = false) // 다이얼로그 외부 클릭 방지
+                                properties = DialogProperties(dismissOnClickOutside = false)
                             )
                         }
                     }
                 }
 
-                // 구분선 추가
                 Divider(
                     color = textColor,
                     thickness = 1.dp,
@@ -146,12 +143,14 @@ fun MemoItemView(data: Memo, onClick: (Memo) -> Unit, onEdit: (Memo) -> Unit, on
 
                 if (currentUrl != null) {
                     currentUrl?.let {
-                        val intent = Intent(activity, WebViewActivity::class.java)
-                        intent.putExtra("url", it)
+                        val intent = Intent(Intent.ACTION_VIEW, it.toUri())
                         activity.startActivity(intent)
+//                        val intent = Intent(activity, WebViewActivity::class.java)
+//                        intent.putExtra("url", it)
+//                        activity.startActivity(intent)
+                        currentUrl = null
                     }
                 } else {
-                    // 링크 텍스트를 표시
                     HyperlinkText(
                         modifier = Modifier.fillMaxWidth(),
                         text = data.detail,
