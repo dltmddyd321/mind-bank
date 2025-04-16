@@ -4,4 +4,22 @@
     <string name="title_activity_password_edit">PasswordEditActivity</string>
     <string name="empty_memo">메모가 없습니다.</string>
     <string name="empty_todo">할일이 없습니다.</string>
+    <string name="title_memo">Memo</string>
+    <string name="action_close">Close</string>
+    <string name="action_confirm">확인</string>
+    <string name="action_cancel">취소</string>
+    <string name="action_save">Save</string>
+    <string name="dialog_backup_title">백업 데이터 불러오기</string>
+    <string name="dialog_backup_message">저장이 완료되지 않은 데이터가 있습니다.\n마저 작성하시겠습니까?</string>
+    <string name="dialog_cancel_title">메모 추가 취소</string>
+    <string name="dialog_cancel_message">메모 추가를 취소하시겠습니까?</string>
+    <string name="hint_title">Title</string>
+    <string name="hint_memo">Write your memo here…</string>
+    <string name="label_last_updated">마지막 업데이트: %1$s</string>
+    <string name="dialog_cancel_todo_title">할일 추가 취소</string>
+    <string name="dialog_cancel_todo_message">할일 추가를 취소하시겠습니까?</string>
+    <string name="hint_todo_input">What\'s happening?</string>
+    <string name="toast_empty_todo">내용을 입력해주세요!</string>
+    <string name="alert_back_press">한번 더 클릭하면 종료됩니다.</string>
+    <string name="alert_search">검색어를 입력하시오.</string>
 </resources>

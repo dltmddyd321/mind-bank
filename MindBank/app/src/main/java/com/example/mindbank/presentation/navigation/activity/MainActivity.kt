@@ -43,6 +43,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.mindbank.R
 import com.example.mindbank.presentation.navigation.component.ChecklistList
 import com.example.mindbank.presentation.navigation.component.SearchBar
 import com.example.mindbank.presentation.navigation.component.BottomNavBar
@@ -165,7 +166,7 @@ class MainActivity : ComponentActivity() {
                     finish()
                 } else {
                     backPressedTime = currentTime
-                    Toast.makeText(this@MainActivity, "한번 더 클릭하면 종료됩니다.", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@MainActivity, getString(R.string.alert_back_press), Toast.LENGTH_SHORT).show()
                 }
             }
         })
@@ -202,7 +203,7 @@ class MainActivity : ComponentActivity() {
                 Column {
                     MainTopBar(title)
                     SearchBar(
-                        hint = "검색어를 입력하시오.",
+                        hint = getString(R.string.alert_search),
                         onTextChange = { searchText = it }
                     )
                 }
