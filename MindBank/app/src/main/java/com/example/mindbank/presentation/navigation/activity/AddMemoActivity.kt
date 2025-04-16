@@ -9,15 +9,12 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -29,7 +26,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
@@ -55,14 +51,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import com.example.mindbank.R
 import com.example.mindbank.data.Memo
 import com.example.mindbank.presentation.navigation.theme.MindBankTheme
 import com.example.mindbank.util.hexToColor
@@ -319,14 +313,43 @@ class AddMemoActivity : ComponentActivity() {
             )
         }) {
             Column(modifier = Modifier.padding(it)) {
-//
-//                TextStyleToolbar()
+                var url by remember { mutableStateOf("") }
 
                 Spacer(modifier = Modifier.height(16.dp))
 
                 TitleInputField(title, onTitleChange = { value ->
                     onTitleChange.invoke(value)
                 })
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                BasicTextField(
+                    value = url,
+                    onValueChange = {
+                        url = it
+                        // 저장 시 활용 가능하거나,
+                        // 자동 백업용으로 관리 필요 시 여기에 로직 추가 가능
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                        .border(1.dp, Color.Gray, RoundedCornerShape(6.dp))
+                        .padding(horizontal = 12.dp, vertical = 8.dp),
+                    textStyle = TextStyle(
+                        fontSize = 16.sp,
+                        color = MaterialTheme.colorScheme.onBackground
+                    ),
+                    decorationBox = { innerTextField ->
+                        if (url.isEmpty()) {
+                            Text(
+                                "관련 URL을 입력하세요 (선택)",
+                                color = Color.Gray,
+                                fontSize = 16.sp
+                            )
+                        }
+                        innerTextField()
+                    }
+                )
 
                 Spacer(modifier = Modifier.height(8.dp))
 
@@ -362,37 +385,6 @@ class AddMemoActivity : ComponentActivity() {
                         textAlign = TextAlign.End
                     )
                 }
-            }
-        }
-    }
-
-    @Composable
-    fun TextStyleToolbar() {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp)
-                .background(Color.White, RoundedCornerShape(12.dp))
-                .padding(8.dp),
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            IconButton(onClick = { /* Bold 기능 추가 */ }) {
-                Image(painter = painterResource(R.drawable.bold_icon), contentDescription = null)
-            }
-            IconButton(onClick = { /* Italic 기능 추가 */ }) {
-                Image(painter = painterResource(R.drawable.italick), contentDescription = null)
-            }
-            IconButton(onClick = { /* Underline 기능 추가 */ }) {
-                Image(painter = painterResource(R.drawable.powerline), contentDescription = null)
-            }
-            IconButton(onClick = { /* 왼쪽 정렬 */ }) {
-                Image(painter = painterResource(R.drawable.left), contentDescription = null)
-            }
-            IconButton(onClick = { /* 가운데 정렬 */ }) {
-                Image(painter = painterResource(R.drawable.middle), contentDescription = null)
-            }
-            IconButton(onClick = { /* 오른쪽 정렬 */ }) {
-                Image(painter = painterResource(R.drawable.right), contentDescription = null)
             }
         }
     }
