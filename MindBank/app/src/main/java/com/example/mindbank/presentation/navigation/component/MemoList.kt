@@ -39,7 +39,12 @@ import com.example.mindbank.util.hexToColor
 import com.example.mindbank.util.isDarkColor
 
 @Composable
-fun MemoItemView(data: Memo, onClick: (Memo) -> Unit, onEdit: (Memo) -> Unit, onDelete: (Memo) -> Unit) {
+fun MemoItemView(
+    data: Memo,
+    onClick: (Memo) -> Unit,
+    onEdit: (Memo) -> Unit,
+    onDelete: (Memo) -> Unit
+) {
     Box(
         modifier = Modifier
             .padding(horizontal = 8.dp)
@@ -138,27 +143,40 @@ fun MemoItemView(data: Memo, onClick: (Memo) -> Unit, onEdit: (Memo) -> Unit, on
                     modifier = Modifier.padding(vertical = 8.dp)
                 )
 
-                var currentUrl by remember { mutableStateOf<String?>(null) }
-                val activity = LocalContext.current as? Activity ?: return@Column
+                val link = data.link
 
-                if (currentUrl != null) {
-                    currentUrl?.let {
-                        val intent = Intent(Intent.ACTION_VIEW, it.toUri())
-                        activity.startActivity(intent)
-//                        val intent = Intent(activity, WebViewActivity::class.java)
-//                        intent.putExtra("url", it)
-//                        activity.startActivity(intent)
-                        currentUrl = null
+                if (!link.isNullOrEmpty()) {
+                    var currentUrl by remember { mutableStateOf<String?>(null) }
+                    val activity = LocalContext.current as? Activity ?: return@Column
+
+                    if (currentUrl != null) {
+                        currentUrl?.let {
+                            val intent = Intent(Intent.ACTION_VIEW, it.toUri())
+                            activity.startActivity(intent)
+                            currentUrl = null
+                        }
+                    } else {
+                        HyperlinkText(
+                            modifier = Modifier.fillMaxWidth(),
+                            text = link,
+                            style = MaterialTheme.typography.bodyMedium
+                        ) {
+                            currentUrl = it
+                        }
                     }
-                } else {
-                    HyperlinkText(
-                        modifier = Modifier.fillMaxWidth(),
-                        text = data.detail,
-                        style = MaterialTheme.typography.bodyMedium
-                    ) {
-                        currentUrl = it
-                    }
+
+                    Divider(
+                        color = textColor,
+                        thickness = 1.dp,
+                        modifier = Modifier.padding(vertical = 8.dp)
+                    )
                 }
+
+                Text(
+                    text = data.detail,
+                    color = textColor,
+                    style = MaterialTheme.typography.labelMedium
+                )
             }
         }
     }

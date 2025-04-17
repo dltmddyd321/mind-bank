@@ -19,6 +19,7 @@ class DataStoreViewModel @Inject constructor(
     suspend fun getUnSavedData(): UnSaved = withContext(Dispatchers.IO) {
         UnSaved(
             datastoreRepo.getString("UNSAVED_TITLE") ?: "",
+            datastoreRepo.getString("UNSAVED_LINK") ?: "",
             datastoreRepo.getString("UNSAVED_MEMO") ?: "",
             datastoreRepo.getString("UNSAVED_COLOR") ?: ""
         )
@@ -27,6 +28,12 @@ class DataStoreViewModel @Inject constructor(
     fun setUnSavedTitle(data: String) {
         CoroutineScope(Dispatchers.IO).launch {
             datastoreRepo.putString("UNSAVED_TITLE", data)
+        }
+    }
+
+    fun setUnSavedLink(data: String) {
+        CoroutineScope(Dispatchers.IO).launch {
+            datastoreRepo.putString("UNSAVED_LINK", data)
         }
     }
 
@@ -61,6 +68,7 @@ class DataStoreViewModel @Inject constructor(
 
 data class UnSaved(
     val title: String,
+    val link: String,
     val memo: String,
     val color: String
 )

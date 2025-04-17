@@ -50,6 +50,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -57,6 +58,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import com.example.mindbank.R
 import com.example.mindbank.data.Memo
 import com.example.mindbank.presentation.navigation.theme.MindBankTheme
 import com.example.mindbank.util.hexToColor
@@ -94,12 +96,14 @@ class AddMemoActivity : ComponentActivity() {
                 ) {
                     editId = intent?.getIntExtra("id", -1) ?: -1
                     var title by remember { mutableStateOf("") }
+                    var link by remember { mutableStateOf("") }
                     var memo by remember { mutableStateOf("") }
                     var circleColor by remember { mutableStateOf(Color.Red) }
 
                     LaunchedEffect(editId) {
                         editMemo = memoViewModel.searchById(editId)
                         title = editMemo?.title ?: ""
+                        link = editMemo?.link ?: ""
                         memo = editMemo?.detail ?: ""
                         lastUpdatedTime = editMemo?.dtUpdated ?: System.currentTimeMillis()
                         val lastColor = editMemo?.color
@@ -109,8 +113,9 @@ class AddMemoActivity : ComponentActivity() {
                         }
                     }
 
-                    AutoBackUpCheckDialog(dataStoreViewModel) { backupTitle, backupMemo, backupColor ->
+                    AutoBackUpCheckDialog(dataStoreViewModel) { backupTitle, backupLink, backupMemo, backupColor ->
                         title = backupTitle
+                        link = backupLink
                         memo = backupMemo
                         circleColor = hexToColor(backupColor)
                         isEditMode = true
@@ -139,19 +144,21 @@ class AddMemoActivity : ComponentActivity() {
     @Composable
     fun AutoBackUpCheckDialog(
         viewModel: DataStoreViewModel,
-        onBackupLoad: (String, String, String) -> Unit
+        onBackupLoad: (String, String, String, String) -> Unit
     ) {
         var showDialog by remember { mutableStateOf(false) }
         var initTitle = ""
+        var initLink = ""
         var initMemo = ""
         var initColor = ""
 
         LaunchedEffect(key1 = Unit) {
             val unSaved = viewModel.getUnSavedData()
             initTitle = unSaved.title
+            initLink = unSaved.link
             initMemo = unSaved.memo
             initColor = unSaved.color
-            if (initTitle.isNotEmpty() || initMemo.isNotEmpty()) showDialog = true
+            if (initTitle.isNotEmpty() || initMemo.isNotEmpty() || initLink.isNotEmpty()) showDialog = true
         }
 
         if (showDialog) {
@@ -161,7 +168,7 @@ class AddMemoActivity : ComponentActivity() {
                 Text(text = "백업 데이터 불러오기")
             }, confirmButton = {
                 TextButton(onClick = {
-                    onBackupLoad.invoke(initTitle, initMemo, initColor)
+                    onBackupLoad.invoke(initTitle, initLink, initMemo, initColor)
                     showDialog = false
                 }) { Text("확인") }
             }, text = {
@@ -187,9 +194,9 @@ class AddMemoActivity : ComponentActivity() {
             }, confirmButton = {
                 TextButton(onClick = { activity.finish() }) { Text("확인") }
             }, title = {
-                Text(text = "메모 추가 취소")
+                Text(text = if (isEditMode) "메모 수정 취소" else "메모 추가 취소")
             }, text = {
-                Text(text = "메모 추가를 취소하시겠습니까?")
+                Text(text = if (isEditMode) "메모 수정을 취소하시겠습니까?" else "메모 추가를 취소하시겠습니까?")
             }, dismissButton = {
                 TextButton(onClick = { showDialog = false }) { Text("취소") }
             })
@@ -325,16 +332,18 @@ class AddMemoActivity : ComponentActivity() {
 
                 BasicTextField(
                     value = url,
-                    onValueChange = {
-                        url = it
-                        // 저장 시 활용 가능하거나,
-                        // 자동 백업용으로 관리 필요 시 여기에 로직 추가 가능
+                    cursorBrush = SolidColor(Color.White),
+                    onValueChange = { value ->
+                        url = value
                     },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp)
                         .border(1.dp, Color.Gray, RoundedCornerShape(6.dp))
-                        .padding(horizontal = 12.dp, vertical = 8.dp),
+                        .padding(horizontal = 12.dp, vertical = 8.dp)
+                        .onFocusChanged { value ->
+                            if (!value.isFocused) dataStoreViewModel.setUnSavedLink(url)
+                        },
                     textStyle = TextStyle(
                         fontSize = 16.sp,
                         color = MaterialTheme.colorScheme.onBackground
@@ -342,7 +351,7 @@ class AddMemoActivity : ComponentActivity() {
                     decorationBox = { innerTextField ->
                         if (url.isEmpty()) {
                             Text(
-                                "관련 URL을 입력하세요 (선택)",
+                                getString(R.string.input_url),
                                 color = Color.Gray,
                                 fontSize = 16.sp
                             )
@@ -393,6 +402,7 @@ class AddMemoActivity : ComponentActivity() {
     fun TitleInputField(title: String, onTitleChange: (String) -> Unit) {
         BasicTextField(
             value = title,
+            cursorBrush = SolidColor(Color.White),
             onValueChange = onTitleChange,
             textStyle = TextStyle(
                 fontSize = 24.sp,
@@ -447,6 +457,7 @@ class AddMemoActivity : ComponentActivity() {
         BasicTextField(
             value = text,
             onValueChange = onTextChange,
+            cursorBrush = SolidColor(Color.White),
             modifier = textFieldModifier,
             textStyle = TextStyle(
                 fontSize = 18.sp,
@@ -455,7 +466,7 @@ class AddMemoActivity : ComponentActivity() {
             ),
             decorationBox = { innerTextField ->
                 if (text.isEmpty()) {
-                    Text("Write your memo here...", color = placeholderColor, fontSize = 18.sp)
+                    Text(getString(R.string.input_memo), color = placeholderColor, fontSize = 18.sp)
                 }
                 innerTextField()
             }

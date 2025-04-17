@@ -2,6 +2,8 @@ package com.example.mindbank.db
 
 import android.content.Context
 import androidx.room.Room
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -17,13 +19,22 @@ object DBModule {
     @Provides
     fun providesDataStoreRepo(
         @ApplicationContext context: Context
-    ) : DatastoreRepo = DatastoreRepoImpl(context)
+    ): DatastoreRepo = DatastoreRepoImpl(context)
+
+    private val MIGRATION_1_2 = object : Migration(1, 2) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("ALTER TABLE save_model ADD COLUMN link TEXT")
+        }
+    }
 
     @Singleton
     @Provides
     fun provideSaveDatabase(
         @ApplicationContext context: Context
-    ): MemoDatabase = Room.databaseBuilder(context, MemoDatabase::class.java, "memo.db").build()
+    ): MemoDatabase =
+        Room.databaseBuilder(context, MemoDatabase::class.java, "memo.db").addMigrations(
+            MIGRATION_1_2
+        ).build()
 
     @Singleton
     @Provides

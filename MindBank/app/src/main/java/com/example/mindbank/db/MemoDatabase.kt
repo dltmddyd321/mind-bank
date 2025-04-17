@@ -5,7 +5,7 @@ import androidx.room.RoomDatabase
 import com.example.mindbank.data.Memo
 import com.example.mindbank.data.Task
 
-@Database(entities = [Memo::class], version = 1)
+@Database(entities = [Memo::class], version = 2)
 abstract class MemoDatabase : RoomDatabase() {
     abstract fun saveDataDao(): SaveDataDao
 }

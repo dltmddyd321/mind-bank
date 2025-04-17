@@ -10,6 +10,7 @@ data class Memo(
     var detail: String,
     val dtCreated: Long,
     var dtUpdated: Long,
-    var color: String
+    var color: String,
+    var link: String? = null
 )
 

@@ -55,10 +55,9 @@ fun MainTopBar(title: String = "Memos") {
 fun MainGrid(memoViewModel: MemoViewModel, searchText: String, onEdit: (Memo) -> Unit) {
     val itemList by memoViewModel.memos.collectAsState()
     val filteredList = if (searchText.isNotEmpty()) itemList.filter {
-        it.title.contains(searchText, ignoreCase = true) || it.detail.contains(
-            searchText,
-            ignoreCase = true
-        )
+        it.title.contains(searchText, ignoreCase = true)
+        || it.detail.contains(searchText, ignoreCase = true)
+        || it.link?.contains(searchText, ignoreCase = true) == true
     } else itemList
 
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
