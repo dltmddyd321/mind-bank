@@ -1,5 +1,6 @@
 package com.example.mindbank.util
 
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.graphics.Color
 import kotlin.math.roundToInt
 
@@ -21,4 +22,10 @@ fun isDarkColor(color: Color): Boolean {
     val b = color.blue
     val luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b
     return luminance < 0.5
+}
+
+fun <T> SnapshotStateList<T>.move(from: Int, to: Int) {
+    if (from == to) return
+    val item = removeAt(from)
+    add(if (to > from) to - 1 else to, item)
 }

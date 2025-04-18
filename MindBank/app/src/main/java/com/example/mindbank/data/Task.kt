@@ -11,6 +11,6 @@ data class Task(
     val dtUpdated: Long,
     val color: String,
     var isDone: Boolean,
-    val position: Long,
+    var position: Long,
     val alarmTime: Long = -1L
 )

@@ -56,6 +56,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import com.example.mindbank.R
 import com.example.mindbank.data.Task
 import com.example.mindbank.presentation.navigation.theme.MindBankTheme
 import com.example.mindbank.util.hexToColor
@@ -192,7 +193,7 @@ class AddTodoActivity : ComponentActivity() {
             }
 
             TopAppBar(title = {
-                Text(text = "Memo", color = MaterialTheme.colorScheme.onPrimary)
+                Text(text = "Todo", color = MaterialTheme.colorScheme.onPrimary)
             }, navigationIcon = {
                 IconButton(onClick = { showBackDialog = true }) {
                     Icon(imageVector = Icons.Default.Close, contentDescription = "Close")
@@ -290,7 +291,7 @@ class AddTodoActivity : ComponentActivity() {
             modifier = textFieldModifier,
             cursorBrush = SolidColor(Color.White),
             decorationBox = { innerTextField ->
-                if (text.isEmpty()) Text("What's happening?", color = placeholderColor)
+                if (text.isEmpty()) Text(getString(R.string.input_todo), color = placeholderColor)
                 innerTextField()
             },
             textStyle = textStyle

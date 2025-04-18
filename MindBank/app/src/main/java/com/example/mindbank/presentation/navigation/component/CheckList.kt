@@ -30,6 +30,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -42,14 +43,34 @@ import androidx.compose.ui.window.DialogProperties
 import com.example.mindbank.R
 import com.example.mindbank.data.Task
 import com.example.mindbank.util.hexToColor
+import com.example.mindbank.util.move
 import com.example.mindbank.viewmodel.TodoViewModel
+import org.burnoutcrew.reorderable.rememberReorderableLazyListState
 
 @Composable
 fun ChecklistList(viewModel: TodoViewModel, searchText: String, onEdit: (Task) -> Unit) {
     val itemList by viewModel.todos.collectAsState()
-    val filteredList = if (searchText.isNotEmpty()) itemList.filter {
-        it.title.contains(searchText, ignoreCase = true)
-    } else itemList
+    val filteredList = remember(itemList, searchText) {
+        val base = if (searchText.isNotEmpty()) {
+            itemList.filter {
+                it.title.contains(searchText, ignoreCase = true)
+            }
+        } else itemList
+        base.sortedByDescending { it.position }.toMutableStateList()
+    }
+
+    val reorderState = rememberReorderableLazyListState(
+        onMove = { from, to ->
+            filteredList.move(from.index, to.index)
+        },
+        onDragEnd = { startIndex, endIndex ->
+            val now = System.currentTimeMillis()
+            filteredList.forEachIndexed { index, task ->
+                task.position = now - index // 순서 역순으로 포지션 재할당
+                viewModel.updateTodo(task)
+            }
+        }
+    )
 
     if (filteredList.isNotEmpty()) {
         LazyColumn(
