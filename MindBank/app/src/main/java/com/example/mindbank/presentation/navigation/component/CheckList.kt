@@ -13,7 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -26,6 +26,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -42,45 +43,52 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import com.example.mindbank.R
 import com.example.mindbank.data.Task
+import com.example.mindbank.util.dragContainer
+import com.example.mindbank.util.draggableItems
 import com.example.mindbank.util.hexToColor
 import com.example.mindbank.util.move
+import com.example.mindbank.util.rememberDragDropState
 import com.example.mindbank.viewmodel.TodoViewModel
-import org.burnoutcrew.reorderable.rememberReorderableLazyListState
 
 @Composable
 fun ChecklistList(viewModel: TodoViewModel, searchText: String, onEdit: (Task) -> Unit) {
     val itemList by viewModel.todos.collectAsState()
-    val filteredList = remember(itemList, searchText) {
-        val base = if (searchText.isNotEmpty()) {
-            itemList.filter {
-                it.title.contains(searchText, ignoreCase = true)
-            }
-        } else itemList
-        base.sortedByDescending { it.position }.toMutableStateList()
+    val originalList = if (searchText.isNotEmpty()) {
+        itemList.filter { it.title.contains(searchText, ignoreCase = true) }
+    } else itemList
+    val filteredList = remember(originalList) {
+        originalList.sortedByDescending { it.position }.toMutableStateList()
     }
+    val stateList = rememberLazyListState()
+    val draggableItems by remember { derivedStateOf { filteredList.size } }
+    val dragDropState =
+        rememberDragDropState(
+            lazyListState = stateList,
+            draggableItemsNum = draggableItems,
+            onMove = { fromIndex, toIndex ->
+                filteredList.move(fromIndex, toIndex)
+            }, onDragEnd = {
+                val now = System.currentTimeMillis()
+                filteredList.forEachIndexed { index, task ->
+                    task.position = now - index
+                    viewModel.updateTodo(task)
+                }
+            })
 
-    val reorderState = rememberReorderableLazyListState(
-        onMove = { from, to ->
-            filteredList.move(from.index, to.index)
-        },
-        onDragEnd = { startIndex, endIndex ->
-            val now = System.currentTimeMillis()
-            filteredList.forEachIndexed { index, task ->
-                task.position = now - index // 순서 역순으로 포지션 재할당
-                viewModel.updateTodo(task)
-            }
-        }
-    )
 
     if (filteredList.isNotEmpty()) {
         LazyColumn(
             modifier = Modifier
+                .dragContainer(dragDropState)
                 .fillMaxSize()
-                .padding(16.dp)
+                .padding(16.dp),
+            state = stateList
         ) {
-            items(filteredList) {
-                ChecklistItem(item = it, onChecked = { todo -> viewModel.updateTodo(todo)
-                }, onEdit = { todo -> onEdit.invoke(todo)
+            draggableItems(filteredList, dragDropState = dragDropState) { modifier, item ->
+                ChecklistItem(item = item, modifier = modifier, onChecked = { todo ->
+                    viewModel.updateTodo(todo)
+                }, onEdit = { todo ->
+                    onEdit.invoke(todo)
                 }, onDelete = { todo -> viewModel.deleteTodo(todo.id) })
             }
         }
@@ -96,12 +104,13 @@ fun ChecklistList(viewModel: TodoViewModel, searchText: String, onEdit: (Task) -
 @Composable
 fun ChecklistItem(
     item: Task,
+    modifier: Modifier = Modifier,
     onChecked: (Task) -> Unit,
     onEdit: (Task) -> Unit,
     onDelete: (Task) -> Unit
 ) {
     Card(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(4.dp)
             .background(Color.Transparent),
