@@ -4,6 +4,8 @@ package com.example.mindbank.presentation.navigation.activity
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.DatePickerDialog
+import android.app.TimePickerDialog
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -41,8 +43,10 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -53,6 +57,7 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -67,11 +72,20 @@ import com.github.skydoves.colorpicker.compose.HsvColorPicker
 import com.github.skydoves.colorpicker.compose.rememberColorPickerController
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.FlowPreview
+import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.LocalTime
+import java.time.ZoneId
+import java.time.ZonedDateTime
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 
 @AndroidEntryPoint
 class AddTodoActivity : ComponentActivity() {
 
     private val todoViewModel: TodoViewModel by viewModels()
+    private var alarmTime = 0L
     private var editId = -1
 
     @Composable
@@ -116,21 +130,17 @@ class AddTodoActivity : ComponentActivity() {
                         editingData = todoViewModel.searchById(editId)
                         title = editingData?.title ?: ""
                         val lastColor = editingData?.color
+                        alarmTime = editingData?.alarmTime ?: 0L
                         if (!lastColor.isNullOrEmpty()) circleColor = hexToColor(lastColor)
                         if (editingData != null) isEditMode = true
                     }
 
                     BackHandlerWithQuestionDialog(false)
-                    InputScreen(
-                        title,
-                        circleColor,
-                        isEditMode,
-                        onTextChange = {
-                            title = it
-                        },
-                        onColorChange = {
-                            circleColor = it
-                        })
+                    InputScreen(title, circleColor, isEditMode, onTextChange = {
+                        title = it
+                    }, onColorChange = {
+                        circleColor = it
+                    })
                 }
             }
         }
@@ -174,8 +184,7 @@ class AddTodoActivity : ComponentActivity() {
                             onColorChanged = { colorEnvelope: ColorEnvelope ->
                                 selectedColor = colorEnvelope.color
                                 onColorChange.invoke(selectedColor)
-                            }
-                        )
+                            })
 
                         Spacer(modifier = Modifier.height(16.dp))
 
@@ -183,8 +192,7 @@ class AddTodoActivity : ComponentActivity() {
                             onClick = {
                                 onColorChange.invoke(selectedColor)
                                 showColorPicker = false
-                            },
-                            modifier = Modifier.fillMaxWidth()
+                            }, modifier = Modifier.fillMaxWidth()
                         ) {
                             Text("확인", fontSize = 18.sp)
                         }
@@ -192,71 +200,78 @@ class AddTodoActivity : ComponentActivity() {
                 }
             }
 
-            TopAppBar(title = {
-                Text(text = "Todo", color = MaterialTheme.colorScheme.onPrimary)
-            }, navigationIcon = {
-                IconButton(onClick = { showBackDialog = true }) {
-                    Icon(imageVector = Icons.Default.Close, contentDescription = "Close")
-                }
-            }, actions = {
-                Row {
-                    Canvas(
-                        modifier = Modifier
-                            .size(40.dp)
-                            .padding(8.dp)
-                            .offset(y = 4.dp)
-                            .clickable {
-                                showColorPicker = true
+            TopAppBar(
+                title = {
+                    Text(text = "Todo", color = MaterialTheme.colorScheme.onPrimary)
+                }, navigationIcon = {
+                    IconButton(onClick = { showBackDialog = true }) {
+                        Icon(imageVector = Icons.Default.Close, contentDescription = "Close")
+                    }
+                }, actions = {
+                    Row {
+                        Canvas(
+                            modifier = Modifier
+                                .size(40.dp)
+                                .padding(8.dp)
+                                .offset(y = 4.dp)
+                                .clickable {
+                                    showColorPicker = true
+                                }) {
+                            drawCircle(
+                                color = circleColor, radius = size.minDimension / 2
+                            )
+                        }
+                        Button(onClick = {
+                            if (title.isBlank()) {
+                                Toast.makeText(context, "내용을 입력해주세요!", Toast.LENGTH_SHORT).show()
+                                return@Button
                             }
-                    ) {
-                        drawCircle(
-                            color = circleColor,
-                            radius = size.minDimension / 2
-                        )
-                    }
-                    Button(onClick = {
-                        if (title.isBlank()) {
-                            Toast.makeText(context, "내용을 입력해주세요!", Toast.LENGTH_SHORT).show()
-                            return@Button
+                            val currentTime = System.currentTimeMillis()
+                            if (isEditMode) {
+                                val task = Task(
+                                    id = editId,
+                                    title = title,
+                                    dtCreated = currentTime,
+                                    dtUpdated = currentTime,
+                                    color = circleColor.toHex(),
+                                    isDone = false,
+                                    position = currentTime,
+                                    alarmTime
+                                )
+                                todoViewModel.updateTodo(task)
+                            } else {
+                                val task = Task(
+                                    title = title,
+                                    dtCreated = currentTime,
+                                    dtUpdated = currentTime,
+                                    color = circleColor.toHex(),
+                                    isDone = false,
+                                    position = currentTime,
+                                    alarmTime = alarmTime
+                                )
+                                todoViewModel.saveTodo(task)
+                            }
+                            setResult(RESULT_OK)
+                            finish()
+                        }) {
+                            Text("Save")
                         }
-                        val currentTime = System.currentTimeMillis()
-                        if (isEditMode) {
-                            val task = Task(
-                                id = editId,
-                                title = title,
-                                dtCreated = currentTime,
-                                dtUpdated = currentTime,
-                                color = circleColor.toHex(),
-                                isDone = false,
-                                position = currentTime
-                            )
-                            todoViewModel.updateTodo(task)
-                        } else {
-                            val task = Task(
-                                title = title,
-                                dtCreated = currentTime,
-                                dtUpdated = currentTime,
-                                color = circleColor.toHex(),
-                                isDone = false,
-                                position = currentTime
-                            )
-                            todoViewModel.saveTodo(task)
-                        }
-                        setResult(RESULT_OK)
-                        finish()
-                    }) {
-                        Text("Save")
                     }
-                }
-            }, colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = MaterialTheme.colorScheme.primary,
-                titleContentColor = MaterialTheme.colorScheme.onPrimary,
-                navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
-                actionIconContentColor = MaterialTheme.colorScheme.onSecondary
-            )
+                }, colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimary,
+                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
+                    actionIconContentColor = MaterialTheme.colorScheme.onSecondary
+                )
             )
         }) {
             Column(modifier = Modifier.padding(it)) {
+                Spacer(modifier = Modifier.height(8.dp))
+                var initTime by remember { mutableLongStateOf(alarmTime) }
+                AlarmSelector(initTime) { selectedTimeMillis ->
+                    initTime = selectedTimeMillis
+                }
+                Spacer(modifier = Modifier.height(8.dp))
                 InputField(title, onTextChange = { value ->
                     onTextChange.invoke(value)
                 })
@@ -267,8 +282,7 @@ class AddTodoActivity : ComponentActivity() {
     @FlowPreview
     @Composable
     fun InputField(
-        text: String,
-        onTextChange: (String) -> Unit
+        text: String, onTextChange: (String) -> Unit
     ) {
         val textFieldModifier = Modifier
             .padding(16.dp)
@@ -280,9 +294,7 @@ class AddTodoActivity : ComponentActivity() {
         val placeholderColor = if (!isSystemInDarkTheme()) Color.Gray else Color.LightGray
 
         val textStyle = TextStyle(
-            fontSize = 20.sp,
-            fontFamily = FontFamily.Monospace,
-            color = textColor
+            fontSize = 20.sp, fontFamily = FontFamily.Monospace, color = textColor
         )
 
         BasicTextField(
@@ -296,5 +308,117 @@ class AddTodoActivity : ComponentActivity() {
             },
             textStyle = textStyle
         )
+    }
+
+    @Composable
+    fun AlarmSelector(
+        lastAlarm: Long, onTimeSelected: (Long) -> Unit
+    ) {
+        var showDatePicker by remember { mutableStateOf(false) }
+        var showTimePicker by remember { mutableStateOf(false) }
+        var selectedDate by remember { mutableStateOf(LocalDate.now()) }
+        var selectedTime by remember { mutableStateOf(LocalTime.now()) }
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
+        ) {
+
+            if (lastAlarm > 0L) {
+                val formattedDate = remember(lastAlarm) {
+                    val sdf = SimpleDateFormat("yyyy년 MM월 dd일 HH시 mm분", Locale.getDefault())
+                    sdf.format(Date(lastAlarm))
+                }
+
+                Text(
+                    text = "알람: $formattedDate",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { showDatePicker = true }
+                        .padding(vertical = 8.dp),
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary)
+            } else {
+                Text(
+                    text = "+ 알림 추가",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { showDatePicker = true }
+                        .padding(vertical = 8.dp),
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary)
+            }
+
+            if (showDatePicker) {
+                DatePickerDialog(
+                    onDismissRequest = { showDatePicker = false },
+                    onDateChange = { date ->
+                        selectedDate = date
+                        showDatePicker = false
+                        showTimePicker = true
+                    })
+            }
+
+            if (showTimePicker) {
+                TimePickerDialog(
+                    onDismissRequest = { showTimePicker = false },
+                    onTimeSelected = { time ->
+                        selectedTime = time
+                        showTimePicker = false
+
+                        val zonedDateTime = ZonedDateTime.of(
+                            selectedDate, selectedTime, ZoneId.systemDefault()
+                        )
+                        onTimeSelected(zonedDateTime.toInstant().toEpochMilli())
+                    })
+            }
+        }
+    }
+}
+
+@Composable
+fun DatePickerDialog(
+    onDismissRequest: () -> Unit, onDateChange: (LocalDate) -> Unit
+) {
+    val context = LocalContext.current
+    val today = remember { Calendar.getInstance() }
+
+    val dialog = remember {
+        DatePickerDialog(
+            context, { _, year, month, dayOfMonth ->
+                val date = LocalDate.of(year, month + 1, dayOfMonth)
+                onDateChange(date)
+            }, today.get(Calendar.YEAR), today.get(Calendar.MONTH), today.get(Calendar.DAY_OF_MONTH)
+        )
+    }
+
+    DisposableEffect(Unit) {
+        dialog.setOnDismissListener { onDismissRequest() }
+        dialog.show()
+        onDispose { dialog.dismiss() }
+    }
+}
+
+@Composable
+fun TimePickerDialog(
+    onDismissRequest: () -> Unit, onTimeSelected: (LocalTime) -> Unit
+) {
+    val context = LocalContext.current
+    val now = remember { Calendar.getInstance() }
+
+    val dialog = remember {
+        TimePickerDialog(
+            context, { _, hourOfDay, minute ->
+                val time = LocalTime.of(hourOfDay, minute)
+                onTimeSelected(time)
+            }, now.get(Calendar.HOUR_OF_DAY), now.get(Calendar.MINUTE), true
+        )
+    }
+
+    DisposableEffect(Unit) {
+        dialog.setOnDismissListener { onDismissRequest() }
+        dialog.show()
+        onDispose { dialog.dismiss() }
     }
 }
