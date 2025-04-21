@@ -4,7 +4,9 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -25,13 +27,14 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -40,24 +43,77 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
 import com.example.mindbank.R
 import com.example.mindbank.data.Task
 import com.example.mindbank.util.dragContainer
 import com.example.mindbank.util.draggableItems
 import com.example.mindbank.util.hexToColor
-import com.example.mindbank.util.move
 import com.example.mindbank.util.rememberDragDropState
 import com.example.mindbank.viewmodel.TodoViewModel
 
 @Composable
+fun MyList() {
+    var list1 by remember { mutableStateOf(List(20) { it }) }
+    val draggableItems by remember {
+        derivedStateOf { list1.size }
+    }
+    val stateList = rememberLazyListState()
+
+    val dragDropState =
+        rememberDragDropState(
+            lazyListState = stateList,
+            draggableItemsNum = draggableItems,
+            onMove = { fromIndex, toIndex ->
+                list1 = list1.toMutableList().apply { add(toIndex, removeAt(fromIndex)) }
+            }, onDragEnd = {
+
+            })
+
+    LazyColumn(
+        modifier = Modifier.dragContainer(dragDropState),
+        state = stateList,
+        contentPadding = PaddingValues(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        item {
+            Text(text = "Title 1", fontSize = 30.sp)
+        }
+
+        draggableItems(items = list1, dragDropState = dragDropState) { modifier, item ->
+            Item(
+                modifier = modifier,
+                index = item,
+            )
+        }
+    }
+}
+
+@Composable
+private fun Item(modifier: Modifier = Modifier, index: Int) {
+    Card(
+        modifier = modifier
+    ) {
+        Text(
+            "Item $index",
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(20.dp)
+        )
+    }
+}
+
+@Composable
 fun ChecklistList(viewModel: TodoViewModel, searchText: String, onEdit: (Task) -> Unit) {
     val itemList by viewModel.todos.collectAsState()
-    val originalList = if (searchText.isNotEmpty()) {
+    val initList = if (searchText.isNotEmpty()) {
         itemList.filter { it.title.contains(searchText, ignoreCase = true) }
     } else itemList
-    val filteredList = remember(originalList) {
-        originalList.sortedByDescending { it.position }.toMutableStateList()
+    var filteredList = remember { mutableStateListOf<Task>() }
+    LaunchedEffect(Unit) {
+        filteredList.clear()
+        filteredList.addAll(initList.sortedByDescending { it.position })
     }
     val stateList = rememberLazyListState()
     val draggableItems by remember { derivedStateOf { filteredList.size } }
@@ -66,7 +122,7 @@ fun ChecklistList(viewModel: TodoViewModel, searchText: String, onEdit: (Task) -
             lazyListState = stateList,
             draggableItemsNum = draggableItems,
             onMove = { fromIndex, toIndex ->
-                filteredList.move(fromIndex, toIndex)
+                filteredList = filteredList.apply { add(toIndex, removeAt(fromIndex)) }
             }, onDragEnd = {
                 val now = System.currentTimeMillis()
                 filteredList.forEachIndexed { index, task ->
