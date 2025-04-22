@@ -29,8 +29,10 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -213,6 +215,12 @@ fun HomeScreen(
 
                         item {
                             val todoList by todoViewModel.todos.collectAsState()
+
+                            val list = remember { mutableStateListOf<Task>() }
+                            LaunchedEffect(todoList) {
+                                list.clear()
+                                list.addAll(todoList)
+                            }
 
                             Card(
                                 modifier = Modifier

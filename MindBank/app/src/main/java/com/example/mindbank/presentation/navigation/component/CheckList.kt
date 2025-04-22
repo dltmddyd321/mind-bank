@@ -111,7 +111,7 @@ fun ChecklistList(viewModel: TodoViewModel, searchText: String, onEdit: (Task) -
         itemList.filter { it.title.contains(searchText, ignoreCase = true) }
     } else itemList
     var filteredList = remember { mutableStateListOf<Task>() }
-    LaunchedEffect(Unit) {
+    LaunchedEffect(itemList, searchText) {
         filteredList.clear()
         filteredList.addAll(initList.sortedByDescending { it.position })
     }

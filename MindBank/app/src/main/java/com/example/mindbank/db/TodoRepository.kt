@@ -40,8 +40,7 @@ class TodoRepository @Inject constructor(
         }
     }
 
-    fun update(task: Task) {
-        CoroutineScope(Dispatchers.IO).launch {
+    suspend fun update(task: Task) {
             todoDao.updateTodo(
                 task.id,
                 task.title,
@@ -50,6 +49,5 @@ class TodoRepository @Inject constructor(
                 task.isDone,
                 task.position
             )
-        }
     }
 }
