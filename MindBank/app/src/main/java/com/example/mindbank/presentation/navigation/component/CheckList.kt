@@ -46,7 +46,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
 import com.example.mindbank.R
-import com.example.mindbank.data.Task
+import com.example.mindbank.db.data.Task
 import com.example.mindbank.util.dragContainer
 import com.example.mindbank.util.draggableItems
 import com.example.mindbank.util.hexToColor

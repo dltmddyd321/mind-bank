@@ -2,8 +2,8 @@ package com.example.mindbank.db
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
-import com.example.mindbank.data.Memo
-import com.example.mindbank.data.Task
+import com.example.mindbank.db.data.Memo
+import com.example.mindbank.db.data.Task
 
 @Database(entities = [Memo::class], version = 2)
 abstract class MemoDatabase : RoomDatabase() {

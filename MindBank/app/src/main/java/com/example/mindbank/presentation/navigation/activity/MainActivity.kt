@@ -53,7 +53,7 @@ import com.example.mindbank.presentation.navigation.component.Screen
 import com.example.mindbank.presentation.navigation.component.SearchBar
 import com.example.mindbank.presentation.navigation.component.SettingsScreen
 import com.example.mindbank.presentation.navigation.theme.MindBankTheme
-import com.example.mindbank.state.DataType
+import com.example.mindbank.util.DataType
 import com.example.mindbank.viewmodel.MemoViewModel
 import com.example.mindbank.viewmodel.TodoViewModel
 import dagger.hilt.android.AndroidEntryPoint

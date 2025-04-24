@@ -1,4 +1,4 @@
-package com.example.mindbank.data
+package com.example.mindbank.db.data
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

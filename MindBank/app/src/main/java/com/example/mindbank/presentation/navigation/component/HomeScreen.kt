@@ -46,8 +46,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.mindbank.R
-import com.example.mindbank.data.Memo
-import com.example.mindbank.data.Task
+import com.example.mindbank.db.data.Memo
+import com.example.mindbank.db.data.Task
 import com.example.mindbank.presentation.navigation.theme.MindBankTheme
 import com.example.mindbank.viewmodel.MemoViewModel
 import com.example.mindbank.viewmodel.TodoViewModel

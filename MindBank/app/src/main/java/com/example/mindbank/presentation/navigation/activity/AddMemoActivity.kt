@@ -59,7 +59,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.example.mindbank.R
-import com.example.mindbank.data.Memo
+import com.example.mindbank.db.data.Memo
 import com.example.mindbank.presentation.navigation.theme.MindBankTheme
 import com.example.mindbank.util.hexToColor
 import com.example.mindbank.util.toHex

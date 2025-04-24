@@ -34,7 +34,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import androidx.core.net.toUri
-import com.example.mindbank.data.Memo
+import com.example.mindbank.db.data.Memo
 import com.example.mindbank.util.hexToColor
 import com.example.mindbank.util.isDarkColor
 

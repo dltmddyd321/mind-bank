@@ -2,7 +2,7 @@ package com.example.mindbank.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.mindbank.data.Memo
+import com.example.mindbank.db.data.Memo
 import com.example.mindbank.db.MemoRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers

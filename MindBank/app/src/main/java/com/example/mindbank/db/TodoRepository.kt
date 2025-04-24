@@ -1,6 +1,6 @@
 package com.example.mindbank.db
 
-import com.example.mindbank.data.Task
+import com.example.mindbank.db.data.Task
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
