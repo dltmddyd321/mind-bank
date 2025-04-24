@@ -278,7 +278,7 @@ fun HomeScreen(
                                                 todoList.forEach { task ->
                                                     ChecklistItem(
                                                         item = task,
-                                                        onChecked = { todoViewModel.updateTodo(task) },
+                                                        onChecked = { checkedTodo -> todoViewModel.updateTodo(checkedTodo) },
                                                         onEdit = { onEditTodo.invoke(task) },
                                                         onDelete = { todoViewModel.deleteTodo(task.id) }
                                                     )
