@@ -3,6 +3,7 @@ package com.example.mindbank.util
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.graphics.Color
 import kotlin.math.roundToInt
+import androidx.core.graphics.toColorInt
 
 fun Color.toHex(): String {
     val red = (red * 255).roundToInt()
@@ -14,7 +15,7 @@ fun Color.toHex(): String {
 }
 
 fun hexToColor(hex: String): Color =
-    Color(android.graphics.Color.parseColor(hex))
+    Color(hex.toColorInt())
 
 fun isDarkColor(color: Color): Boolean {
     val r = color.red

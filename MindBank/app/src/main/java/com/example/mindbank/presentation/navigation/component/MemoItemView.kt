@@ -31,9 +31,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import androidx.core.net.toUri
+import com.example.mindbank.R
 import com.example.mindbank.db.data.Memo
 import com.example.mindbank.util.hexToColor
 import com.example.mindbank.util.isDarkColor
@@ -110,7 +112,7 @@ fun MemoItemView(
                                     showDialog = false
                                 },
                                 title = {
-                                    Text(text = "삭제하시겠습니까?")
+                                    Text(text = stringResource(R.string.question_delete))
                                 },
                                 confirmButton = {
                                     TextButton(
@@ -119,7 +121,7 @@ fun MemoItemView(
                                             showDialog = false
                                         }
                                     ) {
-                                        Text("확인")
+                                        Text(stringResource(R.string.confirm))
                                     }
                                 },
                                 dismissButton = {
@@ -128,7 +130,7 @@ fun MemoItemView(
                                             showDialog = false
                                         }
                                     ) {
-                                        Text("취소")
+                                        Text(stringResource(R.string.cancel))
                                     }
                                 },
                                 properties = DialogProperties(dismissOnClickOutside = false)

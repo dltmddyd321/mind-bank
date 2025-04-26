@@ -15,16 +15,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SheetState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -55,39 +52,6 @@ import kotlinx.coroutines.launch
 
 @ExperimentalMaterial3Api
 @Composable
-fun DataSheet(
-    memo: Memo,
-    sheetState: SheetState,
-    onDismiss: () -> Unit
-) {
-    ModalBottomSheet(
-        onDismissRequest = {
-            onDismiss.invoke()
-        },
-        sheetState = sheetState
-    ) {
-        Column(
-            Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        ) {
-            Text("메모 상세보기", style = MaterialTheme.typography.titleLarge)
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(text = memo.title)
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(text = memo.detail)
-            Spacer(modifier = Modifier.height(12.dp))
-            Button(onClick = {
-                onDismiss.invoke()
-            }) {
-                Text("닫기")
-            }
-        }
-    }
-}
-
-@ExperimentalMaterial3Api
-@Composable
 fun HomeScreen(
     navController: NavController,
     memoViewModel: MemoViewModel,
@@ -100,7 +64,7 @@ fun HomeScreen(
         Scaffold(
             modifier = Modifier.padding(paddingValues),
             topBar = {
-                MainTopBar("Home")
+                MainTopBar(stringResource(R.string.home_title))
             },
             content = {
                 Surface(
@@ -114,7 +78,7 @@ fun HomeScreen(
                     var selectedMemo by remember { mutableStateOf<Memo?>(null) }
 
                     selectedMemo?.let { memo ->
-                        DataSheet(memo, sheetState) {
+                        MemoSheet(memo, sheetState) {
                             selectedMemo = null
                             coroutineScope.launch { sheetState.hide() }
                         }
@@ -160,7 +124,7 @@ fun HomeScreen(
                                             horizontalArrangement = Arrangement.SpaceBetween
                                         ) {
                                             Text(
-                                                text = "Memo",
+                                                text = stringResource(R.string.memo_title),
                                                 style = MaterialTheme.typography.titleMedium,
                                                 color = MaterialTheme.colorScheme.onBackground
                                             )
@@ -253,7 +217,7 @@ fun HomeScreen(
                                             horizontalArrangement = Arrangement.SpaceBetween
                                         ) {
                                             Text(
-                                                text = "Todo",
+                                                text = stringResource(R.string.todo_title),
                                                 style = MaterialTheme.typography.titleMedium,
                                                 color = MaterialTheme.colorScheme.onBackground
                                             )

@@ -37,6 +37,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.animation.doOnEnd
 import androidx.core.content.ContextCompat
@@ -53,6 +54,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.concurrent.Executor
 import androidx.core.net.toUri
+import com.example.mindbank.R
 
 
 @AndroidEntryPoint
@@ -69,7 +71,7 @@ class PasswordActivity : ComponentActivity() {
             TedPermission.create()
                 .setPermissionListener(permissionListener)
                 .setPermissions(*permission.toTypedArray())
-                .setDeniedMessage("알람을 사용하려면 권한을 허용해야 합니다.")
+                .setDeniedMessage(getString(R.string.alarm_permission_message))
                 .check()
         }
     private lateinit var splash: androidx.core.splashscreen.SplashScreen
@@ -102,21 +104,20 @@ class PasswordActivity : ComponentActivity() {
             password = dataStoreViewModel.getPassWord()
             withContext(Dispatchers.Main) {
                 requestAlarmPermission(this@PasswordActivity)
-
             }
         }
     }
 
     private var permissionListener: PermissionListener = object : PermissionListener {
         override fun onPermissionGranted() {
-            Toast.makeText(this@PasswordActivity, "Permission Granted", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this@PasswordActivity, getString(R.string.permission_granted), Toast.LENGTH_SHORT).show()
             start { onCheckPassword?.invoke() }
         }
 
         override fun onPermissionDenied(deniedPermissions: List<String>) {
             Toast.makeText(
                 this@PasswordActivity,
-                "Permission Denied\n$deniedPermissions", Toast.LENGTH_SHORT
+                "${getString(R.string.permission_denied)}\n$deniedPermissions", Toast.LENGTH_SHORT
             ).show()
             start { onCheckPassword?.invoke() }
         }
@@ -203,9 +204,9 @@ fun BiometricAuthScreen() {
         )
 
         val promptInfo = BiometricPrompt.PromptInfo.Builder()
-            .setTitle("지문 인증")
-            .setSubtitle("앱을 사용하려면 지문을 인증하세요")
-            .setNegativeButtonText("취소")
+            .setTitle(context.getString(R.string.biometric_prompt_title))
+            .setSubtitle(context.getString(R.string.biometric_prompt_subtitle))
+            .setNegativeButtonText(context.getString(R.string.cancel))
             .build()
 
         biometricPrompt.authenticate(promptInfo)

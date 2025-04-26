@@ -4,7 +4,6 @@
     <string name="title_activity_password_edit">PasswordEditActivity</string>
     <string name="empty_memo">메모가 없습니다.</string>
     <string name="empty_todo">할일이 없습니다.</string>
-    <string name="title_memo">Memo</string>
     <string name="action_close">Close</string>
     <string name="action_confirm">확인</string>
     <string name="action_cancel">취소</string>
@@ -25,4 +24,40 @@
     <string name="input_url">URL을 입력하시오.(선택)</string>
     <string name="input_memo">메모를 입력하시오.</string>
     <string name="input_todo">할일을 입력하시오.</string>
+    <!-- Settings -->
+    <string name="settings_title">Settings</string>
+    <string name="memo_title">Memo</string>
+    <string name="home_title">Home</string>
+    <string name="todo_title">Todo</string>
+
+    <!-- Delete Button -->
+    <string name="delete_all_data">전체 데이터 초기화</string>
+    <string name="delete">Delete</string>
+    <string name="confirm_delete">Confirm Delete</string>
+    <string name="confirm_delete_description">Are you sure you want to delete this? This action cannot be undone.</string>
+    <string name="confirm">Yes</string>
+    <string name="cancel">Cancel</string>
+    <string name="close">Close</string>
+
+    <!-- Password -->
+    <string name="password_edit">비밀번호 변경 및 등록</string>
+
+    <!-- UI (기타) -->
+    <string name="icon_description_settings">설정</string>
+    <string name="memo_detail">메모 상세보기</string>
+    <string name="question_delete">삭제하시겠습니까?</string>
+
+    <!-- 지문 인증 화면 -->
+    <string name="biometric_auth_prompt">지문 인증을 진행해주세요.</string>
+    <string name="biometric_success">인증 성공!</string>
+    <string name="biometric_unavailable">지문 인증을 사용할 수 없습니다.</string>
+    <string name="biometric_button">지문 인증하기</string>
+    <string name="biometric_prompt_title">지문 인증</string>
+    <string name="biometric_prompt_subtitle">앱을 사용하려면 지문을 인증하세요</string>
+    <string name="biometric_prompt_cancel">취소</string>
+
+    <!-- 퍼미션 관련 -->
+    <string name="permission_granted">Permission Granted</string>
+    <string name="permission_denied">Permission Denied</string>
+    <string name="alarm_permission_message">알람을 사용하려면 권한을 허용해야 합니다.</string>
 </resources>

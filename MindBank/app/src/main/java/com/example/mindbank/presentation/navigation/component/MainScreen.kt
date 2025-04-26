@@ -32,7 +32,7 @@ import com.example.mindbank.viewmodel.MemoViewModel
 import kotlinx.coroutines.launch
 
 @Composable
-fun MainTopBar(title: String = "Memos") {
+fun MainTopBar(title: String = stringResource(R.string.memo_title)) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -65,7 +65,7 @@ fun MainGrid(memoViewModel: MemoViewModel, searchText: String, onEdit: (Memo) ->
     var selectedMemo by remember { mutableStateOf<Memo?>(null) }
 
     selectedMemo?.let { memo ->
-        DataSheet(memo, sheetState) {
+        MemoSheet(memo, sheetState) {
             selectedMemo = null
             coroutineScope.launch { sheetState.hide() }
         }

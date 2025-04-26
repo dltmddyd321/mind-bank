@@ -4,9 +4,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -43,7 +41,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
 import com.example.mindbank.R
 import com.example.mindbank.db.data.Task
@@ -52,57 +49,6 @@ import com.example.mindbank.util.draggableItems
 import com.example.mindbank.util.hexToColor
 import com.example.mindbank.util.rememberDragDropState
 import com.example.mindbank.viewmodel.TodoViewModel
-
-@Composable
-fun MyList() {
-    var list1 by remember { mutableStateOf(List(20) { it }) }
-    val draggableItems by remember {
-        derivedStateOf { list1.size }
-    }
-    val stateList = rememberLazyListState()
-
-    val dragDropState =
-        rememberDragDropState(
-            lazyListState = stateList,
-            draggableItemsNum = draggableItems,
-            onMove = { fromIndex, toIndex ->
-                list1 = list1.toMutableList().apply { add(toIndex, removeAt(fromIndex)) }
-            }, onDragEnd = {
-
-            })
-
-    LazyColumn(
-        modifier = Modifier.dragContainer(dragDropState),
-        state = stateList,
-        contentPadding = PaddingValues(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        item {
-            Text(text = "Title 1", fontSize = 30.sp)
-        }
-
-        draggableItems(items = list1, dragDropState = dragDropState) { modifier, item ->
-            Item(
-                modifier = modifier,
-                index = item,
-            )
-        }
-    }
-}
-
-@Composable
-private fun Item(modifier: Modifier = Modifier, index: Int) {
-    Card(
-        modifier = modifier
-    ) {
-        Text(
-            "Item $index",
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(20.dp)
-        )
-    }
-}
 
 @Composable
 fun ChecklistList(viewModel: TodoViewModel, searchText: String, onEdit: (Task) -> Unit) {
@@ -225,7 +171,7 @@ fun ChecklistItem(
                         showDialog = false
                     },
                     title = {
-                        Text(text = "삭제하시겠습니까?")
+                        Text(text = stringResource(R.string.question_delete))
                     },
                     confirmButton = {
                         TextButton(
@@ -234,7 +180,7 @@ fun ChecklistItem(
                                 showDialog = false
                             }
                         ) {
-                            Text("확인")
+                            Text(stringResource(R.string.confirm))
                         }
                     },
                     dismissButton = {
@@ -243,7 +189,7 @@ fun ChecklistItem(
                                 showDialog = false
                             }
                         ) {
-                            Text("취소")
+                            Text(stringResource(R.string.cancel))
                         }
                     },
                     properties = DialogProperties(dismissOnClickOutside = false)

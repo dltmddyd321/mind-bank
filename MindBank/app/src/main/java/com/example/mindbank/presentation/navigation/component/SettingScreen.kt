@@ -1,15 +1,6 @@
 package com.example.mindbank.presentation.navigation.component
 
 import android.content.Intent
-import android.graphics.Typeface
-import android.text.SpannableString
-import android.text.Spanned
-import android.text.TextPaint
-import android.text.method.LinkMovementMethod
-import android.text.style.ClickableSpan
-import android.text.style.StyleSpan
-import android.view.View
-import android.widget.TextView
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -49,10 +40,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.mindbank.R
-import com.example.mindbank.presentation.navigation.activity.PasswordEditActivity
 import com.example.mindbank.presentation.navigation.theme.MindBankTheme
 
 @Composable
@@ -69,7 +60,7 @@ fun SettingsScreen(
         MindBankTheme {
             Scaffold(
                 topBar = {
-                    MainTopBar("Settings")
+                    MainTopBar(stringResource(R.string.settings_title))
                 },
                 content = {
                     Surface(
@@ -93,16 +84,11 @@ fun SettingsScreen(
 fun SettingsScreen(onConfirmDelete: () -> Unit) {
     val context = LocalContext.current
     LazyColumn(contentPadding = PaddingValues(vertical = 4.dp)) {
-//        item {
-//            VersionCheckButton(title = "최신 버전 확인", onClick = { /* Handle click */ })
-//        }
         item {
-            DeleteButton(title = "전체 데이터 초기화", onConfirmDelete = onConfirmDelete)
-        }
-        item {
-            PasswordEditBtn(title = "비밀번호 변경 및 등록", onClick = {
-                context.startActivity(Intent(context, PasswordEditActivity::class.java))
-            })
+            DeleteButton(
+                title = stringResource(R.string.delete_all_data),
+                onConfirmDelete = onConfirmDelete
+            )
         }
     }
 }
@@ -127,7 +113,7 @@ fun DeleteButton(title: String, onConfirmDelete: () -> Unit) {
         ) {
             Image(
                 painter = painterResource(id = R.drawable.baseline_cleaning_services_24),
-                contentDescription = "Go to $title",
+                contentDescription = null,
                 colorFilter = ColorFilter.tint(Color.White),
                 modifier = Modifier.size(24.dp)
             )
@@ -142,7 +128,7 @@ fun DeleteButton(title: String, onConfirmDelete: () -> Unit) {
 
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                contentDescription = "Go to $title",
+                contentDescription = null,
                 tint = Color.Gray
             )
         }
@@ -160,7 +146,7 @@ fun DeleteButton(title: String, onConfirmDelete: () -> Unit) {
                         .height(48.dp)
                 ) {
                     Text(
-                        text = "Delete",
+                        text = stringResource(R.string.delete),
                         color = Color.White,
                         fontSize = 16.sp
                     )
@@ -199,7 +185,7 @@ fun PasswordEditBtn(title: String, onClick: () -> Unit) {
         ) {
             Image(
                 painter = painterResource(id = R.drawable.baseline_lock_outline_24),
-                contentDescription = "Go to $title",
+                contentDescription = null,
                 colorFilter = ColorFilter.tint(Color.White),
                 modifier = Modifier.size(24.dp)
             )
@@ -285,90 +271,23 @@ fun ConfirmDeleteDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
     AlertDialog(
         onDismissRequest = { onDismiss() },
         title = {
-            Text(text = "Confirm Delete", style = MaterialTheme.typography.titleMedium)
+            Text(
+                text = stringResource(R.string.confirm_delete),
+                style = MaterialTheme.typography.titleMedium
+            )
         },
         text = {
-            Text(text = "Are you sure you want to delete this? This action cannot be undone.")
+            Text(text = stringResource(R.string.confirm_delete_description))
         },
         confirmButton = {
             Button(onClick = onConfirm) {
-                Text(text = "Yes", color = Color.White)
+                Text(text = stringResource(R.string.confirm), color = Color.White)
             }
         },
         dismissButton = {
             OutlinedButton(onClick = onDismiss) {
-                Text(text = "Cancel")
+                Text(text = stringResource(R.string.cancel))
             }
         }
     )
-}
-
-private fun setLinkedText(
-    textView: TextView,
-    map: MutableMap<String, List<String>>,
-    result: String,
-    onConfirm: (List<String>) -> Unit
-) {
-    val normalizedResult = result.replace(" ", "")
-    val spannableString = SpannableString(result)
-
-    map.forEach { (word, uidList) ->
-        val normalizedWord = word.replace(" ", "")
-        var normalizedStartIndex = 0
-
-        while (normalizedStartIndex < normalizedResult.length) {
-            val matchIndex = normalizedResult.indexOf(normalizedWord, normalizedStartIndex)
-            if (matchIndex == -1) break
-
-            var originalStartIndex = 0
-            var normalizedCount = 0
-
-            for (i in result.indices) {
-                if (!result[i].isWhitespace()) normalizedCount++
-                if (normalizedCount == matchIndex + 1) {
-                    originalStartIndex = i
-                    break
-                }
-            }
-
-            var originalEndIndex = originalStartIndex
-            var normalizedWordCount = 0
-            while (originalEndIndex < result.length && normalizedWordCount < normalizedWord.length) {
-                if (!result[originalEndIndex].isWhitespace()) normalizedWordCount++
-                originalEndIndex++
-            }
-
-            if (originalStartIndex < originalEndIndex) {
-                val clickableSpan = object : ClickableSpan() {
-                    override fun onClick(widget: View) {
-                        onConfirm(uidList)
-                    }
-
-                    override fun updateDrawState(ds: TextPaint) {
-                        super.updateDrawState(ds)
-                        ds.isUnderlineText = true
-                    }
-                }
-
-                spannableString.setSpan(
-                    clickableSpan,
-                    originalStartIndex,
-                    originalEndIndex,
-                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-                )
-
-                val boldStyle = StyleSpan(Typeface.BOLD)
-                spannableString.setSpan(
-                    boldStyle,
-                    originalStartIndex,
-                    originalEndIndex,
-                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-                )
-            }
-
-            normalizedStartIndex = matchIndex + normalizedWord.length
-        }
-    }
-    textView.text = spannableString
-    textView.movementMethod = LinkMovementMethod.getInstance()
 }

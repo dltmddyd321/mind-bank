@@ -140,7 +140,7 @@ fun SearchBar(
                         .fillMaxSize()
                         .padding(10.dp),
                     painter = painterResource(id = R.drawable.baseline_close_24),
-                    contentDescription = "Search Clear",
+                    contentDescription = null,
                     tint = MaterialTheme.colorScheme.primary,
                 )
             } else {
@@ -149,7 +149,7 @@ fun SearchBar(
                         .fillMaxSize()
                         .padding(10.dp),
                     painter = painterResource(id = R.drawable.baseline_search_24),
-                    contentDescription = "Search Call",
+                    contentDescription = null,
                     tint = MaterialTheme.colorScheme.primary,
                 )
             }
