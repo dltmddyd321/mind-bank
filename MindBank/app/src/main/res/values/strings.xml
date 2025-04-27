@@ -60,4 +60,11 @@
     <string name="permission_granted">Permission Granted</string>
     <string name="permission_denied">Permission Denied</string>
     <string name="alarm_permission_message">알람을 사용하려면 권한을 허용해야 합니다.</string>
+    <string name="cancel_add_todo_title">할일 추가 취소</string>
+    <string name="cancel_add_todo_message">할일 추가를 취소하시겠습니까?</string>
+    <string name="save">저장</string>
+    <string name="input_contents">내용을 입력해주세요!</string>
+    <string name="please_enter_content">내용을 입력해주세요!</string>
+    <string name="add_alarm">+ 알림 추가</string>
+    <string name="alarm_text">알람: %1$s</string>
 </resources>
