@@ -37,6 +37,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.navigation.compose.NavHost
@@ -166,7 +167,11 @@ class MainActivity : ComponentActivity() {
                     finish()
                 } else {
                     backPressedTime = currentTime
-                    Toast.makeText(this@MainActivity, getString(R.string.alert_back_press), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        this@MainActivity,
+                        getString(R.string.alert_back_press),
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
         })
@@ -196,7 +201,8 @@ class MainActivity : ComponentActivity() {
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     @Composable
     fun MainScreen(viewModel: ViewModel, paddingValues: PaddingValues) {
-        val title = if (isTodoMode) "Todo" else "Memo"
+        val title =
+            if (isTodoMode) stringResource(R.string.todo_title) else stringResource(R.string.memo_title)
         var searchText by remember { mutableStateOf("") }
         Scaffold(
             topBar = {

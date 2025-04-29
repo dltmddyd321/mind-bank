@@ -55,6 +55,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -99,13 +100,13 @@ class AddTodoActivity : ComponentActivity() {
             AlertDialog(onDismissRequest = {
                 showDialog = false
             }, confirmButton = {
-                TextButton(onClick = { activity.finish() }) { Text("확인") }
+                TextButton(onClick = { activity.finish() }) { Text(stringResource(R.string.confirm)) }
             }, title = {
-                Text(text = "할일 추가 취소")
+                Text(text = stringResource(R.string.cancel_add_todo_title))
             }, text = {
-                Text(text = "할일 추가를 취소하시겠습니까?")
+                Text(text = stringResource(R.string.cancel_add_todo_message))
             }, dismissButton = {
-                TextButton(onClick = { showDialog = false }) { Text("취소") }
+                TextButton(onClick = { showDialog = false }) { Text(stringResource(R.string.cancel)) }
             })
         }
 
@@ -194,7 +195,7 @@ class AddTodoActivity : ComponentActivity() {
                                 showColorPicker = false
                             }, modifier = Modifier.fillMaxWidth()
                         ) {
-                            Text("확인", fontSize = 18.sp)
+                            Text(stringResource(R.string.confirm), fontSize = 18.sp)
                         }
                     }
                 }
@@ -202,7 +203,7 @@ class AddTodoActivity : ComponentActivity() {
 
             TopAppBar(
                 title = {
-                    Text(text = "Todo", color = MaterialTheme.colorScheme.onPrimary)
+                    Text(text = stringResource(R.string.todo_title), color = MaterialTheme.colorScheme.onPrimary)
                 }, navigationIcon = {
                     IconButton(onClick = { showBackDialog = true }) {
                         Icon(imageVector = Icons.Default.Close, contentDescription = "Close")
@@ -223,7 +224,11 @@ class AddTodoActivity : ComponentActivity() {
                         }
                         Button(onClick = {
                             if (title.isBlank()) {
-                                Toast.makeText(context, "내용을 입력해주세요!", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(
+                                    context,
+                                    getString(R.string.toast_empty_todo),
+                                    Toast.LENGTH_SHORT
+                                ).show()
                                 return@Button
                             }
                             val currentTime = System.currentTimeMillis()
@@ -254,7 +259,7 @@ class AddTodoActivity : ComponentActivity() {
                             setResult(RESULT_OK)
                             finish()
                         }) {
-                            Text("Save")
+                            Text(stringResource(R.string.action_save))
                         }
                     }
                 }, colors = TopAppBarDefaults.topAppBarColors(
@@ -327,12 +332,18 @@ class AddTodoActivity : ComponentActivity() {
 
             if (lastAlarm > 0L) {
                 val formattedDate = remember(lastAlarm) {
-                    val sdf = SimpleDateFormat("yyyy년 MM월 dd일 HH시 mm분", Locale.getDefault())
+                    val locale = Locale.getDefault()
+                    val pattern = when (locale.language) {
+                        "ko" -> "yyyy년 MM월 dd일 HH시 mm분" // 한국어
+                        "ja" -> "yyyy年 MM月 dd日 HH時 mm分" // 일본어
+                        else -> "yyyy/MM/dd HH:mm" // 기본 (영어)
+                    }
+                    val sdf = SimpleDateFormat(pattern, locale)
                     sdf.format(Date(lastAlarm))
                 }
 
                 Text(
-                    text = "알람: $formattedDate",
+                    text = String.format(stringResource(R.string.alarm_time_prefix), formattedDate),
                     modifier = Modifier
                         .fillMaxWidth()
                         .clickable { showDatePicker = true }
@@ -341,7 +352,7 @@ class AddTodoActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.primary)
             } else {
                 Text(
-                    text = "+ 알림 추가",
+                    text = stringResource(R.string.add_alarm),
                     modifier = Modifier
                         .fillMaxWidth()
                         .clickable { showDatePicker = true }

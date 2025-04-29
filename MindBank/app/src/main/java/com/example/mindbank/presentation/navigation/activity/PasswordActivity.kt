@@ -65,8 +65,10 @@ class PasswordActivity : ComponentActivity() {
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             val permission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 listOf(Manifest.permission.SCHEDULE_EXACT_ALARM)
-            } else listOf(Manifest.permission.SCHEDULE_EXACT_ALARM,
-                Manifest.permission.POST_NOTIFICATIONS)
+            } else listOf(
+                Manifest.permission.SCHEDULE_EXACT_ALARM,
+                Manifest.permission.POST_NOTIFICATIONS
+            )
 
             TedPermission.create()
                 .setPermissionListener(permissionListener)
@@ -110,7 +112,11 @@ class PasswordActivity : ComponentActivity() {
 
     private var permissionListener: PermissionListener = object : PermissionListener {
         override fun onPermissionGranted() {
-            Toast.makeText(this@PasswordActivity, getString(R.string.permission_granted), Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                this@PasswordActivity,
+                getString(R.string.permission_granted),
+                Toast.LENGTH_SHORT
+            ).show()
             start { onCheckPassword?.invoke() }
         }
 
@@ -145,7 +151,9 @@ class PasswordActivity : ComponentActivity() {
         val intent = Intent(this@PasswordActivity, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         }
-        if (password.isEmpty()) startActivity(intent) else { onCheckPassword.invoke() }
+        if (password.isEmpty()) startActivity(intent) else {
+            onCheckPassword.invoke()
+        }
     }
 
     @SuppressLint("Recycle")
@@ -156,7 +164,7 @@ class PasswordActivity : ComponentActivity() {
 
                 ObjectAnimator.ofPropertyValuesHolder(icon).run {
                     interpolator = AnticipateInterpolator()
-                    repeatCount = 2 // 반복 횟수
+                    repeatCount = 2
                     duration = 500L
                     doOnEnd {
                         splashView.remove()
@@ -213,7 +221,7 @@ fun BiometricAuthScreen() {
     }
 
     val context = LocalContext.current
-    var authMessage by remember { mutableStateOf("지문 인증을 진행해주세요.") }
+    var authMessage by remember { mutableStateOf(context.getString(R.string.biometric_auth_prompt)) }
 
     Column(
         modifier = Modifier
@@ -231,15 +239,18 @@ fun BiometricAuthScreen() {
                 if (isBiometricAvailable(context)) {
                     showBiometricPrompt(
                         context,
-                        onSuccess = { authMessage = "인증 성공!" },
-                        onFailure = { errorMsg -> authMessage = "인증 실패: $errorMsg" }
+                        onSuccess = { authMessage = context.getString(R.string.biometric_success) },
+                        onFailure = { errorMsg ->
+                            authMessage =
+                                "${context.getString(R.string.biometric_failed)}: $errorMsg"
+                        }
                     )
                 } else {
-                    authMessage = "지문 인증을 사용할 수 없습니다."
+                    authMessage = context.getString(R.string.biometric_unavailable)
                 }
             }
         ) {
-            Text("지문 인증하기")
+            Text(stringResource(R.string.biometric_button))
         }
     }
 }

@@ -8,9 +8,11 @@ import android.content.Intent
 
 class AlarmController {
     @SuppressLint("ScheduleExactAlarm")
-    fun setAlarm(context: Context, pushTime: Long) {
+    fun setAlarm(context: Context, pushTime: Long, todoTitle: String) {
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val intent = Intent(context, AlarmReceiver::class.java)
+        val intent = Intent(context, AlarmReceiver::class.java).apply {
+            putExtra("TODO_TITLE", todoTitle)
+        }
 
         val pendingIntent = PendingIntent.getBroadcast(
             context,

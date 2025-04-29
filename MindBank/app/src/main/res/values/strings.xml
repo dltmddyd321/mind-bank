@@ -10,8 +10,10 @@
     <string name="action_save">Save</string>
     <string name="dialog_backup_title">백업 데이터 불러오기</string>
     <string name="dialog_backup_message">저장이 완료되지 않은 데이터가 있습니다.\n마저 작성하시겠습니까?</string>
-    <string name="dialog_cancel_title">메모 추가 취소</string>
-    <string name="dialog_cancel_message">메모 추가를 취소하시겠습니까?</string>
+    <string name="dialog_cancel_add_title">메모 추가 취소</string>
+    <string name="dialog_cancel_add_message">메모 추가를 취소하시겠습니까?</string>
+    <string name="dialog_cancel_edit_title">메모 수정 취소</string>
+    <string name="dialog_cancel_edit_message">메모 수정을 취소하시겠습니까?</string>
     <string name="hint_title">Title</string>
     <string name="hint_memo">Write your memo here…</string>
     <string name="label_last_updated">마지막 업데이트: %1$s</string>
@@ -50,6 +52,7 @@
     <!-- 지문 인증 화면 -->
     <string name="biometric_auth_prompt">지문 인증을 진행해주세요.</string>
     <string name="biometric_success">인증 성공!</string>
+    <string name="biometric_failed">인증 실패:</string>
     <string name="biometric_unavailable">지문 인증을 사용할 수 없습니다.</string>
     <string name="biometric_button">지문 인증하기</string>
     <string name="biometric_prompt_title">지문 인증</string>
@@ -65,6 +68,6 @@
     <string name="save">저장</string>
     <string name="input_contents">내용을 입력해주세요!</string>
     <string name="please_enter_content">내용을 입력해주세요!</string>
+    <string name="alarm_time_prefix">알림 시간: %1$s</string>
     <string name="add_alarm">+ 알림 추가</string>
-    <string name="alarm_text">알람: %1$s</string>
 </resources>

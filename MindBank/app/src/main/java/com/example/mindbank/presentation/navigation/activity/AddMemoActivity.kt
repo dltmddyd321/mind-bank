@@ -52,6 +52,7 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -158,25 +159,29 @@ class AddMemoActivity : ComponentActivity() {
             initLink = unSaved.link
             initMemo = unSaved.memo
             initColor = unSaved.color
-            if (initTitle.isNotEmpty() || initMemo.isNotEmpty() || initLink.isNotEmpty()) showDialog = true
+            if (initTitle.isNotEmpty() || initMemo.isNotEmpty() || initLink.isNotEmpty()) showDialog =
+                true
         }
 
         if (showDialog) {
             AlertDialog(onDismissRequest = {
                 showDialog = false
             }, title = {
-                Text(text = "백업 데이터 불러오기")
+                Text(text = stringResource(R.string.dialog_backup_title))
             }, confirmButton = {
                 TextButton(onClick = {
                     onBackupLoad.invoke(initTitle, initLink, initMemo, initColor)
                     showDialog = false
-                }) { Text("확인") }
+                }) { Text(stringResource(R.string.confirm)) }
             }, text = {
                 Text(
-                    text = "저장이 완료되지 않은 데이터가 있습니다.\n마저 작성하시겠습니까?", textAlign = TextAlign.Center
+                    text = stringResource(R.string.dialog_backup_message),
+                    textAlign = TextAlign.Center
                 )
             }, dismissButton = {
-                TextButton(onClick = { showDialog = false }) { Text("취소") }
+                TextButton(onClick = {
+                    showDialog = false
+                }) { Text(stringResource(R.string.cancel)) }
             })
         }
     }
@@ -192,13 +197,23 @@ class AddMemoActivity : ComponentActivity() {
             AlertDialog(onDismissRequest = {
                 showDialog = false
             }, confirmButton = {
-                TextButton(onClick = { activity.finish() }) { Text("확인") }
+                TextButton(onClick = { activity.finish() }) { Text(stringResource(R.string.confirm)) }
             }, title = {
-                Text(text = if (isEditMode) "메모 수정 취소" else "메모 추가 취소")
+                Text(
+                    text = if (isEditMode) stringResource(R.string.dialog_cancel_edit_title) else stringResource(
+                        R.string.dialog_cancel_add_title
+                    )
+                )
             }, text = {
-                Text(text = if (isEditMode) "메모 수정을 취소하시겠습니까?" else "메모 추가를 취소하시겠습니까?")
+                Text(
+                    text = if (isEditMode) stringResource(R.string.dialog_cancel_edit_message) else stringResource(
+                        R.string.dialog_cancel_add_message
+                    )
+                )
             }, dismissButton = {
-                TextButton(onClick = { showDialog = false }) { Text("취소") }
+                TextButton(onClick = {
+                    showDialog = false
+                }) { Text(stringResource(R.string.cancel)) }
             })
         }
 
@@ -256,7 +271,7 @@ class AddMemoActivity : ComponentActivity() {
                             },
                             modifier = Modifier.fillMaxWidth()
                         ) {
-                            Text("확인", fontSize = 18.sp)
+                            Text(stringResource(R.string.confirm), fontSize = 18.sp)
                         }
                     }
                 }
@@ -264,7 +279,10 @@ class AddMemoActivity : ComponentActivity() {
 
             TopAppBar(
                 title = {
-                    Text(text = "Memo", color = MaterialTheme.colorScheme.onPrimary)
+                    Text(
+                        text = stringResource(R.string.memo_title),
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
                 }, navigationIcon = {
                     IconButton(onClick = { showBackDialog = true }) {
                         Icon(imageVector = Icons.Default.Close, contentDescription = "Close")
@@ -308,7 +326,7 @@ class AddMemoActivity : ComponentActivity() {
                             setResult(RESULT_OK)
                             finish()
                         }) {
-                            Text("Save")
+                            Text(stringResource(R.string.action_save))
                         }
                     }
                 }, colors = TopAppBarDefaults.topAppBarColors(
@@ -380,12 +398,21 @@ class AddMemoActivity : ComponentActivity() {
 
                 if (isEditMode) {
                     val formattedDate = remember(lastUpdatedTime) {
-                        val sdf = SimpleDateFormat("yyyy년 MM월 dd일 HH시 mm분", Locale.getDefault())
+                        val locale = Locale.getDefault()
+                        val pattern = when (locale.language) {
+                            "ko" -> "yyyy년 MM월 dd일 HH시 mm분" // 한국어
+                            "ja" -> "yyyy年 MM月 dd日 HH時 mm分" // 일본어
+                            else -> "yyyy/MM/dd HH:mm" // 기본 (영어)
+                        }
+                        val sdf = SimpleDateFormat(pattern, locale)
                         sdf.format(Date(lastUpdatedTime))
                     }
 
                     Text(
-                        text = "마지막 업데이트: $formattedDate",
+                        text = String.format(
+                            stringResource(R.string.label_last_updated),
+                            formattedDate
+                        ),
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 16.dp),
@@ -418,7 +445,7 @@ class AddMemoActivity : ComponentActivity() {
             decorationBox = { innerTextField ->
                 if (title.isEmpty()) {
                     Text(
-                        "Title",
+                        stringResource(R.string.hint_title),
                         color = Color.Gray,
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold
