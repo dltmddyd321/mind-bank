@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mindbank.db.data.Task
 import com.example.mindbank.db.TodoRepository
+import com.example.mindbank.util.alarm.SetTodoAlarmUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,7 +16,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class TodoViewModel @Inject constructor(
-    private val todoRepository: TodoRepository
+    private val todoRepository: TodoRepository,
+    private val setTodoAlarmUseCase: SetTodoAlarmUseCase
 ): ViewModel() {
 
     private val _todos = MutableStateFlow<List<Task>>(emptyList())
@@ -23,6 +25,10 @@ class TodoViewModel @Inject constructor(
 
     init {
         loadTodoList()
+    }
+
+    fun onSetAlarm(todo: Task) {
+        setTodoAlarmUseCase(todo)
     }
 
     fun loadTodoList() {

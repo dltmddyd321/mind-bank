@@ -57,7 +57,7 @@
             android:theme="@style/Theme.MindBank" />
 
         <receiver
-            android:name=".util.AlarmReceiver"
+            android:name=".util.alarm.AlarmReceiver"
             android:enabled="true"
             android:exported="false"/>
     </application>

@@ -1,4 +1,4 @@
-package com.example.mindbank.util
+package com.example.mindbank.util.alarm
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -8,21 +8,24 @@ import android.content.Intent
 import androidx.core.app.NotificationCompat
 import com.example.mindbank.R
 
-class AlarmReceiver: BroadcastReceiver() {
+class AlarmReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent?) {
-        showNotification(context)
+        val todoTitle = intent?.getStringExtra("TODO_TITLE") ?: "할일 없음"
+        showNotification(context, todoTitle)
     }
 
-    private fun showNotification(context: Context) {
-        val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    private fun showNotification(context: Context, title: String) {
+        val notificationManager =
+            context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val channelId = "Mind_Push"
-        val channel = NotificationChannel(channelId, "Todo_Alarm", NotificationManager.IMPORTANCE_HIGH)
+        val channel =
+            NotificationChannel(channelId, "Todo_Alarm", NotificationManager.IMPORTANCE_HIGH)
         notificationManager.createNotificationChannel(channel)
 
         val builder = NotificationCompat.Builder(context, channelId)
             .setSmallIcon(R.drawable.mindbank)
-            .setContentTitle("할일 알람")
-            .setContentText("오늘 할일 기억나세요?")
+            .setContentTitle(context.getString(R.string.todo_push_title))
+            .setContentText(title)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setAutoCancel(true)
 
