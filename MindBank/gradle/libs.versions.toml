@@ -6,8 +6,11 @@ activityComposeVersion = "1.8.0-alpha07"
 agp = "8.5.0"
 biometric = "1.2.0-alpha05"
 converterGson = "2.9.0"
+firebaseAnalytics = "22.4.0"
 firebaseBom = "33.11.0"
+firebaseBomVersion = "33.13.0"
 firebaseCrashlyticsGradle = "3.0.3"
+firebaseCrashlyticsNdk = "19.4.3"
 glanceAppwidget = "1.1.1"
 hiltAndroid = "2.44"
 kotlin = "1.9.23"
@@ -35,7 +38,10 @@ androidx-glance-appwidget = { module = "androidx.glance:glance-appwidget", versi
 converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "converterGson" }
 firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
+firebase-bom-v33130 = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBomVersion" }
 firebase-crashlytics-gradle = { module = "com.google.firebase:firebase-crashlytics-gradle", version.ref = "firebaseCrashlyticsGradle" }
+firebase-crashlytics-ndk = { module = "com.google.firebase:firebase-crashlytics-ndk", version.ref = "firebaseCrashlyticsNdk" }
+google-firebase-analytics = { module = "com.google.firebase:firebase-analytics", version.ref = "firebaseAnalytics" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }

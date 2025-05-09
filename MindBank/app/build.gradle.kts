@@ -3,6 +3,7 @@ plugins {
     id("com.google.dagger.hilt.android")
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
+    id("com.google.firebase.crashlytics")
 }
 
 android {
@@ -52,6 +53,9 @@ android {
 }
 
 dependencies {
+    implementation(platform("com.google.firebase:firebase-bom:31.2.3"))
+    implementation("com.google.firebase:firebase-crashlytics-ktx:18.3.5")
+    implementation("com.google.firebase:firebase-analytics-ktx:21.2.0")
     implementation(libs.tedpermission.normal)
     implementation(libs.tedpermission.coroutine)
     implementation(libs.androidx.biometric)

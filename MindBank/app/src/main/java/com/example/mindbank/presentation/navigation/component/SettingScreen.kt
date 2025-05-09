@@ -91,6 +91,11 @@ fun SettingsScreen(onConfirmDelete: () -> Unit) {
             )
         }
     }
+//    Button(onClick = {
+//        throw RuntimeException("Crash test")
+//    }) {
+//        Text("강제 크래시")
+//    }
 }
 
 @Composable
