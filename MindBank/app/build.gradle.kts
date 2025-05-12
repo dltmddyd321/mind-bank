@@ -53,6 +53,9 @@ android {
 }
 
 dependencies {
+    implementation("androidx.glance:glance:1.1.1")
+    implementation("androidx.glance:glance-material3:1.1.1")
+    implementation("androidx.glance:glance-appwidget:1.1.1")
     implementation(platform("com.google.firebase:firebase-bom:31.2.3"))
     implementation("com.google.firebase:firebase-crashlytics-ktx:18.3.5")
     implementation("com.google.firebase:firebase-analytics-ktx:21.2.0")
