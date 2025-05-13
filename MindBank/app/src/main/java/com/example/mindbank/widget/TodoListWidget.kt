@@ -14,6 +14,7 @@ import androidx.glance.ImageProvider
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.provideContent
+import androidx.glance.background
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Column
 import androidx.glance.layout.Row
@@ -28,39 +29,23 @@ import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
 import androidx.glance.unit.ColorProvider
-import androidx.room.Room
 import com.example.mindbank.R
-import com.example.mindbank.db.TodoDao
-import com.example.mindbank.db.TodoDatabase
 import com.example.mindbank.db.data.Task
 import com.example.mindbank.util.hexToColor
 
 class TodoListWidget : GlanceAppWidget() {
-
-    private var todoDao: TodoDao? = null
-
     override suspend fun provideGlance(context: Context, id: GlanceId) {
-        val todoList = fetchTodoList(context)
+        val todoList = WidgetDataManager.fetchTodoList(context)
         provideContent {
-            TodoListWidgetLayout(todoList, todoDao)
+            TodoListWidgetLayout(todoList)
         }
-    }
-
-    private fun fetchTodoList(context: Context): List<Task> {
-        val database = Room.databaseBuilder(
-            context.applicationContext,
-            TodoDatabase::class.java,
-            "todo.db"
-        ).build()
-        todoDao = database.todoDao()
-        return todoDao?.getAllSaveData() ?: emptyList()
     }
 }
 
 @Composable
-fun TodoListWidgetLayout(todoList: List<Task>, todoDao: TodoDao?) {
+fun TodoListWidgetLayout(todoList: List<Task>) {
     Column(
-        modifier = GlanceModifier.fillMaxSize().padding(8.dp)
+        modifier = GlanceModifier.fillMaxSize().padding(8.dp).background(Color.White)
     ) {
         Row(
             modifier = GlanceModifier.fillMaxWidth(),
@@ -98,7 +83,7 @@ fun TodoListWidgetLayout(todoList: List<Task>, todoDao: TodoDao?) {
                     Image(
                         modifier = GlanceModifier.size(24.dp).clickable {
                             val updatedTask = todo.copy(isDone = !todo.isDone)
-                            todoDao?.insertOrUpdate(updatedTask)
+                            WidgetDataManager.insertOrUpdate(updatedTask)
                         },
                         provider = ImageProvider(if (todo.isDone) R.drawable.checked_img else R.drawable.unchecked_img),
                         contentDescription = "CheckBox",
