@@ -1,18 +1,18 @@
 package com.example.mindbank.widget
 
 import android.content.Context
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.glance.ColorFilter
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
 import androidx.glance.Image
 import androidx.glance.ImageProvider
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
+import androidx.glance.appwidget.lazy.items
 import androidx.glance.appwidget.provideContent
 import androidx.glance.background
 import androidx.glance.layout.Alignment
@@ -35,15 +35,17 @@ import com.example.mindbank.util.hexToColor
 
 class TodoListWidget : GlanceAppWidget() {
     override suspend fun provideGlance(context: Context, id: GlanceId) {
-        val todoList = WidgetDataManager.fetchTodoList(context)
+        val todoRepository = TodoWidgetRepository.get(context)
         provideContent {
-            TodoListWidgetLayout(todoList)
+            TodoListWidgetLayout(todoRepository.getTodoList()) { todo ->
+                todoRepository.updateTodo(todo)
+            }
         }
     }
 }
 
 @Composable
-fun TodoListWidgetLayout(todoList: List<Task>) {
+fun TodoListWidgetLayout(todoList: List<Task>, onCheck: (Task) -> Unit) {
     Column(
         modifier = GlanceModifier.fillMaxSize().padding(8.dp).background(Color.White)
     ) {
@@ -72,7 +74,7 @@ fun TodoListWidgetLayout(todoList: List<Task>) {
 
         Spacer(modifier = GlanceModifier.height(8.dp))
 
-        LazyColumn {
+        androidx.glance.appwidget.lazy.LazyColumn {
             items(todoList) { todo ->
                 Row(
                     modifier = GlanceModifier
@@ -83,11 +85,11 @@ fun TodoListWidgetLayout(todoList: List<Task>) {
                     Image(
                         modifier = GlanceModifier.size(24.dp).clickable {
                             val updatedTask = todo.copy(isDone = !todo.isDone)
-                            WidgetDataManager.insertOrUpdate(updatedTask)
+                            onCheck.invoke(updatedTask)
                         },
                         provider = ImageProvider(if (todo.isDone) R.drawable.checked_img else R.drawable.unchecked_img),
                         contentDescription = "CheckBox",
-                        colorFilter = androidx.glance.ColorFilter.tint(ColorProvider(hexToColor(todo.color)))
+                        colorFilter = ColorFilter.tint(ColorProvider(hexToColor(todo.color)))
                     )
 
                     Spacer(modifier = GlanceModifier.width(8.dp))
