@@ -16,16 +16,27 @@ import javax.inject.Inject
 
 class TodoWidgetRepository @Inject constructor(
     @ApplicationContext private val context: Context,
-    private val todoDao: TodoDao
+    private val todoDao: TodoDao,
 ) {
     fun getTodoList(): List<Task> = runBlocking(Dispatchers.IO) {
         todoDao.getAllSaveData()
     }
 
+    fun getTodo(id: Int) : Task? = runBlocking(Dispatchers.IO) {
+        todoDao.searchById(id)
+    }
+
     fun updateTodo(task: Task) {
         CoroutineScope(Dispatchers.IO).launch {
-            todoDao.insertOrUpdate(task)
-            //TODO: 할일 위젯 업데이트
+            todoDao.updateTodo(
+                task.id,
+                task.title,
+                task.dtUpdated,
+                task.color,
+                task.isDone,
+                task.position
+            )
+            updateWidget(context)
         }
     }
 

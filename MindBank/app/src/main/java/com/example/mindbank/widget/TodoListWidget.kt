@@ -1,6 +1,7 @@
 package com.example.mindbank.widget
 
 import android.content.Context
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -10,8 +11,13 @@ import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
 import androidx.glance.Image
 import androidx.glance.ImageProvider
+import androidx.glance.action.ActionParameters
+import androidx.glance.action.actionParametersOf
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
+import androidx.glance.appwidget.GlanceAppWidgetManager
+import androidx.glance.appwidget.action.ActionCallback
+import androidx.glance.appwidget.action.actionRunCallback
 import androidx.glance.appwidget.lazy.items
 import androidx.glance.appwidget.provideContent
 import androidx.glance.background
@@ -36,69 +42,94 @@ import com.example.mindbank.util.hexToColor
 class TodoListWidget : GlanceAppWidget() {
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         val todoRepository = TodoWidgetRepository.get(context)
+        val todoList = todoRepository.getTodoList()
         provideContent {
-            TodoListWidgetLayout(todoRepository.getTodoList()) { todo ->
-                todoRepository.updateTodo(todo)
+            TodoListWidgetLayout(todoList)
+        }
+    }
+
+    @Composable
+    fun TodoListWidgetLayout(todoList: List<Task>) {
+        Column(
+            modifier = GlanceModifier.fillMaxSize().padding(8.dp).background(Color.White)
+        ) {
+            Row(
+                modifier = GlanceModifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.Horizontal.Start,
+                verticalAlignment = Alignment.Vertical.CenterVertically
+            ) {
+                Text(
+                    text = "할일 >",
+                    style = TextStyle(
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 16.sp
+                    ),
+                    modifier = GlanceModifier.defaultWeight()
+                )
+
+                Image(
+                    provider = ImageProvider(R.drawable.baseline_settings_24),
+                    contentDescription = "설정",
+                    modifier = GlanceModifier.size(24.dp).clickable {
+                        // 여기에 설정 액션 넣기 (예: 설정 Activity 이동)
+                    }
+                )
+            }
+
+            Spacer(modifier = GlanceModifier.height(8.dp))
+
+            androidx.glance.appwidget.lazy.LazyColumn {
+                items(todoList) { todo ->
+                    Row(
+                        modifier = GlanceModifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Image(
+                            modifier = GlanceModifier.size(24.dp).clickable(
+                                onClick = actionRunCallback<ToggleTodoAction>(
+                                    actionParametersOf(ActionParameters.Key<Int>("task_id") to todo.id)
+                                )
+                            ),
+                            provider = ImageProvider(if (todo.isDone) R.drawable.checked_img else R.drawable.unchecked_img),
+                            contentDescription = "CheckBox",
+                            colorFilter = ColorFilter.tint(ColorProvider(hexToColor(todo.color)))
+                        )
+
+                        Spacer(modifier = GlanceModifier.width(8.dp))
+
+                        Text(todo.title, style = TextStyle(color = ColorProvider(Color.Black)))
+
+                        Spacer(modifier = GlanceModifier.width(4.dp))
+                    }
+                }
             }
         }
     }
 }
 
-@Composable
-fun TodoListWidgetLayout(todoList: List<Task>, onCheck: (Task) -> Unit) {
-    Column(
-        modifier = GlanceModifier.fillMaxSize().padding(8.dp).background(Color.White)
+class ToggleTodoAction : ActionCallback {
+
+    override suspend fun onAction(
+        context: Context,
+        glanceId: GlanceId,
+        parameters: ActionParameters,
     ) {
-        Row(
-            modifier = GlanceModifier.fillMaxWidth(),
-            horizontalAlignment = Alignment.Horizontal.Start,
-            verticalAlignment = Alignment.Vertical.CenterVertically
-        ) {
-            Text(
-                text = "할일 >",
-                style = TextStyle(
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp
-                ),
-                modifier = GlanceModifier.defaultWeight()
-            )
+        val taskId = parameters[ActionParameters.Key<Int>("task_id")] ?: return
 
-            Image(
-                provider = ImageProvider(R.drawable.baseline_settings_24),
-                contentDescription = "설정",
-                modifier = GlanceModifier.size(24.dp).clickable {
-                    // 여기에 설정 액션 넣기 (예: 설정 Activity 이동)
-                }
-            )
-        }
+        val repo = TodoWidgetRepository.get(context)
+        val task = repo.getTodo(taskId) ?: return
 
-        Spacer(modifier = GlanceModifier.height(8.dp))
+        val updated = task.copy(isDone = !task.isDone)
+        repo.updateTodo(updated)
+    }
+}
 
-        androidx.glance.appwidget.lazy.LazyColumn {
-            items(todoList) { todo ->
-                Row(
-                    modifier = GlanceModifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Image(
-                        modifier = GlanceModifier.size(24.dp).clickable {
-                            val updatedTask = todo.copy(isDone = !todo.isDone)
-                            onCheck.invoke(updatedTask)
-                        },
-                        provider = ImageProvider(if (todo.isDone) R.drawable.checked_img else R.drawable.unchecked_img),
-                        contentDescription = "CheckBox",
-                        colorFilter = ColorFilter.tint(ColorProvider(hexToColor(todo.color)))
-                    )
-
-                    Spacer(modifier = GlanceModifier.width(8.dp))
-
-                    Text(todo.title, style = TextStyle(color = ColorProvider(Color.Black)))
-
-                    Spacer(modifier = GlanceModifier.width(4.dp))
-                }
-            }
-        }
+suspend fun updateWidget(context: Context) {
+    val manager = GlanceAppWidgetManager(context)
+    val glanceIds = manager.getGlanceIds(TodoListWidget::class.java)
+    glanceIds.forEach { glanceId ->
+        TodoListWidget().update(context, glanceId)
     }
 }
