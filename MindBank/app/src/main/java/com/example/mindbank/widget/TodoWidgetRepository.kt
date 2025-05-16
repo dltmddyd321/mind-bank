@@ -8,9 +8,7 @@ import dagger.hilt.EntryPoints
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
@@ -18,26 +16,25 @@ class TodoWidgetRepository @Inject constructor(
     @ApplicationContext private val context: Context,
     private val todoDao: TodoDao,
 ) {
+    private val taskComparator = compareByDescending<Task> { it.position }
+
     fun getTodoList(): List<Task> = runBlocking(Dispatchers.IO) {
-        todoDao.getAllSaveData()
+        todoDao.getAllSaveData().sortedWith(taskComparator)
     }
 
-    fun getTodo(id: Int) : Task? = runBlocking(Dispatchers.IO) {
+    fun getTodo(id: Int): Task? = runBlocking(Dispatchers.IO) {
         todoDao.searchById(id)
     }
 
-    fun updateTodo(task: Task) {
-        CoroutineScope(Dispatchers.IO).launch {
-            todoDao.updateTodo(
-                task.id,
-                task.title,
-                task.dtUpdated,
-                task.color,
-                task.isDone,
-                task.position
-            )
-            updateWidget(context)
-        }
+    suspend fun updateTodo(task: Task) {
+        todoDao.updateTodo(
+            task.id,
+            task.title,
+            task.dtUpdated,
+            task.color,
+            task.isDone,
+            task.position
+        )
     }
 
     @EntryPoint

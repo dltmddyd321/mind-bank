@@ -6,6 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.glance.ColorFilter
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
@@ -20,7 +21,9 @@ import androidx.glance.appwidget.action.ActionCallback
 import androidx.glance.appwidget.action.actionRunCallback
 import androidx.glance.appwidget.lazy.items
 import androidx.glance.appwidget.provideContent
+import androidx.glance.appwidget.state.updateAppWidgetState
 import androidx.glance.background
+import androidx.glance.currentState
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Column
 import androidx.glance.layout.Row
@@ -36,20 +39,21 @@ import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
 import androidx.glance.unit.ColorProvider
 import com.example.mindbank.R
-import com.example.mindbank.db.data.Task
 import com.example.mindbank.util.hexToColor
 
-class TodoListWidget : GlanceAppWidget() {
+object TodoListWidget : GlanceAppWidget() {
+
+    val updateKey = longPreferencesKey("updatedTime")
+
     override suspend fun provideGlance(context: Context, id: GlanceId) {
-        val todoRepository = TodoWidgetRepository.get(context)
-        val todoList = todoRepository.getTodoList()
-        provideContent {
-            TodoListWidgetLayout(todoList)
-        }
+        provideContent { TodoListWidgetLayout(context) }
     }
 
     @Composable
-    fun TodoListWidgetLayout(todoList: List<Task>) {
+    fun TodoListWidgetLayout(context: Context) {
+        val updatedTime = currentState(key = updateKey) ?: 0L
+        val todoRepository = TodoWidgetRepository.get(context)
+        val todoList = todoRepository.getTodoList()
         Column(
             modifier = GlanceModifier.fillMaxSize().padding(8.dp).background(Color.White)
         ) {
@@ -105,24 +109,31 @@ class TodoListWidget : GlanceAppWidget() {
                     }
                 }
             }
+            Text(
+                "마지막 위젯 업데이트 시간 : $updatedTime",
+                style = TextStyle(color = ColorProvider(Color.Black))
+            )
         }
     }
 }
 
-class ToggleTodoAction : ActionCallback {
-
+object ToggleTodoAction : ActionCallback {
     override suspend fun onAction(
         context: Context,
         glanceId: GlanceId,
         parameters: ActionParameters,
     ) {
+        updateAppWidgetState(context, glanceId) { prefs ->
+            prefs[TodoListWidget.updateKey] = System.currentTimeMillis()
+        }
         val taskId = parameters[ActionParameters.Key<Int>("task_id")] ?: return
 
-        val repo = TodoWidgetRepository.get(context)
+        val repo = TodoWidgetRepository.get(context.applicationContext)
         val task = repo.getTodo(taskId) ?: return
 
         val updated = task.copy(isDone = !task.isDone)
         repo.updateTodo(updated)
+        TodoListWidget.update(context, glanceId)
     }
 }
 
@@ -130,6 +141,6 @@ suspend fun updateWidget(context: Context) {
     val manager = GlanceAppWidgetManager(context)
     val glanceIds = manager.getGlanceIds(TodoListWidget::class.java)
     glanceIds.forEach { glanceId ->
-        TodoListWidget().update(context, glanceId)
+        TodoListWidget.update(context, glanceId)
     }
 }
