@@ -1,50 +1,63 @@
 <resources>
     <string name="app_name">MindBank</string>
-    <string name="title_activity_web_view">WebViewActivity</string>
-    <string name="title_activity_password_edit">PasswordEditActivity</string>
+
+    <string name="title_activity_web_view">웹뷰 화면</string>
+    <string name="title_activity_password_edit">비밀번호 편집 화면</string>
     <string name="empty_memo">메모가 없습니다.</string>
-    <string name="empty_todo">할일이 없습니다.</string>
-    <string name="action_close">Close</string>
+    <string name="empty_todo">할 일이 없습니다.</string>
+
+    <string name="action_close">닫기</string>
     <string name="action_confirm">확인</string>
     <string name="action_cancel">취소</string>
-    <string name="action_save">Save</string>
+    <string name="action_save">저장</string>
+
     <string name="dialog_backup_title">백업 데이터 불러오기</string>
     <string name="dialog_backup_message">저장이 완료되지 않은 데이터가 있습니다.\n마저 작성하시겠습니까?</string>
+
     <string name="dialog_cancel_add_title">메모 추가 취소</string>
     <string name="dialog_cancel_add_message">메모 추가를 취소하시겠습니까?</string>
+
     <string name="dialog_cancel_edit_title">메모 수정 취소</string>
     <string name="dialog_cancel_edit_message">메모 수정을 취소하시겠습니까?</string>
-    <string name="hint_title">Title</string>
-    <string name="hint_memo">Write your memo here…</string>
+
+    <string name="hint_title">제목</string>
+    <string name="hint_memo">여기에 메모를 작성하세요…</string>
+
     <string name="label_last_updated">마지막 업데이트: %1$s</string>
-    <string name="dialog_cancel_todo_title">할일 추가 취소</string>
-    <string name="dialog_cancel_todo_message">할일 추가를 취소하시겠습니까?</string>
-    <string name="hint_todo_input">What\'s happening?</string>
+
+    <string name="dialog_cancel_todo_title">할 일 추가 취소</string>
+    <string name="dialog_cancel_todo_message">할 일 추가를 취소하시겠습니까?</string>
+
+    <string name="hint_todo_input">무슨 일이 있었나요?</string>
+
     <string name="toast_empty_todo">내용을 입력해주세요!</string>
-    <string name="alert_back_press">한번 더 클릭하면 종료됩니다.</string>
-    <string name="alert_search">검색어를 입력하시오.</string>
-    <string name="input_url">URL을 입력하시오.(선택)</string>
-    <string name="input_memo">메모를 입력하시오.</string>
-    <string name="input_todo">할일을 입력하시오.</string>
-    <!-- Settings -->
-    <string name="settings_title">Settings</string>
-    <string name="memo_title">Memo</string>
-    <string name="home_title">Home</string>
-    <string name="todo_title">Todo</string>
 
-    <!-- Delete Button -->
+    <string name="alert_back_press">한 번 더 누르시면 종료됩니다.</string>
+    <string name="alert_search">검색어를 입력하세요.</string>
+
+    <string name="input_url">URL을 입력하세요. (선택)</string>
+    <string name="input_memo">메모를 입력하세요.</string>
+    <string name="input_todo">할 일을 입력하세요.</string>
+
+    <!-- 설정 -->
+    <string name="settings_title">설정</string>
+    <string name="memo_title">메모</string>
+    <string name="home_title">홈</string>
+    <string name="todo_title">할 일</string>
+
+    <!-- 삭제 관련 -->
     <string name="delete_all_data">전체 데이터 초기화</string>
-    <string name="delete">Delete</string>
-    <string name="confirm_delete">Confirm Delete</string>
-    <string name="confirm_delete_description">Are you sure you want to delete this? This action cannot be undone.</string>
-    <string name="confirm">Yes</string>
-    <string name="cancel">Cancel</string>
-    <string name="close">Close</string>
+    <string name="delete">삭제</string>
+    <string name="confirm_delete">삭제 확인</string>
+    <string name="confirm_delete_description">정말 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.</string>
+    <string name="confirm">예</string>
+    <string name="cancel">취소</string>
+    <string name="close">닫기</string>
 
-    <!-- Password -->
-    <string name="password_edit">비밀번호 변경 및 등록</string>
+    <!-- 비밀번호 -->
+    <string name="password_edit">비밀번호 등록 및 변경</string>
 
-    <!-- UI (기타) -->
+    <!-- 기타 UI -->
     <string name="icon_description_settings">설정</string>
     <string name="memo_detail">메모 상세보기</string>
     <string name="question_delete">삭제하시겠습니까?</string>
@@ -56,19 +69,22 @@
     <string name="biometric_unavailable">지문 인증을 사용할 수 없습니다.</string>
     <string name="biometric_button">지문 인증하기</string>
     <string name="biometric_prompt_title">지문 인증</string>
-    <string name="biometric_prompt_subtitle">앱을 사용하려면 지문을 인증하세요</string>
+    <string name="biometric_prompt_subtitle">앱을 사용하려면 지문 인증이 필요합니다</string>
     <string name="biometric_prompt_cancel">취소</string>
 
-    <!-- 퍼미션 관련 -->
-    <string name="permission_granted">Permission Granted</string>
-    <string name="permission_denied">Permission Denied</string>
+    <!-- 권한 관련 -->
+    <string name="permission_granted">권한이 허용되었습니다</string>
+    <string name="permission_denied">권한이 거부되었습니다</string>
     <string name="alarm_permission_message">알람을 사용하려면 권한을 허용해야 합니다.</string>
-    <string name="cancel_add_todo_title">할일 추가 취소</string>
-    <string name="cancel_add_todo_message">할일 추가를 취소하시겠습니까?</string>
+
+    <string name="cancel_add_todo_title">할 일 추가 취소</string>
+    <string name="cancel_add_todo_message">할 일 추가를 취소하시겠습니까?</string>
+
     <string name="save">저장</string>
     <string name="input_contents">내용을 입력해주세요!</string>
     <string name="please_enter_content">내용을 입력해주세요!</string>
+
     <string name="alarm_time_prefix">알림 시간: %1$s</string>
     <string name="add_alarm">+ 알림 추가</string>
-    <string name="todo_push_title">할일이 있습니다.</string>
+    <string name="todo_push_title">할 일이 있습니다.</string>
 </resources>
