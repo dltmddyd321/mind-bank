@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="title_activity_web_view">Màn hình WebView</string>
+    <string name="title_activity_password_edit">Màn hình chỉnh sửa mật khẩu</string>
+    <string name="empty_memo">Không có ghi chú nào.</string>
+    <string name="empty_todo">Không có công việc nào.</string>
+
+    <string name="action_close">Đóng</string>
+    <string name="action_confirm">Xác nhận</string>
+    <string name="action_cancel">Hủy</string>
+    <string name="action_save">Lưu</string>
+
+    <string name="dialog_backup_title">Tải dữ liệu sao lưu</string>
+    <string name="dialog_backup_message">Có dữ liệu chưa được lưu.\nBạn có muốn tiếp tục chỉnh sửa không?</string>
+
+    <string name="dialog_cancel_add_title">Hủy thêm ghi chú</string>
+    <string name="dialog_cancel_add_message">Bạn có muốn hủy thêm ghi chú không?</string>
+
+    <string name="dialog_cancel_edit_title">Hủy chỉnh sửa ghi chú</string>
+    <string name="dialog_cancel_edit_message">Bạn có muốn hủy chỉnh sửa ghi chú không?</string>
+
+    <string name="hint_title">Tiêu đề</string>
+    <string name="hint_memo">Viết ghi chú của bạn tại đây…</string>
+
+    <string name="label_last_updated">Cập nhật lần cuối: %1$s</string>
+
+    <string name="dialog_cancel_todo_title">Hủy thêm công việc</string>
+    <string name="dialog_cancel_todo_message">Bạn có muốn hủy thêm công việc không?</string>
+
+    <string name="hint_todo_input">Chuyện gì đã xảy ra?</string>
+
+    <string name="toast_empty_todo">Vui lòng nhập nội dung!</string>
+
+    <string name="alert_back_press">Nhấn thêm một lần để thoát.</string>
+    <string name="alert_search">Vui lòng nhập từ khóa tìm kiếm.</string>
+
+    <string name="input_url">Nhập URL (không bắt buộc)</string>
+    <string name="input_memo">Nhập ghi chú</string>
+    <string name="input_todo">Nhập công việc</string>
+
+    <!-- Cài đặt -->
+    <string name="settings_title">Cài đặt</string>
+    <string name="memo_title">Ghi chú</string>
+    <string name="home_title">Trang chủ</string>
+    <string name="todo_title">Công việc</string>
+
+    <!-- Xóa -->
+    <string name="delete_all_data">Đặt lại toàn bộ dữ liệu</string>
+    <string name="delete">Xóa</string>
+    <string name="confirm_delete">Xác nhận xóa</string>
+    <string name="confirm_delete_description">Bạn có chắc chắn muốn xóa không? Hành động này không thể hoàn tác.</string>
+    <string name="confirm">Có</string>
+    <string name="cancel">Hủy</string>
+    <string name="close">Đóng</string>
+
+    <!-- Mật khẩu -->
+    <string name="password_edit">Đăng ký hoặc thay đổi mật khẩu</string>
+
+    <!-- Giao diện -->
+    <string name="icon_description_settings">Cài đặt</string>
+    <string name="memo_detail">Chi tiết ghi chú</string>
+    <string name="question_delete">Bạn có chắc muốn xóa không?</string>
+
+    <!-- Xác thực vân tay -->
+    <string name="biometric_auth_prompt">Vui lòng xác thực bằng vân tay.</string>
+    <string name="biometric_success">Xác thực thành công!</string>
+    <string name="biometric_failed">Xác thực thất bại:</string>
+    <string name="biometric_unavailable">Không thể sử dụng xác thực vân tay.</string>
+    <string name="biometric_button">Xác thực</string>
+    <string name="biometric_prompt_title">Xác thực vân tay</string>
+    <string name="biometric_prompt_subtitle">Vui lòng xác thực để sử dụng ứng dụng</string>
+    <string name="biometric_prompt_cancel">Hủy</string>
+
+    <!-- Quyền -->
+    <string name="permission_granted">Quyền đã được cấp</string>
+    <string name="permission_denied">Quyền bị từ chối</string>
+    <string name="alarm_permission_message">Bạn cần cấp quyền để sử dụng báo thức.</string>
+
+    <string name="cancel_add_todo_title">Hủy thêm công việc</string>
+    <string name="cancel_add_todo_message">Bạn có muốn hủy thêm công việc không?</string>
+
+    <string name="save">Lưu</string>
+    <string name="input_contents">Vui lòng nhập nội dung!</string>
+    <string name="please_enter_content">Vui lòng nhập nội dung!</string>
+
+    <string name="alarm_time_prefix">Thời gian báo thức: %1$s</string>
+    <string name="add_alarm">+ Thêm báo thức</string>
+    <string name="todo_push_title">Bạn có công việc cần làm.</string>
+</resources>

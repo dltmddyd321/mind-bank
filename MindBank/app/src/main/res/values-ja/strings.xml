@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">MindBank</string>
+    <string name="title_activity_web_view">ウェブビュー画面</string>
+    <string name="title_activity_password_edit">パスワード編集画面</string>
+    <string name="empty_memo">メモがありません。</string>
+    <string name="empty_todo">タスクがありません。</string>
+
+    <string name="action_close">閉じる</string>
+    <string name="action_confirm">確認</string>
+    <string name="action_cancel">キャンセル</string>
+    <string name="action_save">保存</string>
+
+    <string name="dialog_backup_title">バックアップデータの読み込み</string>
+    <string name="dialog_backup_message">保存されていないデータがあります。\n続けて編集しますか？</string>
+
+    <string name="dialog_cancel_add_title">メモ追加のキャンセル</string>
+    <string name="dialog_cancel_add_message">メモの追加をキャンセルしますか？</string>
+
+    <string name="dialog_cancel_edit_title">メモ編集のキャンセル</string>
+    <string name="dialog_cancel_edit_message">メモの編集をキャンセルしますか？</string>
+
+    <string name="hint_title">タイトル</string>
+    <string name="hint_memo">ここにメモを入力してください…</string>
+
+    <string name="label_last_updated">最終更新: %1$s</string>
+
+    <string name="dialog_cancel_todo_title">タスク追加のキャンセル</string>
+    <string name="dialog_cancel_todo_message">タスクの追加をキャンセルしますか？</string>
+
+    <string name="hint_todo_input">何がありましたか？</string>
+
+    <string name="toast_empty_todo">内容を入力してください！</string>
+
+    <string name="alert_back_press">もう一度押すと終了します。</string>
+    <string name="alert_search">検索キーワードを入力してください。</string>
+
+    <string name="input_url">URLを入力してください（任意）</string>
+    <string name="input_memo">メモを入力してください</string>
+    <string name="input_todo">タスクを入力してください</string>
+
+    <!-- 設定 -->
+    <string name="settings_title">設定</string>
+    <string name="memo_title">メモ</string>
+    <string name="home_title">ホーム</string>
+    <string name="todo_title">タスク</string>
+
+    <!-- 削除 -->
+    <string name="delete_all_data">すべてのデータをリセット</string>
+    <string name="delete">削除</string>
+    <string name="confirm_delete">削除の確認</string>
+    <string name="confirm_delete_description">本当に削除しますか？この操作は元に戻せません。</string>
+    <string name="confirm">はい</string>
+    <string name="cancel">キャンセル</string>
+    <string name="close">閉じる</string>
+
+    <!-- パスワード -->
+    <string name="password_edit">パスワードの登録・変更</string>
+
+    <!-- UI -->
+    <string name="icon_description_settings">設定</string>
+    <string name="memo_detail">メモの詳細</string>
+    <string name="question_delete">削除しますか？</string>
+
+    <!-- 指紋認証 -->
+    <string name="biometric_auth_prompt">指紋認証を行ってください。</string>
+    <string name="biometric_success">認証成功！</string>
+    <string name="biometric_failed">認証失敗：</string>
+    <string name="biometric_unavailable">指紋認証を利用できません。</string>
+    <string name="biometric_button">認証する</string>
+    <string name="biometric_prompt_title">指紋認証</string>
+    <string name="biometric_prompt_subtitle">アプリを使用するには認証が必要です</string>
+    <string name="biometric_prompt_cancel">キャンセル</string>
+
+    <!-- パーミッション -->
+    <string name="permission_granted">権限が許可されました</string>
+    <string name="permission_denied">権限が拒否されました</string>
+    <string name="alarm_permission_message">アラームを使用するには権限が必要です。</string>
+
+    <string name="cancel_add_todo_title">タスク追加のキャンセル</string>
+    <string name="cancel_add_todo_message">タスクの追加をキャンセルしますか？</string>
+
+    <string name="save">保存</string>
+    <string name="input_contents">内容を入力してください！</string>
+    <string name="please_enter_content">内容を入力してください！</string>
+
+    <string name="alarm_time_prefix">アラーム時間: %1$s</string>
+    <string name="add_alarm">+ アラームを追加</string>
+    <string name="todo_push_title">タスクがあります。</string>
+</resources>

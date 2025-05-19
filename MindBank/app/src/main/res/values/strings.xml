@@ -4,7 +4,7 @@
     <string name="title_activity_web_view">웹뷰 화면</string>
     <string name="title_activity_password_edit">비밀번호 편집 화면</string>
     <string name="empty_memo">메모가 없습니다.</string>
-    <string name="empty_todo">할 일이 없습니다.</string>
+    <string name="empty_todo">할일이 없습니다.</string>
 
     <string name="action_close">닫기</string>
     <string name="action_confirm">확인</string>
@@ -25,8 +25,8 @@
 
     <string name="label_last_updated">마지막 업데이트: %1$s</string>
 
-    <string name="dialog_cancel_todo_title">할 일 추가 취소</string>
-    <string name="dialog_cancel_todo_message">할 일 추가를 취소하시겠습니까?</string>
+    <string name="dialog_cancel_todo_title">할일 추가 취소</string>
+    <string name="dialog_cancel_todo_message">할일 추가를 취소하시겠습니까?</string>
 
     <string name="hint_todo_input">무슨 일이 있었나요?</string>
 
@@ -37,13 +37,13 @@
 
     <string name="input_url">URL을 입력하세요. (선택)</string>
     <string name="input_memo">메모를 입력하세요.</string>
-    <string name="input_todo">할 일을 입력하세요.</string>
+    <string name="input_todo">할일을 입력하세요.</string>
 
     <!-- 설정 -->
     <string name="settings_title">설정</string>
     <string name="memo_title">메모</string>
     <string name="home_title">홈</string>
-    <string name="todo_title">할 일</string>
+    <string name="todo_title">할일</string>
 
     <!-- 삭제 관련 -->
     <string name="delete_all_data">전체 데이터 초기화</string>
@@ -78,7 +78,7 @@
     <string name="alarm_permission_message">알람을 사용하려면 권한을 허용해야 합니다.</string>
 
     <string name="cancel_add_todo_title">할 일 추가 취소</string>
-    <string name="cancel_add_todo_message">할 일 추가를 취소하시겠습니까?</string>
+    <string name="cancel_add_todo_message">할일 추가를 취소하시겠습니까?</string>
 
     <string name="save">저장</string>
     <string name="input_contents">내용을 입력해주세요!</string>
@@ -86,5 +86,5 @@
 
     <string name="alarm_time_prefix">알림 시간: %1$s</string>
     <string name="add_alarm">+ 알림 추가</string>
-    <string name="todo_push_title">할 일이 있습니다.</string>
+    <string name="todo_push_title">할일이 있습니다.</string>
 </resources>

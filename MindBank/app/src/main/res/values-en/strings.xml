@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">MindBank</string>
+    <string name="title_activity_web_view">Web View</string>
+    <string name="title_activity_password_edit">Edit Password</string>
+    <string name="empty_memo">No memos available.</string>
+    <string name="empty_todo">No tasks available.</string>
+
+    <string name="action_close">Close</string>
+    <string name="action_confirm">Confirm</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_save">Save</string>
+
+    <string name="dialog_backup_title">Load Backup Data</string>
+    <string name="dialog_backup_message">There is unsaved data.\nWould you like to continue editing?</string>
+
+    <string name="dialog_cancel_add_title">Cancel Adding Memo</string>
+    <string name="dialog_cancel_add_message">Do you want to cancel adding this memo?</string>
+
+    <string name="dialog_cancel_edit_title">Cancel Editing Memo</string>
+    <string name="dialog_cancel_edit_message">Do you want to cancel editing this memo?</string>
+
+    <string name="hint_title">Title</string>
+    <string name="hint_memo">Write your memo here…</string>
+
+    <string name="label_last_updated">Last updated: %1$s</string>
+
+    <string name="dialog_cancel_todo_title">Cancel Adding Task</string>
+    <string name="dialog_cancel_todo_message">Do you want to cancel adding this task?</string>
+
+    <string name="hint_todo_input">What happened?</string>
+
+    <string name="toast_empty_todo">Please enter some content!</string>
+
+    <string name="alert_back_press">Press once more to exit.</string>
+    <string name="alert_search">Please enter a search keyword.</string>
+
+    <string name="input_url">Enter URL (optional)</string>
+    <string name="input_memo">Enter memo</string>
+    <string name="input_todo">Enter task</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Settings</string>
+    <string name="memo_title">Memo</string>
+    <string name="home_title">Home</string>
+    <string name="todo_title">To-do</string>
+
+    <!-- Delete -->
+    <string name="delete_all_data">Reset All Data</string>
+    <string name="delete">Delete</string>
+    <string name="confirm_delete">Confirm Deletion</string>
+    <string name="confirm_delete_description">Are you sure you want to delete this? This action cannot be undone.</string>
+    <string name="confirm">Yes</string>
+    <string name="cancel">Cancel</string>
+    <string name="close">Close</string>
+
+    <!-- Password -->
+    <string name="password_edit">Register or Change Password</string>
+
+    <!-- UI -->
+    <string name="icon_description_settings">Settings</string>
+    <string name="memo_detail">Memo Details</string>
+    <string name="question_delete">Are you sure you want to delete?</string>
+
+    <!-- Biometric Authentication -->
+    <string name="biometric_auth_prompt">Please authenticate using your fingerprint.</string>
+    <string name="biometric_success">Authentication successful!</string>
+    <string name="biometric_failed">Authentication failed:</string>
+    <string name="biometric_unavailable">Fingerprint authentication is not available.</string>
+    <string name="biometric_button">Authenticate</string>
+    <string name="biometric_prompt_title">Fingerprint Authentication</string>
+    <string name="biometric_prompt_subtitle">Please authenticate to use the app</string>
+    <string name="biometric_prompt_cancel">Cancel</string>
+
+    <!-- Permissions -->
+    <string name="permission_granted">Permission granted</string>
+    <string name="permission_denied">Permission denied</string>
+    <string name="alarm_permission_message">You must grant permission to use alarms.</string>
+
+    <string name="cancel_add_todo_title">Cancel Adding Task</string>
+    <string name="cancel_add_todo_message">Do you want to cancel adding this task?</string>
+
+    <string name="save">Save</string>
+    <string name="input_contents">Please enter some content!</string>
+    <string name="please_enter_content">Please enter some content!</string>
+
+    <string name="alarm_time_prefix">Alarm time: %1$s</string>
+    <string name="add_alarm">+ Add Alarm</string>
+    <string name="todo_push_title">You have tasks to do.</string>
+</resources>
