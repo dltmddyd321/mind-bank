@@ -77,7 +77,7 @@
     <string name="permission_denied">권한이 거부되었습니다</string>
     <string name="alarm_permission_message">알람을 사용하려면 권한을 허용해야 합니다.</string>
 
-    <string name="cancel_add_todo_title">할 일 추가 취소</string>
+    <string name="cancel_add_todo_title">할일 추가 취소</string>
     <string name="cancel_add_todo_message">할일 추가를 취소하시겠습니까?</string>
 
     <string name="save">저장</string>

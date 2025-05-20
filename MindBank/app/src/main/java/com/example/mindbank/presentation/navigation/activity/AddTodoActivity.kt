@@ -271,11 +271,11 @@ class AddTodoActivity : ComponentActivity() {
             )
         }) {
             Column(modifier = Modifier.padding(it)) {
-                Spacer(modifier = Modifier.height(8.dp))
-                var initTime by remember { mutableLongStateOf(alarmTime) }
-                AlarmSelector(initTime) { selectedTimeMillis ->
-                    initTime = selectedTimeMillis
-                }
+//                Spacer(modifier = Modifier.height(8.dp))
+//                var initTime by remember { mutableLongStateOf(alarmTime) }
+//                AlarmSelector(initTime) { selectedTimeMillis ->
+//                    initTime = selectedTimeMillis
+//                }
                 Spacer(modifier = Modifier.height(8.dp))
                 InputField(title, onTextChange = { value ->
                     onTextChange.invoke(value)

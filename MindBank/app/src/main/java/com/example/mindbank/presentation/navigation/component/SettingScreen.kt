@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material3.AlertDialog
@@ -26,9 +27,11 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -49,7 +52,7 @@ import com.example.mindbank.presentation.navigation.theme.MindBankTheme
 @Composable
 fun SettingsScreen(
     paddingValues: PaddingValues,
-    onConfirmDelete: () -> Unit
+    onConfirmDelete: () -> Unit,
 ) {
     Box(
         modifier = Modifier
@@ -79,17 +82,82 @@ fun SettingsScreen(
     }
 }
 
+@Composable
+fun LanguageSelectorDialog(
+    currentSelection: String,
+    onDismiss: () -> Unit,
+    onConfirm: (String) -> Unit,
+) {
+    val options = listOf("한국어", "English", "日本語", "Tiếng Việt")
+    var selectedOption by remember { mutableStateOf(currentSelection) }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("언어를 선택하세요") },
+        text = {
+            Column {
+                options.forEach { language ->
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .selectable(
+                                selected = (language == selectedOption),
+                                onClick = { selectedOption = language }
+                            )
+                            .padding(vertical = 4.dp)
+                    ) {
+                        RadioButton(
+                            selected = (language == selectedOption),
+                            onClick = { selectedOption = language }
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(text = language)
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = { onConfirm(selectedOption) }) {
+                Text("확인")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("취소")
+            }
+        }
+    )
+}
 
 @Composable
 fun SettingsScreen(onConfirmDelete: () -> Unit) {
-    val context = LocalContext.current
+    var showDialog by remember { mutableStateOf(false) }
+    var selectedLanguage by remember { mutableStateOf("한국어") }
     LazyColumn(contentPadding = PaddingValues(vertical = 4.dp)) {
         item {
             DeleteButton(
                 title = stringResource(R.string.delete_all_data),
                 onConfirmDelete = onConfirmDelete
             )
+            PasswordEditBtn(
+                title = "언어 변경",
+                onClick = {
+                    showDialog = true
+                }
+            )
         }
+    }
+    if (showDialog) {
+        LanguageSelectorDialog(
+            currentSelection = selectedLanguage,
+            onDismiss = { showDialog = false },
+            onConfirm = { lang ->
+                selectedLanguage = lang
+                showDialog = false
+                // TODO: 실제 언어 변경 로직 여기에 넣기
+            }
+        )
     }
 //    Button(onClick = {
 //        throw RuntimeException("Crash test")
@@ -189,7 +257,7 @@ fun PasswordEditBtn(title: String, onClick: () -> Unit) {
             horizontalArrangement = Arrangement.Start
         ) {
             Image(
-                painter = painterResource(id = R.drawable.baseline_lock_outline_24),
+                painter = painterResource(id = R.drawable.baseline_settings_24),
                 contentDescription = null,
                 colorFilter = ColorFilter.tint(Color.White),
                 modifier = Modifier.size(24.dp)
@@ -210,61 +278,6 @@ fun PasswordEditBtn(title: String, onClick: () -> Unit) {
                 tint = Color.Gray,
                 modifier = Modifier.size(24.dp)
             )
-        }
-        Spacer(modifier = Modifier.height(8.dp))
-        Divider(color = Color.LightGray, thickness = 1.dp)
-    }
-}
-
-@Composable
-fun VersionCheckButton(title: String, onClick: () -> Unit) {
-    var expand by remember { mutableStateOf(false) }
-
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = { expand = !expand })
-            .padding(horizontal = 16.dp, vertical = 12.dp)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(48.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(
-                text = title,
-                color = Color.White,
-                fontSize = 18.sp
-            )
-
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                contentDescription = "Go to $title",
-                tint = Color.Gray
-            )
-        }
-        AnimatedVisibility(visible = expand) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp)
-            ) {
-                Button(
-                    onClick = { onClick() },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(48.dp)
-                ) {
-                    Text(
-                        text = "Delete",
-                        color = Color.White,
-                        fontSize = 16.sp
-                    )
-                }
-            }
         }
         Spacer(modifier = Modifier.height(8.dp))
         Divider(color = Color.LightGray, thickness = 1.dp)
