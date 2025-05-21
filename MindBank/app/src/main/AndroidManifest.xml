@@ -24,6 +24,17 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
+            android:name=".presentation.navigation.activity.ReceiveShareActivity"
+            android:exported="false"
+            android:label="@string/title_activity_receive_share"
+            android:theme="@style/Theme.MindBank" >
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/plain" />
+            </intent-filter>
+        </activity>
+        <activity
             android:name=".presentation.navigation.activity.PasswordEditActivity"
             android:exported="false"
             android:label="@string/title_activity_password_edit"
@@ -59,19 +70,7 @@
         <receiver
             android:name=".util.alarm.AlarmReceiver"
             android:enabled="true"
-            android:exported="false"/>
-
-<!--        <receiver-->
-<!--            android:name=".widget.TodoListWidgetReceiver"-->
-<!--            android:exported="true">-->
-<!--            <intent-filter>-->
-<!--                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />-->
-<!--            </intent-filter>-->
-
-<!--            <meta-data-->
-<!--                android:name="android.appwidget.provider"-->
-<!--                android:resource="@xml/widget_todo_list" />-->
-<!--        </receiver>-->
+            android:exported="false" />
     </application>
 
 </manifest>
