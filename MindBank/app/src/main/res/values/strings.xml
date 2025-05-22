@@ -87,5 +87,5 @@
     <string name="alarm_time_prefix">알림 시간: %1$s</string>
     <string name="add_alarm">+ 알림 추가</string>
     <string name="todo_push_title">할일이 있습니다.</string>
-    <string name="title_activity_receive_share">ReceiveShareActivity</string>
+    <string name="title_activity_receive_share">링크 저장</string>
 </resources>

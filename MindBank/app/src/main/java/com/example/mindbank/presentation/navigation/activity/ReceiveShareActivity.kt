@@ -2,19 +2,35 @@ package com.example.mindbank.presentation.navigation.activity
 
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import com.example.mindbank.db.data.Memo
 import com.example.mindbank.presentation.navigation.activity.ui.theme.MindBankTheme
+import com.example.mindbank.util.toHex
+import com.example.mindbank.viewmodel.MemoViewModel
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
 
+@AndroidEntryPoint
 class ReceiveShareActivity : ComponentActivity() {
+
+    private val memoViewModel: MemoViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val sharedUrl = if (intent?.action == Intent.ACTION_SEND && intent.type == "text/plain") {
@@ -22,29 +38,50 @@ class ReceiveShareActivity : ComponentActivity() {
         } else null
         setContent {
             MindBankTheme {
-                if (sharedUrl != null) {
-                    Text("받은 URL: $sharedUrl")
-                    // or WebViewScreen(url = sharedUrl)
+                val context = LocalContext.current
+                var isDone by remember { mutableStateOf(false) }
+
+                if (!sharedUrl.isNullOrEmpty()) {
+                    LaunchedEffect(sharedUrl) {
+                        val linkMemo = Memo(
+                            title = "외부 링크",
+                            detail = "",
+                            dtCreated = System.currentTimeMillis(),
+                            dtUpdated = System.currentTimeMillis(),
+                            color = Color.White.toHex(),
+                            link = sharedUrl
+                        )
+                        memoViewModel.insertData(linkMemo)
+                        isDone = true
+                    }
+
+                    if (isDone) {
+                        LaunchedEffect(Unit) {
+                            Toast.makeText(context, "링크가 저장되었습니다.", Toast.LENGTH_SHORT).show()
+                            delay(500L)
+                            finish()
+                        }
+                    }
+
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
                 } else {
-                    Text("공유된 URL이 없습니다.")
+                    LaunchedEffect(Unit) {
+                        delay(500L)
+                        finish()
+                    }
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text("공유된 URL이 없습니다.")
+                    }
                 }
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    MindBankTheme {
-        Greeting("Android")
     }
 }

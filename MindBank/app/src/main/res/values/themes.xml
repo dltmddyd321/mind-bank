@@ -2,7 +2,4 @@
 <resources>
 
     <style name="Theme.MindBank" parent="android:Theme.Material.Light.NoActionBar" />
-
-    <style name="Theme.App.Starting" parent="android:Theme.Material.Light.NoActionBar" />
-
 </resources>

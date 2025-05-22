@@ -86,4 +86,5 @@
     <string name="alarm_time_prefix">Thời gian báo thức: %1$s</string>
     <string name="add_alarm">+ Thêm báo thức</string>
     <string name="todo_push_title">Bạn có công việc cần làm.</string>
+    <string name="title_activity_receive_share">Lưu liên kết</string>
 </resources>

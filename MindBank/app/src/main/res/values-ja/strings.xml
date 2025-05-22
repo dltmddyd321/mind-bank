@@ -87,4 +87,5 @@
     <string name="alarm_time_prefix">アラーム時間: %1$s</string>
     <string name="add_alarm">+ アラームを追加</string>
     <string name="todo_push_title">タスクがあります。</string>
+    <string name="title_activity_receive_share">リンクを保存</string>
 </resources>
