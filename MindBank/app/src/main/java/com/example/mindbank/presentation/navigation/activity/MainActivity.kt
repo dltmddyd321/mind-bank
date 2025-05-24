@@ -54,6 +54,7 @@ import com.example.mindbank.presentation.navigation.component.Screen
 import com.example.mindbank.presentation.navigation.component.SearchBar
 import com.example.mindbank.presentation.navigation.component.SettingsScreen
 import com.example.mindbank.presentation.navigation.theme.MindBankTheme
+import com.example.mindbank.util.AppLanguageState
 import com.example.mindbank.util.DataType
 import com.example.mindbank.viewmodel.MemoViewModel
 import com.example.mindbank.viewmodel.TodoViewModel
@@ -63,7 +64,7 @@ import dagger.hilt.android.AndroidEntryPoint
 @ExperimentalMaterial3Api
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-
+    private val languageState = AppLanguageState()
     private val todoViewModel: TodoViewModel by viewModels()
     private val memoViewModel: MemoViewModel by viewModels()
     private var backPressedTime: Long = 0

@@ -26,6 +26,7 @@ retrofit = "2.9.0"
 tedpermissionCoroutine = "3.4.2"
 tedpermissionNormal = "3.4.2"
 timber = "5.0.1"
+appcompat = "1.7.0"
 
 [libraries]
 accompanist-flowlayout = { module = "com.google.accompanist:accompanist-flowlayout", version.ref = "accompanistFlowlayout" }
@@ -60,6 +61,7 @@ logging-interceptor = { module = "com.squareup.okhttp3:logging-interceptor", ver
 tedpermission-coroutine = { module = "io.github.ParkSangGwon:tedpermission-coroutine", version.ref = "tedpermissionCoroutine" }
 tedpermission-normal = { module = "io.github.ParkSangGwon:tedpermission-normal", version.ref = "tedpermissionNormal" }
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

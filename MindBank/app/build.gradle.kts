@@ -74,6 +74,7 @@ dependencies {
     implementation("androidx.datastore:datastore-preferences:1.0.0")
     implementation("androidx.compose.material3:material3:1.2.1")
     implementation("androidx.room:room-runtime:2.5.2")
+    implementation(libs.androidx.appcompat)
     kapt("androidx.room:room-compiler:2.5.2")
     implementation("com.google.dagger:hilt-android:2.46")
     kapt("com.google.dagger:hilt-android-compiler:2.46")
