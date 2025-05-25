@@ -48,10 +48,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.mindbank.R
 import com.example.mindbank.presentation.navigation.theme.MindBankTheme
+import com.example.mindbank.util.AppLanguageState
 
 @Composable
 fun SettingsScreen(
     paddingValues: PaddingValues,
+    languageState: AppLanguageState,
     onConfirmDelete: () -> Unit,
 ) {
     Box(
@@ -61,23 +63,20 @@ fun SettingsScreen(
         contentAlignment = Alignment.Center
     ) {
         MindBankTheme {
-            Scaffold(
-                topBar = {
-                    MainTopBar(stringResource(R.string.settings_title))
-                },
-                content = {
-                    Surface(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(it),
-                        color = MaterialTheme.colorScheme.background
-                    ) {
-                        SettingsScreen(onConfirmDelete = {
-                            onConfirmDelete.invoke()
-                        })
-                    }
+            Scaffold(topBar = {
+                MainTopBar(stringResource(R.string.settings_title))
+            }, content = {
+                Surface(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(it),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    SettingsScreen(languageState, onConfirmDelete = {
+                        onConfirmDelete.invoke()
+                    })
                 }
-            )
+            })
         }
     }
 }
@@ -91,61 +90,49 @@ fun LanguageSelectorDialog(
     val options = listOf("한국어", "English", "日本語", "Tiếng Việt")
     var selectedOption by remember { mutableStateOf(currentSelection) }
 
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text("언어를 선택하세요") },
-        text = {
-            Column {
-                options.forEach { language ->
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .selectable(
-                                selected = (language == selectedOption),
-                                onClick = { selectedOption = language }
-                            )
-                            .padding(vertical = 4.dp)
-                    ) {
-                        RadioButton(
+    AlertDialog(onDismissRequest = onDismiss, title = { Text("언어를 선택하세요") }, text = {
+        Column {
+            options.forEach { language ->
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .selectable(
                             selected = (language == selectedOption),
-                            onClick = { selectedOption = language }
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(text = language)
-                    }
+                            onClick = { selectedOption = language })
+                        .padding(vertical = 4.dp)) {
+                    RadioButton(
+                        selected = (language == selectedOption),
+                        onClick = { selectedOption = language })
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(text = language)
                 }
             }
-        },
-        confirmButton = {
-            TextButton(onClick = { onConfirm(selectedOption) }) {
-                Text("확인")
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text("취소")
-            }
         }
-    )
+    }, confirmButton = {
+        TextButton(onClick = { onConfirm(selectedOption) }) {
+            Text("확인")
+        }
+    }, dismissButton = {
+        TextButton(onClick = onDismiss) {
+            Text("취소")
+        }
+    })
 }
 
 @Composable
-fun SettingsScreen(onConfirmDelete: () -> Unit) {
+fun SettingsScreen(languageState: AppLanguageState, onConfirmDelete: () -> Unit) {
     var showDialog by remember { mutableStateOf(false) }
     var selectedLanguage by remember { mutableStateOf("한국어") }
     LazyColumn(contentPadding = PaddingValues(vertical = 4.dp)) {
         item {
             DeleteButton(
-                title = stringResource(R.string.delete_all_data),
-                onConfirmDelete = onConfirmDelete
+                title = stringResource(R.string.delete_all_data), onConfirmDelete = onConfirmDelete
             )
             PasswordEditBtn(
-                title = "언어 변경",
-                onClick = {
+                title = "언어 변경", onClick = {
                     showDialog = true
-                }
-            )
+                })
         }
     }
     if (showDialog) {
@@ -155,15 +142,16 @@ fun SettingsScreen(onConfirmDelete: () -> Unit) {
             onConfirm = { lang ->
                 selectedLanguage = lang
                 showDialog = false
-                // TODO: 실제 언어 변경 로직 여기에 넣기
-            }
-        )
+                val langCode = when (lang) {
+                    "한국어" -> "ko"
+                    "English" -> "en"
+                    "日本語" -> "ja"
+                    "Tiếng Việt" -> "vi"
+                    else -> "en"
+                }
+                languageState.updateLocale(langCode)
+            })
     }
-//    Button(onClick = {
-//        throw RuntimeException("Crash test")
-//    }) {
-//        Text("강제 크래시")
-//    }
 }
 
 @Composable
@@ -193,10 +181,7 @@ fun DeleteButton(title: String, onConfirmDelete: () -> Unit) {
 
             Spacer(modifier = Modifier.width(8.dp))
             Text(
-                text = title,
-                color = Color.White,
-                fontSize = 18.sp,
-                modifier = Modifier.weight(1f)
+                text = title, color = Color.White, fontSize = 18.sp, modifier = Modifier.weight(1f)
             )
 
             Icon(
@@ -231,24 +216,19 @@ fun DeleteButton(title: String, onConfirmDelete: () -> Unit) {
     }
 
     if (showDialog) {
-        ConfirmDeleteDialog(
-            onConfirm = {
-                showDialog = false
-                onConfirmDelete()
-            },
-            onDismiss = { showDialog = false }
-        )
+        ConfirmDeleteDialog(onConfirm = {
+            showDialog = false
+            onConfirmDelete()
+        }, onDismiss = { showDialog = false })
     }
 }
 
 @Composable
 fun PasswordEditBtn(title: String, onClick: () -> Unit) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onClick.invoke() }
-            .padding(horizontal = 16.dp, vertical = 12.dp)
-    ) {
+    Column(modifier = Modifier
+        .fillMaxWidth()
+        .clickable { onClick.invoke() }
+        .padding(horizontal = 16.dp, vertical = 12.dp)) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -266,10 +246,7 @@ fun PasswordEditBtn(title: String, onClick: () -> Unit) {
             Spacer(modifier = Modifier.width(8.dp))
 
             Text(
-                text = title,
-                color = Color.White,
-                fontSize = 18.sp,
-                modifier = Modifier.weight(1f)
+                text = title, color = Color.White, fontSize = 18.sp, modifier = Modifier.weight(1f)
             )
 
             Icon(
@@ -286,26 +263,20 @@ fun PasswordEditBtn(title: String, onClick: () -> Unit) {
 
 @Composable
 fun ConfirmDeleteDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
-    AlertDialog(
-        onDismissRequest = { onDismiss() },
-        title = {
-            Text(
-                text = stringResource(R.string.confirm_delete),
-                style = MaterialTheme.typography.titleMedium
-            )
-        },
-        text = {
-            Text(text = stringResource(R.string.confirm_delete_description))
-        },
-        confirmButton = {
-            Button(onClick = onConfirm) {
-                Text(text = stringResource(R.string.confirm), color = Color.White)
-            }
-        },
-        dismissButton = {
-            OutlinedButton(onClick = onDismiss) {
-                Text(text = stringResource(R.string.cancel))
-            }
+    AlertDialog(onDismissRequest = { onDismiss() }, title = {
+        Text(
+            text = stringResource(R.string.confirm_delete),
+            style = MaterialTheme.typography.titleMedium
+        )
+    }, text = {
+        Text(text = stringResource(R.string.confirm_delete_description))
+    }, confirmButton = {
+        Button(onClick = onConfirm) {
+            Text(text = stringResource(R.string.confirm), color = Color.White)
         }
-    )
+    }, dismissButton = {
+        OutlinedButton(onClick = onDismiss) {
+            Text(text = stringResource(R.string.cancel))
+        }
+    })
 }

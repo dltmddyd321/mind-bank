@@ -8,7 +8,7 @@ import androidx.core.os.LocaleListCompat
 import java.util.Locale
 
 class AppLanguageState {
-    private var currentLocale by mutableStateOf(Locale.getDefault())
+    var currentLocale: Locale by mutableStateOf(Locale.getDefault())
 
     fun updateLocale(langCode: String) {
         val newLocale = Locale(langCode)

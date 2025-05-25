@@ -28,7 +28,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -36,6 +39,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -59,11 +63,13 @@ import com.example.mindbank.util.DataType
 import com.example.mindbank.viewmodel.MemoViewModel
 import com.example.mindbank.viewmodel.TodoViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import java.util.Locale
 
 
 @ExperimentalMaterial3Api
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    private val localAppLocale = compositionLocalOf { Locale.getDefault() }
     private val languageState = AppLanguageState()
     private val todoViewModel: TodoViewModel by viewModels()
     private val memoViewModel: MemoViewModel by viewModels()
@@ -88,94 +94,102 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            ChangeSystemBarsTheme(!isSystemInDarkTheme())
-            val navController = rememberNavController()
-            val navBackStackEntry by navController.currentBackStackEntryAsState()
-            val currentRoute = navBackStackEntry?.destination?.route
-            Scaffold(
-                bottomBar = { BottomNavBar(navController = navController) },
-                floatingActionButton = {
-                    if (currentRoute == Screen.Todo.route || currentRoute == Screen.Notes.route) {
-                        val context = LocalContext.current
-                        FloatingActionButton(
-                            onClick = {
-                                if (isTodoMode) {
-                                    val intent = Intent(context, AddTodoActivity::class.java)
+            CompositionLocalProvider(localAppLocale provides languageState.currentLocale) {
+                val locale = localAppLocale.current
+                SideEffect { Locale.setDefault(locale) }
+                val configuration = LocalConfiguration.current
+                configuration.setLocale(locale)
+                ChangeSystemBarsTheme(!isSystemInDarkTheme())
+                val navController = rememberNavController()
+                val navBackStackEntry by navController.currentBackStackEntryAsState()
+                val currentRoute = navBackStackEntry?.destination?.route
+                Scaffold(
+                    bottomBar = { BottomNavBar(navController = navController) },
+                    floatingActionButton = {
+                        if (currentRoute == Screen.Todo.route || currentRoute == Screen.Notes.route) {
+                            val context = LocalContext.current
+                            FloatingActionButton(
+                                onClick = {
+                                    if (isTodoMode) {
+                                        val intent = Intent(context, AddTodoActivity::class.java)
+                                        todoLauncher.launch(intent)
+                                    } else {
+                                        val intent = Intent(context, AddMemoActivity::class.java)
+                                        memoLauncher.launch(intent)
+                                    }
+                                },
+                                containerColor = MaterialTheme.colorScheme.secondary,
+                                shape = RoundedCornerShape(16.dp),
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Rounded.Add,
+                                    contentDescription = "Add FAB",
+                                    tint = Color.White,
+                                )
+                            }
+                        }
+                    }
+                ) { paddingValues ->
+                    isTodoMode = currentRoute == Screen.Todo.route
+                    NavHost(navController, startDestination = Screen.Home.route) {
+                        composable(Screen.Home.route) {
+                            HomeScreen(
+                                navController, memoViewModel, todoViewModel,
+                                paddingValues, onEditTodo = { todo ->
+                                    val intent =
+                                        Intent(this@MainActivity, AddTodoActivity::class.java)
+                                            .apply { putExtra("id", todo.id) }
                                     todoLauncher.launch(intent)
-                                } else {
-                                    val intent = Intent(context, AddMemoActivity::class.java)
+                                }, onEditMemo = { memo ->
+                                    val intent =
+                                        Intent(this@MainActivity, AddMemoActivity::class.java)
+                                            .apply { putExtra("id", memo.id) }
                                     memoLauncher.launch(intent)
-                                }
-                            },
-                            containerColor = MaterialTheme.colorScheme.secondary,
-                            shape = RoundedCornerShape(16.dp),
-                        ) {
-                            Icon(
-                                imageVector = Icons.Rounded.Add,
-                                contentDescription = "Add FAB",
-                                tint = Color.White,
+                                })
+                        }
+                        composable(Screen.Todo.route) {
+                            NotesScreen(
+                                memoViewModel,
+                                todoViewModel,
+                                paddingValues,
+                                DataType.Todo
                             )
                         }
-                    }
-                }
-            ) { paddingValues ->
-                isTodoMode = currentRoute == Screen.Todo.route
-                NavHost(navController, startDestination = Screen.Home.route) {
-                    composable(Screen.Home.route) {
-                        HomeScreen(
-                            navController, memoViewModel, todoViewModel,
-                            paddingValues, onEditTodo = { todo ->
-                                val intent = Intent(this@MainActivity, AddTodoActivity::class.java)
-                                    .apply { putExtra("id", todo.id) }
-                                todoLauncher.launch(intent)
-                            }, onEditMemo = { memo ->
-                                val intent = Intent(this@MainActivity, AddMemoActivity::class.java)
-                                    .apply { putExtra("id", memo.id) }
-                                memoLauncher.launch(intent)
-                            })
-                    }
-                    composable(Screen.Todo.route) {
-                        NotesScreen(
-                            memoViewModel,
-                            todoViewModel,
-                            paddingValues,
-                            DataType.Todo
-                        )
-                    }
-                    composable(Screen.Notes.route) {
-                        NotesScreen(
-                            memoViewModel,
-                            todoViewModel,
-                            paddingValues,
-                            DataType.Memo
-                        )
-                    }
-                    composable(Screen.Settings.route) {
-                        SettingsScreen(paddingValues) {
-                            todoViewModel.clear()
-                            memoViewModel.clear()
+                        composable(Screen.Notes.route) {
+                            NotesScreen(
+                                memoViewModel,
+                                todoViewModel,
+                                paddingValues,
+                                DataType.Memo
+                            )
+                        }
+                        composable(Screen.Settings.route) {
+                            SettingsScreen(paddingValues, languageState) {
+                                todoViewModel.clear()
+                                memoViewModel.clear()
+                            }
                         }
                     }
                 }
+                requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+
+                onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+                    override fun handleOnBackPressed() {
+                        val currentTime = System.currentTimeMillis()
+                        if (currentTime - backPressedTime < 2000) { // 2초 내에 다시 눌렀다면 종료
+                            finish()
+                        } else {
+                            backPressedTime = currentTime
+                            Toast.makeText(
+                                this@MainActivity,
+                                getString(R.string.alert_back_press),
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    }
+                })
             }
         }
-        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-
-        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                val currentTime = System.currentTimeMillis()
-                if (currentTime - backPressedTime < 2000) { // 2초 내에 다시 눌렀다면 종료
-                    finish()
-                } else {
-                    backPressedTime = currentTime
-                    Toast.makeText(
-                        this@MainActivity,
-                        getString(R.string.alert_back_press),
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-            }
-        })
     }
 
     @Composable
@@ -183,7 +197,7 @@ class MainActivity : ComponentActivity() {
         memoViewModel: MemoViewModel,
         todoViewModel: TodoViewModel,
         paddingValues: PaddingValues,
-        dataType: DataType
+        dataType: DataType,
     ) {
         MindBankTheme {
             Surface(
