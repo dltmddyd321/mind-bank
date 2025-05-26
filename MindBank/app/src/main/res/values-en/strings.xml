@@ -88,4 +88,7 @@
     <string name="add_alarm">+ Add Alarm</string>
     <string name="todo_push_title">You have tasks to do.</string>
     <string name="title_activity_receive_share">Save Link</string>
+
+    <string name="language_change">Change Language</string>
+    <string name="select_language">Please select a language</string>
 </resources>

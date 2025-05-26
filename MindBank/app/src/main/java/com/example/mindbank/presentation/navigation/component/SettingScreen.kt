@@ -92,7 +92,7 @@ fun LanguageSelectorDialog(
     val options = listOf("한국어", "English", "日本語", "Tiếng Việt")
     var selectedOption by remember { mutableStateOf(currentSelection) }
 
-    AlertDialog(onDismissRequest = onDismiss, title = { Text("언어를 선택하세요") }, text = {
+    AlertDialog(onDismissRequest = onDismiss, title = { Text(stringResource(R.string.select_language)) }, text = {
         Column {
             options.forEach { language ->
                 Row(
@@ -113,11 +113,11 @@ fun LanguageSelectorDialog(
         }
     }, confirmButton = {
         TextButton(onClick = { onConfirm(selectedOption) }) {
-            Text("확인")
+            Text(stringResource(R.string.confirm))
         }
     }, dismissButton = {
         TextButton(onClick = onDismiss) {
-            Text("취소")
+            Text(stringResource(R.string.cancel))
         }
     })
 }
@@ -134,7 +134,7 @@ fun SettingsScreen(onConfirmDelete: () -> Unit) {
                 title = stringResource(R.string.delete_all_data), onConfirmDelete = onConfirmDelete
             )
             PasswordEditBtn(
-                title = "언어 변경", onClick = {
+                title = stringResource(R.string.language_change), onClick = {
                     showDialog = true
                 })
         }

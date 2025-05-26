@@ -87,4 +87,7 @@
     <string name="add_alarm">+ Thêm báo thức</string>
     <string name="todo_push_title">Bạn có công việc cần làm.</string>
     <string name="title_activity_receive_share">Lưu liên kết</string>
+
+    <string name="language_change">Thay đổi ngôn ngữ</string>
+    <string name="select_language">Vui lòng chọn ngôn ngữ</string>
 </resources>

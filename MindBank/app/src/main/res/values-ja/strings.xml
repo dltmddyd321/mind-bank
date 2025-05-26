@@ -88,4 +88,7 @@
     <string name="add_alarm">+ アラームを追加</string>
     <string name="todo_push_title">タスクがあります。</string>
     <string name="title_activity_receive_share">リンクを保存</string>
+
+    <string name="language_change">言語を変更</string>
+    <string name="select_language">言語を選択してください</string>
 </resources>
