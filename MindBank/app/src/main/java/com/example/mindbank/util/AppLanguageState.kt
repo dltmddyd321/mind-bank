@@ -1,18 +1,26 @@
 package com.example.mindbank.util
 
+import android.content.Context
+import android.content.res.Configuration
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.core.os.LocaleListCompat
 import java.util.Locale
+import androidx.core.content.edit
 
 class AppLanguageState {
-    var currentLocale: Locale by mutableStateOf(Locale.getDefault())
+    fun updateLocale(context: Context, langCode: String) {
+        AppCompatDelegate.setApplicationLocales(LocaleListCompat.create(Locale(langCode)))
+        val locale = Locale(langCode)
+        Locale.setDefault(locale)
 
-    fun updateLocale(langCode: String) {
-        val newLocale = Locale(langCode)
-        currentLocale = newLocale
-        AppCompatDelegate.setApplicationLocales(LocaleListCompat.create(newLocale))
+        val config = Configuration(context.resources.configuration)
+        config.setLocale(locale)
+
+        context.resources.updateConfiguration(config, context.resources.displayMetrics)
+
+        context.applicationContext.resources.updateConfiguration(config, context.resources.displayMetrics)
+
+        val prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
+        prefs.edit { putString("language", langCode) }
     }
 }

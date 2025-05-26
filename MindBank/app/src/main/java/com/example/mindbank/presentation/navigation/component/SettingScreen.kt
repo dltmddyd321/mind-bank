@@ -1,6 +1,7 @@
 package com.example.mindbank.presentation.navigation.component
 
-import android.content.Intent
+import android.app.Activity
+import android.content.Context
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -49,6 +50,7 @@ import androidx.compose.ui.unit.sp
 import com.example.mindbank.R
 import com.example.mindbank.presentation.navigation.theme.MindBankTheme
 import com.example.mindbank.util.AppLanguageState
+import java.util.Locale
 
 @Composable
 fun SettingsScreen(
@@ -72,7 +74,7 @@ fun SettingsScreen(
                         .padding(it),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    SettingsScreen(languageState, onConfirmDelete = {
+                    SettingsScreen(onConfirmDelete = {
                         onConfirmDelete.invoke()
                     })
                 }
@@ -121,9 +123,11 @@ fun LanguageSelectorDialog(
 }
 
 @Composable
-fun SettingsScreen(languageState: AppLanguageState, onConfirmDelete: () -> Unit) {
+fun SettingsScreen(onConfirmDelete: () -> Unit) {
+    val context = LocalContext.current
+    val prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
     var showDialog by remember { mutableStateOf(false) }
-    var selectedLanguage by remember { mutableStateOf("한국어") }
+    var selectedLanguage by remember { mutableStateOf(prefs.getString("language", Locale.getDefault().language) ?: "ko") }
     LazyColumn(contentPadding = PaddingValues(vertical = 4.dp)) {
         item {
             DeleteButton(
@@ -149,7 +153,8 @@ fun SettingsScreen(languageState: AppLanguageState, onConfirmDelete: () -> Unit)
                     "Tiếng Việt" -> "vi"
                     else -> "en"
                 }
-                languageState.updateLocale(langCode)
+                AppLanguageState().updateLocale(context, langCode)
+                (context as? Activity)?.recreate()
             })
     }
 }
