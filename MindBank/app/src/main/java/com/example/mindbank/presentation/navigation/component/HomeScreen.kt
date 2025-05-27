@@ -251,11 +251,14 @@ fun HomeScreen(
                                         } else {
                                             Box(
                                                 contentAlignment = Alignment.Center,
-                                                modifier = Modifier.fillMaxSize()
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .padding(vertical = 32.dp)
                                             ) {
                                                 Text(
                                                     text = stringResource(R.string.empty_todo),
-                                                    textAlign = TextAlign.Center
+                                                    textAlign = TextAlign.Center,
+                                                    style = MaterialTheme.typography.bodyMedium
                                                 )
                                             }
                                         }

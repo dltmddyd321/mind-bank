@@ -21,7 +21,8 @@ class CoreApplication : Application() {
         Locale.setDefault(locale)
         val config = Configuration()
         config.setLocale(locale)
-        baseContext.resources.updateConfiguration(config, baseContext.resources.displayMetrics)
+        resources.updateConfiguration(config, resources.displayMetrics)
+        applicationContext.resources.updateConfiguration(config, resources.displayMetrics)
     }
 
     private fun loadSavedLocales(): LocaleListCompat = AppCompatDelegate.getApplicationLocales()
