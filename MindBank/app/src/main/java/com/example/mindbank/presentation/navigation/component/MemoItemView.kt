@@ -45,14 +45,13 @@ fun MemoItemView(
     data: Memo,
     onClick: (Memo) -> Unit,
     onEdit: (Memo) -> Unit,
-    onDelete: (Memo) -> Unit
+    onDelete: (Memo) -> Unit,
 ) {
     Box(
         modifier = Modifier
             .padding(horizontal = 8.dp)
             .fillMaxWidth()
-            .clickable { onClick.invoke(data) }
-    ) {
+            .clickable { onClick.invoke(data) }) {
         val backgroundColor = hexToColor(data.color)
         Card(
             shape = RoundedCornerShape(10.dp),
@@ -69,8 +68,7 @@ fun MemoItemView(
                     .fillMaxWidth()
             ) {
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
@@ -85,8 +83,7 @@ fun MemoItemView(
                     IconButton(
                         onClick = {
                             onEdit.invoke(data)
-                        },
-                        modifier = Modifier.size(24.dp)
+                        }, modifier = Modifier.size(24.dp)
                     ) {
                         Icon(
                             imageVector = Icons.Filled.Edit,
@@ -97,8 +94,7 @@ fun MemoItemView(
                     }
 
                     IconButton(
-                        onClick = { showDialog = true },
-                        modifier = Modifier.size(24.dp)
+                        onClick = { showDialog = true }, modifier = Modifier.size(24.dp)
                     ) {
                         Icon(
                             imageVector = Icons.Filled.Close,
@@ -109,45 +105,37 @@ fun MemoItemView(
                         if (showDialog) {
                             AlertDialog(
                                 onDismissRequest = {
-                                    showDialog = false
-                                },
-                                title = {
-                                    Text(text = stringResource(R.string.question_delete))
-                                },
-                                confirmButton = {
-                                    TextButton(
-                                        onClick = {
-                                            onDelete(data)
-                                            showDialog = false
-                                        }
-                                    ) {
-                                        Text(stringResource(R.string.confirm))
-                                    }
-                                },
-                                dismissButton = {
-                                    TextButton(
-                                        onClick = {
-                                            showDialog = false
-                                        }
-                                    ) {
-                                        Text(stringResource(R.string.cancel))
-                                    }
-                                },
-                                properties = DialogProperties(dismissOnClickOutside = false)
+                                showDialog = false
+                            }, title = {
+                                Text(text = stringResource(R.string.question_delete))
+                            }, confirmButton = {
+                                TextButton(
+                                    onClick = {
+                                        onDelete(data)
+                                        showDialog = false
+                                    }) {
+                                    Text(stringResource(R.string.confirm))
+                                }
+                            }, dismissButton = {
+                                TextButton(
+                                    onClick = {
+                                        showDialog = false
+                                    }) {
+                                    Text(stringResource(R.string.cancel))
+                                }
+                            }, properties = DialogProperties(dismissOnClickOutside = false)
                             )
                         }
                     }
                 }
-
-                Divider(
-                    color = textColor,
-                    thickness = 1.dp,
-                    modifier = Modifier.padding(vertical = 8.dp)
-                )
-
                 val link = data.link
-
                 if (!link.isNullOrEmpty()) {
+                    Divider(
+                        color = textColor,
+                        thickness = 1.dp,
+                        modifier = Modifier.padding(vertical = 8.dp)
+                    )
+
                     var currentUrl by remember { mutableStateOf<String?>(null) }
                     val activity = LocalContext.current as? Activity ?: return@Column
 
@@ -166,19 +154,19 @@ fun MemoItemView(
                             currentUrl = it
                         }
                     }
-
+                }
+                if (data.detail.isNotEmpty()) {
                     Divider(
                         color = textColor,
                         thickness = 1.dp,
                         modifier = Modifier.padding(vertical = 8.dp)
                     )
+                    Text(
+                        text = data.detail,
+                        color = textColor,
+                        style = MaterialTheme.typography.labelMedium
+                    )
                 }
-
-                Text(
-                    text = data.detail,
-                    color = textColor,
-                    style = MaterialTheme.typography.labelMedium
-                )
             }
         }
     }
