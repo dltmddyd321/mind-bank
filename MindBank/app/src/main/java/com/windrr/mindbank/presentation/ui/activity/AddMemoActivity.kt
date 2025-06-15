@@ -1,4 +1,4 @@
-package com.windrr.mindbank.presentation.navigation.activity
+package com.windrr.mindbank.presentation.ui.activity
 
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -61,7 +61,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.windrr.mindbank.R
 import com.windrr.mindbank.db.data.Memo
-import com.windrr.mindbank.presentation.navigation.theme.MindBankTheme
+import com.windrr.mindbank.presentation.ui.theme.MindBankTheme
 import com.windrr.mindbank.util.hexToColor
 import com.windrr.mindbank.util.toHex
 import com.windrr.mindbank.viewmodel.DataStoreViewModel

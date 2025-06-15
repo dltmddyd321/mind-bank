@@ -1,4 +1,4 @@
-package com.windrr.mindbank.presentation.navigation.activity
+package com.windrr.mindbank.presentation.ui.activity
 
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -45,15 +45,15 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.windrr.mindbank.R
-import com.windrr.mindbank.presentation.navigation.component.BottomNavBar
-import com.windrr.mindbank.presentation.navigation.component.ChecklistList
-import com.windrr.mindbank.presentation.navigation.component.HomeScreen
-import com.windrr.mindbank.presentation.navigation.component.MainGrid
-import com.windrr.mindbank.presentation.navigation.component.MainTopBar
-import com.windrr.mindbank.presentation.navigation.component.Screen
-import com.windrr.mindbank.presentation.navigation.component.SearchBar
-import com.windrr.mindbank.presentation.navigation.component.SettingsScreen
-import com.windrr.mindbank.presentation.navigation.theme.MindBankTheme
+import com.windrr.mindbank.presentation.ui.component.BottomNavBar
+import com.windrr.mindbank.presentation.ui.component.ChecklistList
+import com.windrr.mindbank.presentation.ui.component.HomeScreen
+import com.windrr.mindbank.presentation.ui.component.MainGrid
+import com.windrr.mindbank.presentation.ui.component.MainTopBar
+import com.windrr.mindbank.presentation.ui.component.Screen
+import com.windrr.mindbank.presentation.ui.component.SearchBar
+import com.windrr.mindbank.presentation.ui.component.SettingsScreen
+import com.windrr.mindbank.presentation.ui.theme.MindBankTheme
 import com.windrr.mindbank.util.AppLanguageState
 import com.windrr.mindbank.util.DataType
 import com.windrr.mindbank.viewmodel.MemoViewModel

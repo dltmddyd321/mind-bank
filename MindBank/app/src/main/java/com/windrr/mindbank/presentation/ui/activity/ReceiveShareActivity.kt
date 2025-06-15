@@ -1,4 +1,4 @@
-package com.windrr.mindbank.presentation.navigation.activity
+package com.windrr.mindbank.presentation.ui.activity
 
 import android.content.Intent
 import android.os.Bundle
@@ -20,7 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import com.windrr.mindbank.db.data.Memo
-import com.windrr.mindbank.presentation.navigation.activity.ui.theme.MindBankTheme
+import com.windrr.mindbank.presentation.ui.activity.ui.theme.MindBankTheme
 import com.windrr.mindbank.util.toHex
 import com.windrr.mindbank.viewmodel.MemoViewModel
 import dagger.hilt.android.AndroidEntryPoint

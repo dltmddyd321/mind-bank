@@ -1,4 +1,4 @@
-package com.windrr.mindbank.presentation.navigation.component
+package com.windrr.mindbank.presentation.ui.component
 
 import android.app.Activity
 import android.content.Context
@@ -48,7 +48,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.windrr.mindbank.R
-import com.windrr.mindbank.presentation.navigation.theme.MindBankTheme
+import com.windrr.mindbank.presentation.ui.theme.MindBankTheme
 import com.windrr.mindbank.util.AppLanguageState
 import java.util.Locale
 

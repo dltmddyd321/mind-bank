@@ -24,7 +24,7 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
-            android:name=".presentation.navigation.activity.ReceiveShareActivity"
+            android:name=".presentation.ui.activity.ReceiveShareActivity"
             android:exported="true"
             android:label="@string/title_activity_receive_share"
             android:theme="@style/Theme.MindBank" >
@@ -35,17 +35,17 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".presentation.navigation.activity.PasswordEditActivity"
+            android:name=".presentation.ui.activity.PasswordEditActivity"
             android:exported="false"
             android:label="@string/title_activity_password_edit"
             android:theme="@style/Theme.App.Starting" />
         <activity
-            android:name=".presentation.navigation.activity.WebViewActivity"
+            android:name=".presentation.ui.activity.WebViewActivity"
             android:exported="false"
             android:label="@string/title_activity_web_view"
             android:theme="@style/Theme.App.Starting" />
         <activity
-            android:name=".presentation.navigation.activity.PasswordActivity"
+            android:name=".presentation.ui.activity.PasswordActivity"
             android:exported="true"
             android:theme="@style/Theme.App.Starting">
             <intent-filter>
@@ -55,15 +55,15 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".presentation.navigation.activity.MainActivity"
+            android:name=".presentation.ui.activity.MainActivity"
             android:exported="false"
             android:theme="@style/Theme.MindBank" />
         <activity
-            android:name=".presentation.navigation.activity.AddMemoActivity"
+            android:name=".presentation.ui.activity.AddMemoActivity"
             android:exported="false"
             android:theme="@style/Theme.MindBank" />
         <activity
-            android:name=".presentation.navigation.activity.AddTodoActivity"
+            android:name=".presentation.ui.activity.AddTodoActivity"
             android:exported="false"
             android:theme="@style/Theme.MindBank" />
 

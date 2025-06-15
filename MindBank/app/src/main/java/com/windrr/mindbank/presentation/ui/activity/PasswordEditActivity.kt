@@ -1,4 +1,4 @@
-package com.windrr.mindbank.presentation.navigation.activity
+package com.windrr.mindbank.presentation.ui.activity
 
 import android.content.Context
 import android.os.Bundle
@@ -53,7 +53,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.windrr.mindbank.presentation.navigation.activity.ui.theme.MindBankTheme
+import com.windrr.mindbank.presentation.ui.activity.ui.theme.MindBankTheme
 import com.windrr.mindbank.viewmodel.DataStoreViewModel
 import dagger.hilt.android.AndroidEntryPoint
 

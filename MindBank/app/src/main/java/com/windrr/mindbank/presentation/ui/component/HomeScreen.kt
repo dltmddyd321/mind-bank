@@ -1,4 +1,4 @@
-package com.windrr.mindbank.presentation.navigation.component
+package com.windrr.mindbank.presentation.ui.component
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
@@ -45,7 +45,7 @@ import androidx.navigation.NavController
 import com.windrr.mindbank.R
 import com.windrr.mindbank.db.data.Memo
 import com.windrr.mindbank.db.data.Task
-import com.windrr.mindbank.presentation.navigation.theme.MindBankTheme
+import com.windrr.mindbank.presentation.ui.theme.MindBankTheme
 import com.windrr.mindbank.viewmodel.MemoViewModel
 import com.windrr.mindbank.viewmodel.TodoViewModel
 import kotlinx.coroutines.launch

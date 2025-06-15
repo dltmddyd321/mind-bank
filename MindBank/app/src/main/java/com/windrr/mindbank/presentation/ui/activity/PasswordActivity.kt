@@ -1,4 +1,4 @@
-package com.windrr.mindbank.presentation.navigation.activity
+package com.windrr.mindbank.presentation.ui.activity
 
 import android.Manifest
 import android.animation.ObjectAnimator
@@ -43,7 +43,7 @@ import androidx.core.animation.doOnEnd
 import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.fragment.app.FragmentActivity
-import com.windrr.mindbank.presentation.navigation.activity.ui.theme.MindBankTheme
+import com.windrr.mindbank.presentation.ui.activity.ui.theme.MindBankTheme
 import com.windrr.mindbank.viewmodel.DataStoreViewModel
 import com.gun0912.tedpermission.PermissionListener
 import com.gun0912.tedpermission.normal.TedPermission
@@ -105,7 +105,7 @@ class PasswordActivity : ComponentActivity() {
         CoroutineScope(Dispatchers.IO).launch {
             password = dataStoreViewModel.getPassWord()
             withContext(Dispatchers.Main) {
-                requestAlarmPermission(this@PasswordActivity)
+                start { onCheckPassword?.invoke() }
             }
         }
     }

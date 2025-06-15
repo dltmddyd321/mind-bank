@@ -1,4 +1,4 @@
-package com.windrr.mindbank.presentation.navigation.component
+package com.windrr.mindbank.presentation.ui.component
 
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.runtime.Composable

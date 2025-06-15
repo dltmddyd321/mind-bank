@@ -1,4 +1,4 @@
-package com.windrr.mindbank.presentation.navigation.component
+package com.windrr.mindbank.presentation.ui.component
 
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons

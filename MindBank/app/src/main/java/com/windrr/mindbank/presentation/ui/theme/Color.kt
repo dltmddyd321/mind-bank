@@ -1,4 +1,4 @@
-package com.windrr.mindbank.presentation.navigation.theme
+package com.windrr.mindbank.presentation.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

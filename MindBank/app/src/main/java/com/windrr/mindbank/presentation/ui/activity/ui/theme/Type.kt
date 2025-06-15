@@ -1,4 +1,4 @@
-package com.windrr.mindbank.presentation.navigation.theme
+package com.windrr.mindbank.presentation.ui.activity.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

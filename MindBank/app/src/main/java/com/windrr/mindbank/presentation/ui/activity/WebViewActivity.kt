@@ -1,9 +1,9 @@
-package com.windrr.mindbank.presentation.navigation.activity
+package com.windrr.mindbank.presentation.ui.activity
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import com.windrr.mindbank.presentation.navigation.component.WebViewScreen
+import com.windrr.mindbank.presentation.ui.component.WebViewScreen
 
 class WebViewActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

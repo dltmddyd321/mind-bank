@@ -1,4 +1,4 @@
-package com.windrr.mindbank.presentation.navigation.theme
+package com.windrr.mindbank.presentation.ui.theme
 
 import android.app.Activity
 import android.os.Build
