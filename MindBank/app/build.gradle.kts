@@ -7,11 +7,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.mindbank"
+    namespace = "com.windrr.mindbank"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.mindbank"
+        applicationId = "com.windrr.mindbank"
         minSdk = 26
         targetSdk = 34
         versionCode = 1
