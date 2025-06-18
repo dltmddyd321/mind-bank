@@ -6,6 +6,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.datastore.preferences.core.longPreferencesKey
+import androidx.datastore.preferences.core.stringSetPreferencesKey
 import androidx.glance.ColorFilter
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
@@ -38,21 +39,24 @@ import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
 import androidx.glance.unit.ColorProvider
 import com.windrr.mindbank.R
+import com.windrr.mindbank.db.data.getTodoData
+import com.windrr.mindbank.db.data.toStorageString
 import com.windrr.mindbank.util.hexToColor
 
 object TodoListWidget : GlanceAppWidget() {
 
     val updateKey = longPreferencesKey("updatedTime")
+    val todoListKey = stringSetPreferencesKey("todoList")
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
-        provideContent { TodoListWidgetLayout(context) }
+        provideContent { TodoListWidgetLayout() }
     }
 
     @Composable
-    fun TodoListWidgetLayout(context: Context) {
+    fun TodoListWidgetLayout() {
         val updatedTime = currentState(key = updateKey) ?: 0L
-        val todoRepository = TodoWidgetRepository.get(context)
-        val todoList = todoRepository.getTodoList()
+        val taskSet = currentState(key = todoListKey) ?: emptySet()
+        val todoList = taskSet.mapNotNull { it.getTodoData() }
         Column(
             modifier = GlanceModifier.fillMaxSize().padding(8.dp).background(Color.White)
         ) {
@@ -122,9 +126,6 @@ object ToggleTodoAction : ActionCallback {
         glanceId: GlanceId,
         parameters: ActionParameters,
     ) {
-        updateAppWidgetState(context, glanceId) { prefs ->
-            prefs[TodoListWidget.updateKey] = System.currentTimeMillis()
-        }
         val taskId = parameters[ActionParameters.Key<Int>("task_id")] ?: return
 
         val repo = TodoWidgetRepository.get(context.applicationContext)
@@ -132,6 +133,18 @@ object ToggleTodoAction : ActionCallback {
 
         val updated = task.copy(isDone = !task.isDone)
         repo.updateTodo(updated)
+
+        // ✅ 최신 todoList 다시 로딩 후 직렬화
+        val todoList = repo.getTodoList()
+        val serialized = todoList.map { it.toStorageString() }.toSet()
+
+        // ✅ 상태 업데이트 (updatedTime + todoListKey)
+        updateAppWidgetState(context, glanceId) { prefs ->
+            prefs[TodoListWidget.updateKey] = System.currentTimeMillis()
+            prefs[TodoListWidget.todoListKey] = serialized
+        }
+
+        // ✅ 위젯 갱신
         TodoListWidget.update(context, glanceId)
     }
 }

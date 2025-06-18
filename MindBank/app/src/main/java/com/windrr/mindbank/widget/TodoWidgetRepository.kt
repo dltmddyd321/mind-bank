@@ -10,6 +10,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class TodoWidgetRepository @Inject constructor(
@@ -18,9 +19,10 @@ class TodoWidgetRepository @Inject constructor(
 ) {
     private val taskComparator = compareByDescending<Task> { it.position }
 
-    fun getTodoList(): List<Task> = runBlocking(Dispatchers.IO) {
-        todoDao.getAllSaveData().sortedWith(taskComparator)
-    }
+    suspend fun getTodoList(): List<Task> =
+        withContext(Dispatchers.IO) {
+            todoDao.getAllSaveData().sortedWith(taskComparator)
+        }
 
     fun getTodo(id: Int): Task? = runBlocking(Dispatchers.IO) {
         todoDao.searchById(id)
