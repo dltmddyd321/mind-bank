@@ -1,0 +1,6 @@
+<actions>
+    <action intentName="actions.intent.OPEN_APP_FEATURE">
+        <fulfillment urlTemplate="mindbank://open_settings" />
+        <parameter-mapping intentParameter="feature" required="true" value="settings" />
+    </action>
+</actions>
