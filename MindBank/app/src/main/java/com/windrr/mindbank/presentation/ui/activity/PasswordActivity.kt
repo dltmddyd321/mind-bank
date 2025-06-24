@@ -148,8 +148,10 @@ class PasswordActivity : ComponentActivity() {
 
     @OptIn(ExperimentalMaterial3Api::class)
     private fun start(onCheckPassword: () -> Unit) {
+        val deepLink = intent?.data
         val intent = Intent(this@PasswordActivity, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            data = deepLink
         }
         if (password.isEmpty()) startActivity(intent) else {
             onCheckPassword.invoke()
