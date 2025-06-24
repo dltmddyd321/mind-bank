@@ -88,8 +88,26 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            ChangeSystemBarsTheme(!isSystemInDarkTheme())
+            var goToSettings by remember { mutableStateOf(false) }
+
             val navController = rememberNavController()
+
+            // 딥링크 값 감지 → 플래그 설정
+            LaunchedEffect(Unit) {
+                val deepLink = intent?.data
+                goToSettings = deepLink?.scheme == "mindbank" && deepLink.host == "open_settings"
+            }
+
+            // 딥링크 조건 충족 시 Navigation 이동
+            LaunchedEffect(goToSettings) {
+                if (goToSettings) {
+                    navController.navigate(Screen.Settings.route) {
+                        popUpTo(Screen.Home.route) { inclusive = false }
+                        launchSingleTop = true
+                    }
+                }
+            }
+            ChangeSystemBarsTheme(!isSystemInDarkTheme())
             val navBackStackEntry by navController.currentBackStackEntryAsState()
             val currentRoute = navBackStackEntry?.destination?.route
             Scaffold(
