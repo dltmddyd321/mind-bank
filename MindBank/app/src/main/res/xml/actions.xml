@@ -1,6 +1,10 @@
-<actions>
-    <action intentName="actions.intent.OPEN_APP_FEATURE">
-        <fulfillment urlTemplate="mindbank://open_settings" />
-        <parameter-mapping intentParameter="feature" required="true" value="settings" />
+<actions xmlns:android="http://schemas.android.com/apk/res/android">
+    <action
+        android:name="actions.intent.OPEN_APP_FEATURE">
+        <fulfillment
+            android:deeplink="mindbank://open_settings" />
+        <parameter
+            android:name="feature"
+            android:key="settings" />
     </action>
 </actions>
