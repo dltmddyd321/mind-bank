@@ -1,8 +1,7 @@
 <actions xmlns:android="http://schemas.android.com/apk/res/android">
     <action
         android:name="actions.intent.OPEN_APP_FEATURE">
-        <fulfillment
-            android:deeplink="mindbank://open_settings" />
+        <fulfillment deeplink="mindbank://open_settings" />
         <parameter
             android:name="feature"
             android:key="settings" />
