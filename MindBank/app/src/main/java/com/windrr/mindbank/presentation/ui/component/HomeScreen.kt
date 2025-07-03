@@ -62,7 +62,7 @@ fun HomeScreen(
 ) {
     MindBankTheme {
         Scaffold(
-            modifier = Modifier.fillMaxSize().padding(paddingValues),
+            modifier = Modifier.fillMaxSize(),
             topBar = {
                 MainTopBar(stringResource(R.string.home_title))
             },

@@ -59,7 +59,7 @@
 
                 <data
                     android:scheme="mindbank"
-                    android:host="open_settings" />
+                    android:host="settings" />
             </intent-filter>
 
             <meta-data android:name="android.app.shortcuts"

@@ -55,13 +55,11 @@ import java.util.Locale
 @Composable
 fun SettingsScreen(
     paddingValues: PaddingValues,
-    languageState: AppLanguageState,
     onConfirmDelete: () -> Unit,
 ) {
     Box(
         modifier = Modifier
-            .fillMaxSize()
-            .padding(paddingValues),
+            .fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
         MindBankTheme {

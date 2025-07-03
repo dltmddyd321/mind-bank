@@ -10,11 +10,15 @@
 
         <intent
             android:action="android.intent.action.VIEW"
-            android:data="mindbank://open_settings"
+            android:data="mindbank://settings"
             android:targetClass="com.windrr.mindbank.presentation.ui.activity.PasswordActivity" />
 
-        <categories android:name="android.shortcut.conversation" />
-        <capability-binding android:key="actions.intent.CREATE_MESSAGE" />
+        <capability-binding
+            android:key="actions.intent.OPEN_APP_FEATURE">
+            <parameter-binding
+                android:key="feature"
+                android:value="@string/settings_title" />
+        </capability-binding>
     </shortcut>
 
 </shortcuts>

@@ -41,7 +41,6 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.ViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -183,7 +182,7 @@ class MainActivity : ComponentActivity() {
                         )
                     }
                     composable(Screen.Settings.route) {
-                        SettingsScreen(paddingValues, languageState) {
+                        SettingsScreen(paddingValues) {
                             todoViewModel.clear()
                             memoViewModel.clear()
                         }
