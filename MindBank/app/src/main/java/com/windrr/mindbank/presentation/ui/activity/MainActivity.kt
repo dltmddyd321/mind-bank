@@ -56,7 +56,6 @@ import com.windrr.mindbank.presentation.ui.component.Screen
 import com.windrr.mindbank.presentation.ui.component.SearchBar
 import com.windrr.mindbank.presentation.ui.component.SettingsScreen
 import com.windrr.mindbank.presentation.ui.theme.MindBankTheme
-import com.windrr.mindbank.util.AppLanguageState
 import com.windrr.mindbank.util.DataType
 import com.windrr.mindbank.viewmodel.MemoViewModel
 import com.windrr.mindbank.viewmodel.TodoViewModel
@@ -66,7 +65,6 @@ import dagger.hilt.android.AndroidEntryPoint
 @ExperimentalMaterial3Api
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    private val languageState = AppLanguageState()
     private val todoViewModel: TodoViewModel by viewModels()
     private val memoViewModel: MemoViewModel by viewModels()
     private var backPressedTime: Long = 0
@@ -88,6 +86,16 @@ class MainActivity : ComponentActivity() {
     @SuppressLint("SourceLockedOrientationActivity")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        intent?.data?.let { uri ->
+            val type = uri.getQueryParameter("type") // 예: "할일"
+            val title = uri.getQueryParameter("title") // 예: "청소하기"
+            val date = uri.getQueryParameter("date") // 예: "2025-07-10"
+
+            Toast.makeText(this, "테스트 출력: type=$type, title=$title, date=$date", Toast.LENGTH_SHORT).show()
+        }
+
+
         val color = Color.Black.toArgb()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) { // Android 15+
             window.decorView.setOnApplyWindowInsetsListener { view, insets ->

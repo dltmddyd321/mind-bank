@@ -27,7 +27,7 @@
             android:name=".presentation.ui.activity.ReceiveShareActivity"
             android:exported="true"
             android:label="@string/title_activity_receive_share"
-            android:theme="@style/Theme.MindBank" >
+            android:theme="@style/Theme.MindBank">
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -58,11 +58,22 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:scheme="mindbank"
-                    android:host="settings" />
+                    android:host="settings"
+                    android:scheme="mindbank" />
             </intent-filter>
 
-            <meta-data android:name="android.app.shortcuts"
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="create"
+                    android:scheme="mindbank" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.app.shortcuts"
                 android:resource="@xml/shortcuts" />
         </activity>
         <activity
@@ -77,6 +88,7 @@
             android:name=".presentation.ui.activity.AddTodoActivity"
             android:exported="false"
             android:theme="@style/Theme.MindBank" />
+
         <receiver
             android:name=".widget.TodoListWidgetReceiver"
             android:exported="true">

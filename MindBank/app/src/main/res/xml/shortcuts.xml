@@ -17,8 +17,37 @@
             android:key="actions.intent.OPEN_APP_FEATURE">
             <parameter-binding
                 android:key="feature"
-                android:value="@string/settings_title" />
+                android:value="settings" />
         </capability-binding>
     </shortcut>
+
+    <shortcuts
+        xmlns:app="http://schemas.android.com/apk/res-auto">
+
+        <capability
+            android:name="custom.actions.intent.CREATE_EVENT"
+            app:queryPatterns="@array/create_event_queries">
+
+            <intent android:targetClass="com.windrr.mindbank.presentation.ui.activity.PasswordActivity"
+                android:data="mindbank://create">
+                <url-template android:value="mindbank://create{?type,title,date}" />
+
+                <parameter
+                    android:name="type"
+                    android:key="type"
+                    android:mimeType="https://schema.org/Text" />
+
+                <parameter
+                    android:name="title"
+                    android:key="title"
+                    android:mimeType="https://schema.org/Text" />
+
+                <parameter
+                    android:name="date"
+                    android:key="date"
+                    android:mimeType="https://schema.org/Date" />
+            </intent>
+        </capability>
+    </shortcuts>
 
 </shortcuts>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="create_event_queries">
+        <item>create a $type called $title on $date</item>
+        <item>add a $type named $title for $date</item>
+        <item>schedule a $type titled $title on $date</item>
+    </string-array>
+</resources>
