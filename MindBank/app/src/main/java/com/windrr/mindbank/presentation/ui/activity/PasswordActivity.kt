@@ -10,6 +10,7 @@ import android.content.pm.ActivityInfo
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
+import android.util.Log
 import android.view.animation.AnticipateInterpolator
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -55,6 +56,7 @@ import kotlinx.coroutines.withContext
 import java.util.concurrent.Executor
 import androidx.core.net.toUri
 import com.windrr.mindbank.R
+import timber.log.Timber
 
 
 @AndroidEntryPoint
@@ -152,7 +154,9 @@ class PasswordActivity : ComponentActivity() {
         val intent = Intent(this@PasswordActivity, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             data = deepLink
+            intent?.extras?.let { putExtras(it) }
         }
+        Timber.tag("인텐트 확인").i(intent.data?.toString())
         if (password.isEmpty()) startActivity(intent) else {
             onCheckPassword.invoke()
         }
@@ -189,7 +193,7 @@ fun BiometricAuthScreen() {
     fun showBiometricPrompt(
         context: Context,
         onSuccess: () -> Unit,
-        onFailure: (String) -> Unit
+        onFailure: (String) -> Unit,
     ) {
         val executor: Executor = ContextCompat.getMainExecutor(context)
         val biometricPrompt = BiometricPrompt(

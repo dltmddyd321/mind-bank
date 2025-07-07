@@ -83,6 +83,16 @@ class MainActivity : ComponentActivity() {
             }
         }
 
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        handleAssistantIntent(intent)
+    }
+
+    private fun handleAssistantIntent(intent: Intent?) {
+        val feature = intent?.getStringExtra("feature") ?: intent?.data?.host
+        Toast.makeText(this, "$feature", Toast.LENGTH_SHORT).show()
+    }
+
     @SuppressLint("SourceLockedOrientationActivity")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

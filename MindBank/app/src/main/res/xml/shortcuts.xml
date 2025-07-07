@@ -12,12 +12,17 @@
             android:action="android.intent.action.VIEW"
             android:data="mindbank://settings"
             android:targetClass="com.windrr.mindbank.presentation.ui.activity.PasswordActivity" />
+    </shortcut>
 
+    <shortcut
+        android:shortcutId="voice_settings"
+        android:shortcutShortLabel="@string/settings_title"
+        android:enabled="false">
         <capability-binding
             android:key="actions.intent.OPEN_APP_FEATURE">
             <parameter-binding
                 android:key="feature"
-                android:value="settings" />
+                android:value="@array/settings_synonyms" />
         </capability-binding>
     </shortcut>
 

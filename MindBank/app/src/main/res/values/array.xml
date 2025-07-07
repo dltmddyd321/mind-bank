@@ -5,4 +5,14 @@
         <item>add a $type named $title for $date</item>
         <item>schedule a $type titled $title on $date</item>
     </string-array>
+
+    <string-array name="settings_synonyms">
+        <item>설정</item>
+        <item>세팅</item>
+        <item>setting</item>
+        <item>settings</item>
+        <item>preferences</item>
+        <item>app settings</item>
+        <item>application settings</item>
+    </string-array>
 </resources>
