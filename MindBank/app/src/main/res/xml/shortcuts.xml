@@ -1,6 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <capability android:name="actions.intent.OPEN_APP_FEATURE">
+        <intent
+            android:targetClass="com.windrr.mindbank.presentation.ui.activity.PasswordActivity">
+            <parameter
+                android:name="feature"
+                android:key="featureParam"/>
+        </intent>
+    </capability>
+
+    <shortcut
+        android:shortcutId="voice_settings"
+        android:shortcutShortLabel="@string/settings_title"
+        android:shortcutLongLabel="@string/settings_title"
+        android:enabled="false">
+        <capability-binding android:key="actions.intent.OPEN_APP_FEATURE">
+            <parameter-binding
+                android:key="feature"
+                android:value="@array/settings_synonyms" />
+        </capability-binding>
+    </shortcut>
+
     <shortcut
         android:enabled="true"
         android:icon="@drawable/baseline_settings_24"
@@ -14,27 +35,15 @@
             android:targetClass="com.windrr.mindbank.presentation.ui.activity.PasswordActivity" />
     </shortcut>
 
-    <shortcut
-        android:shortcutId="voice_settings"
-        android:shortcutShortLabel="@string/settings_title"
-        android:enabled="false">
-        <capability-binding
-            android:key="actions.intent.OPEN_APP_FEATURE">
-            <parameter-binding
-                android:key="feature"
-                android:value="@array/settings_synonyms" />
-        </capability-binding>
-    </shortcut>
-
-    <shortcuts
-        xmlns:app="http://schemas.android.com/apk/res-auto">
+    <shortcuts xmlns:app="http://schemas.android.com/apk/res-auto">
 
         <capability
             android:name="custom.actions.intent.CREATE_EVENT"
             app:queryPatterns="@array/create_event_queries">
 
-            <intent android:targetClass="com.windrr.mindbank.presentation.ui.activity.PasswordActivity"
-                android:data="mindbank://create">
+            <intent
+                android:data="mindbank://create"
+                android:targetClass="com.windrr.mindbank.presentation.ui.activity.PasswordActivity">
                 <url-template android:value="mindbank://create{?type,title,date}" />
 
                 <parameter

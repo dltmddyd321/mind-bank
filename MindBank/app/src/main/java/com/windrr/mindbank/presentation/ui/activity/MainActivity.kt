@@ -83,13 +83,8 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-    override fun onNewIntent(intent: Intent?) {
-        super.onNewIntent(intent)
-        handleAssistantIntent(intent)
-    }
-
     private fun handleAssistantIntent(intent: Intent?) {
-        val feature = intent?.getStringExtra("feature") ?: intent?.data?.host
+        val feature = intent?.getStringExtra("featureParam") ?: intent?.data?.host
         Toast.makeText(this, "$feature", Toast.LENGTH_SHORT).show()
     }
 
@@ -97,14 +92,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        intent?.data?.let { uri ->
-            val type = uri.getQueryParameter("type") // 예: "할일"
-            val title = uri.getQueryParameter("title") // 예: "청소하기"
-            val date = uri.getQueryParameter("date") // 예: "2025-07-10"
-
-            Toast.makeText(this, "테스트 출력: type=$type, title=$title, date=$date", Toast.LENGTH_SHORT).show()
-        }
-
+        handleAssistantIntent(intent)
 
         val color = Color.Black.toArgb()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) { // Android 15+
@@ -124,7 +112,7 @@ class MainActivity : ComponentActivity() {
             // 딥링크 값 감지 → 플래그 설정
             LaunchedEffect(Unit) {
                 val deepLink = intent?.data
-                goToSettings = deepLink?.scheme == "mindbank" && deepLink.host == "open_settings"
+                goToSettings = deepLink?.scheme == "mindbank" && deepLink.host == "settings"
             }
 
             // 딥링크 조건 충족 시 Navigation 이동
