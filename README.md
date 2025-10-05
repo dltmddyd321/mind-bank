@@ -1,30 +1,20 @@
 # Mind Bank
 링크 및 간단한 메모를 단순하고 빠르게 저장 가능한 서비스입니다.<br />
 <p align="left">
-  <a href="https://play.google.com/store/apps/details?id=com.windrr.jibrro">
-    <img src="./screen_shot/google_play.png" alt="Download on Google Play" width="200"/>
+  <a href="https://play.google.com/store/apps/details?id=com.windrr.mindbank">
+    <img src="./images/google_play.png" alt="Download on Google Play" width="200"/>
   </a>
 </p>
-<br />
 
-## Mind Bank
-Stack
-- Kotlin
-- Room, DataStore
-- Hilt, Refrofit, Compose
-- MVVM, MVI
+## 주요 기능
+- 사용자에게 Advice 문장 제공
+- Room DB를 기반으로 사용자가 링크 및 메모를 저장 및 조회
+- 사용자에게 메모 및 할일에 대한 검색 기능 제공
+- Navigation을 통한 전체 / 할일 / 메모 / 설정 전환 기능 제공
+- 크롬에서 앱으로 링크 붙여넣기 기능 제공
+- 앱 기본 문자열에 대한 4개 국어 변환 기능 제공
+- 메모 임시 저장 기능을 통해 작성 중 데이터 유실 방지
 
-DB로 데이터 추출
-Compose UI -> DataViewModel(Hilt) -> DataBase
-
-API를 통한 데이터 수신
-Compose UI.State -> ApiViewModel(Hilt) -> Intent -> ApiService
-
-### 메모 입력 기능 
-- 매번 메모 입력 화면에 진입 시, LaunchedEffect를 통해 DataStore에서 임시 저장 데이터가 있는지 검사
-- ColorPicker와 TextField를 통해 색상 및 내용 지정이 가능
-- 최종 저장 시, Room DB 저장 처리
-
-### Table
+## Table
 ![스크린샷 2024-10-13 오후 3 58 13](https://github.com/user-attachments/assets/fc144a5f-fdd7-4f06-8099-57456d7e27d7)
 
