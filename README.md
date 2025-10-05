@@ -1,3 +1,12 @@
+# Mind Bank
+링크 및 간단한 메모를 단순하고 빠르게 저장 가능한 서비스입니다.<br />
+<p align="left">
+  <a href="https://play.google.com/store/apps/details?id=com.windrr.jibrro">
+    <img src="./screen_shot/google_play.png" alt="Download on Google Play" width="200"/>
+  </a>
+</p>
+<br />
+
 ## Mind Bank
 Stack
 - Kotlin
