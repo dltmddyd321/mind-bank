@@ -23,13 +23,6 @@ data class TodoInWidget(
     val color: String
 )
 
-fun Task.toWidgetTodo(): TodoInWidget = TodoInWidget(
-    id = id,
-    title = title,
-    isDone = isDone,
-    color = color
-)
-
 val gson = Gson()
 
 fun String.getTodoData(): TodoInWidget? = runCatching {
