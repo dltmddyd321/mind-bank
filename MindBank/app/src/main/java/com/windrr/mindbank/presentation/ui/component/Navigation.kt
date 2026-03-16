@@ -13,9 +13,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.windrr.mindbank.R
 
 sealed class Screen(val route: String, val title: String, val icon: ImageVector) {
     data object Home : Screen("home", "Home", Icons.Default.Home)
@@ -40,11 +42,25 @@ fun BottomNavBar(navController: NavController) {
         items.forEach { screen ->
             NavigationBarItem(
                 icon = {
-                    Icon(
-                        imageVector = screen.icon,
-                        contentDescription = screen.title,
-                        modifier = Modifier.size(24.dp)
-                    )
+                    when (screen) {
+                        Screen.Todo -> Icon(
+                            painter = painterResource(id = R.drawable.todo_icon),
+                            contentDescription = screen.title,
+                            modifier = Modifier.size(24.dp)
+                        )
+
+                        Screen.Notes -> Icon(
+                            painter = painterResource(id = R.drawable.memo_icon),
+                            contentDescription = screen.title,
+                            modifier = Modifier.size(24.dp)
+                        )
+
+                        else -> Icon(
+                            imageVector = screen.icon,
+                            contentDescription = screen.title,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
                 },
                 label = null,
                 selected = currentRoute == screen.route,
