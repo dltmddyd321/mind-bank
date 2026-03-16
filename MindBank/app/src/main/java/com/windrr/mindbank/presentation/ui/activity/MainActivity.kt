@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
@@ -36,9 +37,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
@@ -55,7 +58,11 @@ import com.windrr.mindbank.presentation.ui.component.MainTopBar
 import com.windrr.mindbank.presentation.ui.component.Screen
 import com.windrr.mindbank.presentation.ui.component.SearchBar
 import com.windrr.mindbank.presentation.ui.component.SettingsScreen
-import com.windrr.mindbank.presentation.ui.theme.MindBankTheme
+import com.windrr.mindbank.presentation.ui.theme.SpaceTheme
+import com.windrr.mindbank.presentation.ui.theme.SpaceCoral
+import com.windrr.mindbank.presentation.ui.theme.SpaceLavender
+import com.windrr.mindbank.presentation.ui.theme.SpacePurple
+import com.windrr.mindbank.presentation.ui.theme.SpaceStar
 import com.windrr.mindbank.util.DataType
 import com.windrr.mindbank.viewmodel.MemoViewModel
 import com.windrr.mindbank.viewmodel.TodoViewModel
@@ -83,16 +90,9 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-    private fun handleAssistantIntent(intent: Intent?) {
-        val feature = intent?.getStringExtra("featureParam") ?: intent?.data?.host
-        Toast.makeText(this, "$feature", Toast.LENGTH_SHORT).show()
-    }
-
     @SuppressLint("SourceLockedOrientationActivity")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        handleAssistantIntent(intent)
 
         val color = Color.Black.toArgb()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) { // Android 15+
@@ -124,7 +124,8 @@ class MainActivity : ComponentActivity() {
                     }
                 }
             }
-            ChangeSystemBarsTheme(!isSystemInDarkTheme())
+            
+            SpaceTheme {
             val navBackStackEntry by navController.currentBackStackEntryAsState()
             val currentRoute = navBackStackEntry?.destination?.route
             Scaffold(
@@ -142,13 +143,20 @@ class MainActivity : ComponentActivity() {
                                     memoLauncher.launch(intent)
                                 }
                             },
-                            containerColor = MaterialTheme.colorScheme.secondary,
-                            shape = RoundedCornerShape(16.dp),
+                            containerColor = SpacePurple,
+                            shape = RoundedCornerShape(20.dp),
+                            modifier = Modifier.shadow(
+                                elevation = 8.dp,
+                                shape = RoundedCornerShape(20.dp),
+                                ambientColor = SpaceLavender.copy(alpha = 0.4f),
+                                spotColor = SpaceLavender.copy(alpha = 0.4f)
+                            )
                         ) {
                             Icon(
-                                imageVector = Icons.Rounded.Add,
+                                painter = painterResource(id = R.drawable.ic_space_star),
                                 contentDescription = "Add FAB",
-                                tint = Color.White,
+                                tint = SpaceStar,
+                                modifier = Modifier.size(24.dp)
                             )
                         }
                     }
@@ -195,6 +203,7 @@ class MainActivity : ComponentActivity() {
                     }
                 }
             }
+            }
             requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 
             onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
@@ -222,7 +231,7 @@ class MainActivity : ComponentActivity() {
         paddingValues: PaddingValues,
         dataType: DataType,
     ) {
-        MindBankTheme {
+        SpaceTheme {
             Surface(
                 modifier = Modifier.fillMaxSize(),
                 color = MaterialTheme.colorScheme.background
@@ -276,28 +285,4 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    @Composable
-    private fun ChangeSystemBarsTheme(lightTheme: Boolean) {
-        LaunchedEffect(lightTheme) {
-            if (lightTheme) {
-                enableEdgeToEdge(
-                    statusBarStyle = SystemBarStyle.light(
-                        Color.White.toArgb(), Color.White.toArgb()
-                    ),
-                    navigationBarStyle = SystemBarStyle.light(
-                        Color.White.toArgb(), Color.White.toArgb()
-                    ),
-                )
-            } else {
-                enableEdgeToEdge(
-                    statusBarStyle = SystemBarStyle.dark(
-                        Color.Black.toArgb()
-                    ),
-                    navigationBarStyle = SystemBarStyle.dark(
-                        Color.Black.toArgb()
-                    ),
-                )
-            }
-        }
     }
-}
