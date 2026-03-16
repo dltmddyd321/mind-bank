@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
@@ -36,16 +37,15 @@ fun MainTopBar(title: String = stringResource(R.string.memo_title)) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp),
+            .statusBarsPadding()
+            .padding(horizontal = 16.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
             text = title,
             fontWeight = FontWeight.Bold,
             style = MaterialTheme.typography.headlineMedium,
-            modifier = Modifier
-                .weight(1f)
-                .padding(6.dp)
+            modifier = Modifier.weight(1f)
         )
     }
 }
@@ -74,7 +74,7 @@ fun MainGrid(memoViewModel: MemoViewModel, searchText: String, onEdit: (Memo) ->
     if (filteredList.isNotEmpty()) {
         LazyVerticalStaggeredGrid (
             columns = StaggeredGridCells.Fixed(2),
-            contentPadding = PaddingValues(8.dp),
+            contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp),
             modifier = Modifier.fillMaxSize()
         ) {
             items(filteredList) { item ->

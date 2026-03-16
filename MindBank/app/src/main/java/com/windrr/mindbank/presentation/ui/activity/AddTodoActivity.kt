@@ -13,9 +13,9 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -27,19 +27,22 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -52,24 +55,26 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import com.windrr.mindbank.R
-import com.windrr.mindbank.db.data.Task
-import com.windrr.mindbank.presentation.ui.theme.MindBankTheme
-import com.windrr.mindbank.util.hexToColor
-import com.windrr.mindbank.util.toHex
-import com.windrr.mindbank.viewmodel.TodoViewModel
 import com.github.skydoves.colorpicker.compose.ColorEnvelope
 import com.github.skydoves.colorpicker.compose.HsvColorPicker
 import com.github.skydoves.colorpicker.compose.rememberColorPickerController
+import com.windrr.mindbank.R
+import com.windrr.mindbank.db.data.Task
+import com.windrr.mindbank.presentation.ui.theme.SpaceBorder
+import com.windrr.mindbank.presentation.ui.theme.SpaceCloud
+import com.windrr.mindbank.presentation.ui.theme.SpacePurple
+import com.windrr.mindbank.presentation.ui.theme.SpaceStar
+import com.windrr.mindbank.presentation.ui.theme.SpaceSurface
+import com.windrr.mindbank.presentation.ui.theme.SpaceTheme
+import com.windrr.mindbank.util.hexToColor
+import com.windrr.mindbank.util.toHex
+import com.windrr.mindbank.viewmodel.TodoViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.FlowPreview
 import java.text.SimpleDateFormat
@@ -116,7 +121,7 @@ class AddTodoActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            MindBankTheme {
+            SpaceTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
                 ) {
@@ -202,18 +207,25 @@ class AddTodoActivity : ComponentActivity() {
 
             TopAppBar(
                 title = {
-                    Text(text = stringResource(R.string.todo_title), color = MaterialTheme.colorScheme.onPrimary)
+                    Text(text = stringResource(R.string.todo_title), color = SpaceCloud)
                 }, navigationIcon = {
                     IconButton(onClick = { showBackDialog = true }) {
-                        Icon(imageVector = Icons.Default.Close, contentDescription = "Close")
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = "Close",
+                            tint = SpaceStar
+                        )
                     }
                 }, actions = {
-                    Row {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
                         Canvas(
                             modifier = Modifier
-                                .size(40.dp)
-                                .padding(8.dp)
-                                .offset(y = 4.dp)
+                                .size(36.dp)
+                                .padding(6.dp)
+                                .offset(y = 2.dp)
                                 .clickable {
                                     showColorPicker = true
                                 }) {
@@ -221,7 +233,8 @@ class AddTodoActivity : ComponentActivity() {
                                 color = circleColor, radius = size.minDimension / 2
                             )
                         }
-                        Button(onClick = {
+                        Button(
+                            onClick = {
                             if (title.isBlank()) {
                                 Toast.makeText(
                                     context,
@@ -257,24 +270,30 @@ class AddTodoActivity : ComponentActivity() {
                             }
                             setResult(RESULT_OK)
                             finish()
-                        }) {
+                            },
+                            modifier = Modifier.height(36.dp),
+                            contentPadding = androidx.compose.foundation.layout.PaddingValues(
+                                horizontal = 14.dp,
+                                vertical = 6.dp
+                            )
+                        ) {
                             Text(stringResource(R.string.action_save))
                         }
                     }
                 }, colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimary,
-                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
-                    actionIconContentColor = MaterialTheme.colorScheme.onSecondary
+                    containerColor = SpaceSurface,
+                    titleContentColor = SpaceCloud,
+                    navigationIconContentColor = SpaceStar,
+                    actionIconContentColor = SpaceStar
                 )
             )
         }) {
-            Column(modifier = Modifier.padding(it)) {
-//                Spacer(modifier = Modifier.height(8.dp))
-//                var initTime by remember { mutableLongStateOf(alarmTime) }
-//                AlarmSelector(initTime) { selectedTimeMillis ->
-//                    initTime = selectedTimeMillis
-//                }
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(it)
+                    .padding(horizontal = 16.dp, vertical = 12.dp)
+            ) {
                 Spacer(modifier = Modifier.height(8.dp))
                 InputField(title, onTextChange = { value ->
                     onTextChange.invoke(value)
@@ -288,30 +307,43 @@ class AddTodoActivity : ComponentActivity() {
     fun InputField(
         text: String, onTextChange: (String) -> Unit
     ) {
-        val textFieldModifier = Modifier
-            .padding(16.dp)
-            .fillMaxWidth()
-            .fillMaxHeight()
-            .border(1.dp, Color.Gray, RoundedCornerShape(4.dp))
-
-        val textColor = MaterialTheme.colorScheme.onBackground
-        val placeholderColor = if (!isSystemInDarkTheme()) Color.Gray else Color.LightGray
-
-        val textStyle = TextStyle(
-            fontSize = 20.sp, fontFamily = FontFamily.Monospace, color = textColor
-        )
-
-        BasicTextField(
-            value = text,
-            onValueChange = onTextChange,
-            modifier = textFieldModifier,
-            cursorBrush = SolidColor(Color.White),
-            decorationBox = { innerTextField ->
-                if (text.isEmpty()) Text(getString(R.string.input_todo), color = placeholderColor)
-                innerTextField()
-            },
-            textStyle = textStyle
-        )
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight(),
+            shape = RoundedCornerShape(20.dp),
+            colors = CardDefaults.cardColors(containerColor = SpaceSurface),
+            border = androidx.compose.foundation.BorderStroke(1.dp, SpaceBorder.copy(alpha = 0.35f))
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                OutlinedTextField(
+                    value = text,
+                    onValueChange = onTextChange,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
+                    placeholder = {
+                        val placeholderColor = if (!isSystemInDarkTheme()) Color.Gray else Color.LightGray
+                        Text(text = getString(R.string.input_todo), color = placeholderColor)
+                    },
+                    textStyle = MaterialTheme.typography.titleMedium,
+                    colors = TextFieldDefaults.colors(
+                        focusedContainerColor = Color.Transparent,
+                        unfocusedContainerColor = Color.Transparent,
+                        focusedIndicatorColor = SpacePurple,
+                        unfocusedIndicatorColor = SpaceBorder.copy(alpha = 0.5f),
+                        cursorColor = SpaceStar
+                    ),
+                    shape = RoundedCornerShape(16.dp),
+                    singleLine = false
+                )
+            }
+        }
     }
 
     @Composable

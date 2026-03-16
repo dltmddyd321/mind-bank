@@ -10,20 +10,15 @@ import android.view.WindowInsets
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
-import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -58,11 +53,10 @@ import com.windrr.mindbank.presentation.ui.component.MainTopBar
 import com.windrr.mindbank.presentation.ui.component.Screen
 import com.windrr.mindbank.presentation.ui.component.SearchBar
 import com.windrr.mindbank.presentation.ui.component.SettingsScreen
-import com.windrr.mindbank.presentation.ui.theme.SpaceTheme
-import com.windrr.mindbank.presentation.ui.theme.SpaceCoral
 import com.windrr.mindbank.presentation.ui.theme.SpaceLavender
 import com.windrr.mindbank.presentation.ui.theme.SpacePurple
 import com.windrr.mindbank.presentation.ui.theme.SpaceStar
+import com.windrr.mindbank.presentation.ui.theme.SpaceTheme
 import com.windrr.mindbank.util.DataType
 import com.windrr.mindbank.viewmodel.MemoViewModel
 import com.windrr.mindbank.viewmodel.TodoViewModel
@@ -90,12 +84,16 @@ class MainActivity : ComponentActivity() {
             }
         }
 
+    private fun handleAssistantIntent(intent: Intent?) {
+        intent?.getStringExtra("featureParam") ?: intent?.data?.host
+    }
+
     @SuppressLint("SourceLockedOrientationActivity")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         val color = Color.Black.toArgb()
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) { // Android 15+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) { 
             window.decorView.setOnApplyWindowInsetsListener { view, insets ->
                 insets.getInsets(WindowInsets.Type.statusBars())
                 view.setBackgroundColor(color)
@@ -261,11 +259,11 @@ class MainActivity : ComponentActivity() {
                     )
                 }
             },
-            modifier = Modifier.padding(paddingValues)
         ) { innerPadding ->
             Column(
                 modifier = Modifier
                     .fillMaxSize()
+                    .padding(paddingValues)
                     .padding(innerPadding)
             ) {
                 if (viewModel is MemoViewModel) {

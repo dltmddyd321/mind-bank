@@ -4,17 +4,19 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.pm.ActivityInfo
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -23,20 +25,23 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -50,7 +55,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -59,16 +63,21 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import com.github.skydoves.colorpicker.compose.ColorEnvelope
+import com.github.skydoves.colorpicker.compose.HsvColorPicker
+import com.github.skydoves.colorpicker.compose.rememberColorPickerController
 import com.windrr.mindbank.R
 import com.windrr.mindbank.db.data.Memo
-import com.windrr.mindbank.presentation.ui.theme.MindBankTheme
+import com.windrr.mindbank.presentation.ui.theme.SpaceBorder
+import com.windrr.mindbank.presentation.ui.theme.SpaceCloud
+import com.windrr.mindbank.presentation.ui.theme.SpacePurple
+import com.windrr.mindbank.presentation.ui.theme.SpaceStar
+import com.windrr.mindbank.presentation.ui.theme.SpaceSurface
+import com.windrr.mindbank.presentation.ui.theme.SpaceTheme
 import com.windrr.mindbank.util.hexToColor
 import com.windrr.mindbank.util.toHex
 import com.windrr.mindbank.viewmodel.DataStoreViewModel
 import com.windrr.mindbank.viewmodel.MemoViewModel
-import com.github.skydoves.colorpicker.compose.ColorEnvelope
-import com.github.skydoves.colorpicker.compose.HsvColorPicker
-import com.github.skydoves.colorpicker.compose.rememberColorPickerController
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.debounce
@@ -91,7 +100,7 @@ class AddMemoActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            MindBankTheme {
+            SpaceTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
                 ) {
@@ -124,10 +133,14 @@ class AddMemoActivity : ComponentActivity() {
                     BackHandlerWithQuestionDialog(false)
                     InputScreen(
                         title,
+                        link,
                         memo,
                         circleColor,
                         onTitleChange = {
                             title = it
+                        },
+                        onLinkChange = {
+                            link = it
                         },
                         onTextChange = {
                             memo = it
@@ -226,12 +239,15 @@ class AddMemoActivity : ComponentActivity() {
     @Composable
     fun InputScreen(
         title: String,
+        link: String,
         memo: String,
         circleColor: Color,
         onTitleChange: (String) -> Unit,
+        onLinkChange: (String) -> Unit,
         onTextChange: (String) -> Unit,
         onColorChange: (Color) -> Unit
     ) {
+        val context = LocalContext.current
 
         Scaffold(topBar = {
             val colorController = rememberColorPickerController()
@@ -281,19 +297,26 @@ class AddMemoActivity : ComponentActivity() {
                 title = {
                     Text(
                         text = stringResource(R.string.memo_title),
-                        color = MaterialTheme.colorScheme.onPrimary
+                        color = SpaceCloud
                     )
                 }, navigationIcon = {
                     IconButton(onClick = { showBackDialog = true }) {
-                        Icon(imageVector = Icons.Default.Close, contentDescription = "Close")
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = "Close",
+                            tint = SpaceStar
+                        )
                     }
                 }, actions = {
-                    Row {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
                         Canvas(
                             modifier = Modifier
-                                .size(40.dp)
-                                .padding(8.dp)
-                                .offset(y = 4.dp)
+                                .size(36.dp)
+                                .padding(6.dp)
+                                .offset(y = 2.dp)
                                 .clickable {
                                     showColorPicker = true
                                 }
@@ -303,10 +326,20 @@ class AddMemoActivity : ComponentActivity() {
                                 radius = size.minDimension / 2
                             )
                         }
-                        Button(onClick = {
+                        Button(
+                            onClick = {
+                            if (title.isBlank() && memo.isBlank()) {
+                                Toast.makeText(
+                                    context,
+                                    context.getString(R.string.input_contents),
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                                return@Button
+                            }
                             if (editId != -1) {
                                 editMemo?.let {
                                     it.title = title
+                                    it.link = link
                                     it.detail = memo
                                     it.dtUpdated = System.currentTimeMillis()
                                     it.color = circleColor.toHex()
@@ -319,82 +352,141 @@ class AddMemoActivity : ComponentActivity() {
                                         detail = memo,
                                         dtCreated = System.currentTimeMillis(),
                                         dtUpdated = System.currentTimeMillis(),
-                                        color = circleColor.toHex()
+                                        color = circleColor.toHex(),
+                                        link = link.ifBlank { null }
                                     )
                                 )
                             }
                             setResult(RESULT_OK)
                             finish()
-                        }) {
+                            },
+                            modifier = Modifier.height(36.dp),
+                            contentPadding = androidx.compose.foundation.layout.PaddingValues(
+                                horizontal = 14.dp,
+                                vertical = 6.dp
+                            )
+                        ) {
                             Text(stringResource(R.string.action_save))
                         }
                     }
                 }, colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimary,
-                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
-                    actionIconContentColor = MaterialTheme.colorScheme.onSecondary
+                    containerColor = SpaceSurface,
+                    titleContentColor = SpaceCloud,
+                    navigationIconContentColor = SpaceStar,
+                    actionIconContentColor = SpaceStar
                 )
             )
         }) {
-            Column(modifier = Modifier.padding(it)) {
-                var url by remember { mutableStateOf("") }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                TitleInputField(title, onTitleChange = { value ->
-                    onTitleChange.invoke(value)
-                })
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                BasicTextField(
-                    value = url,
-                    cursorBrush = SolidColor(Color.White),
-                    onValueChange = { value ->
-                        url = value
-                    },
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(it)
+                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
-                        .border(1.dp, Color.Gray, RoundedCornerShape(6.dp))
-                        .padding(horizontal = 12.dp, vertical = 8.dp)
-                        .onFocusChanged { value ->
-                            if (!value.isFocused) dataStoreViewModel.setUnSavedLink(url)
-                        },
-                    textStyle = TextStyle(
-                        fontSize = 16.sp,
-                        color = MaterialTheme.colorScheme.onBackground
-                    ),
-                    decorationBox = { innerTextField ->
-                        if (url.isEmpty()) {
-                            Text(
-                                getString(R.string.input_url),
-                                color = Color.Gray,
-                                fontSize = 16.sp
-                            )
-                        }
-                        innerTextField()
+                        .wrapContentHeight(),
+                    shape = RoundedCornerShape(20.dp),
+                    colors = CardDefaults.cardColors(containerColor = SpaceSurface),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, SpaceBorder.copy(alpha = 0.35f))
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
+                        OutlinedTextField(
+                            value = title,
+                            onValueChange = {
+                                onTitleChange(it)
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .onFocusChanged {
+                                    if (!it.isFocused) dataStoreViewModel.setUnSavedTitle(title)
+                                },
+                            placeholder = {
+                                Text(
+                                    text = stringResource(R.string.hint_title),
+                                    color = Color.Gray
+                                )
+                            },
+                            textStyle = TextStyle(
+                                fontSize = 22.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onBackground
+                            ),
+                            colors = TextFieldDefaults.colors(
+                                focusedContainerColor = Color.Transparent,
+                                unfocusedContainerColor = Color.Transparent,
+                                focusedIndicatorColor = SpacePurple,
+                                unfocusedIndicatorColor = SpaceBorder.copy(alpha = 0.5f),
+                                cursorColor = SpaceStar
+                            ),
+                            shape = RoundedCornerShape(16.dp),
+                            singleLine = true
+                        )
+
+                        OutlinedTextField(
+                            value = link,
+                            onValueChange = {
+                                onLinkChange(it)
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .onFocusChanged { focus ->
+                                    if (!focus.isFocused) dataStoreViewModel.setUnSavedLink(link)
+                                },
+                            placeholder = {
+                                Text(
+                                    text = getString(R.string.input_url),
+                                    color = Color.Gray
+                                )
+                            },
+                            textStyle = TextStyle(
+                                fontSize = 16.sp,
+                                color = MaterialTheme.colorScheme.onBackground
+                            ),
+                            colors = TextFieldDefaults.colors(
+                                focusedContainerColor = Color.Transparent,
+                                unfocusedContainerColor = Color.Transparent,
+                                focusedIndicatorColor = SpacePurple,
+                                unfocusedIndicatorColor = SpaceBorder.copy(alpha = 0.5f),
+                                cursorColor = SpaceStar
+                            ),
+                            shape = RoundedCornerShape(16.dp),
+                            singleLine = true
+                        )
                     }
-                )
+                }
 
-                Spacer(modifier = Modifier.height(8.dp))
-
-                InputField(memo, onTextChange = { value ->
-                    onTextChange.invoke(value)
-                })
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Divider(
+                Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
-                    color = Color.Gray.copy(alpha = 0.3f),
-                    thickness = 1.dp
-                )
+                        .fillMaxHeight(),
+                    shape = RoundedCornerShape(20.dp),
+                    colors = CardDefaults.cardColors(containerColor = SpaceSurface),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, SpaceBorder.copy(alpha = 0.35f))
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(16.dp)
+                    ) {
+                        InputField(memo, onTextChange = { value ->
+                            onTextChange.invoke(value)
+                        })
 
-                Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Divider(
+                            modifier = Modifier.fillMaxWidth(),
+                            color = Color.Gray.copy(alpha = 0.25f),
+                            thickness = 1.dp
+                        )
 
                 if (isEditMode) {
                     val formattedDate = remember(lastUpdatedTime) {
@@ -421,37 +513,23 @@ class AddMemoActivity : ComponentActivity() {
                         textAlign = TextAlign.End
                     )
                 }
+                    }
+                }
             }
         }
     }
 
     @Composable
     fun TitleInputField(title: String, onTitleChange: (String) -> Unit) {
-        BasicTextField(
+        OutlinedTextField(
             value = title,
-            cursorBrush = SolidColor(Color.White),
             onValueChange = onTitleChange,
-            textStyle = TextStyle(
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onBackground
-            ),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 8.dp)
-                .onFocusChanged {
-                    if (!it.isFocused) dataStoreViewModel.setUnSavedTitle(title)
-                },
-            decorationBox = { innerTextField ->
-                if (title.isEmpty()) {
-                    Text(
-                        stringResource(R.string.hint_title),
-                        color = Color.Gray,
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-                innerTextField()
+            modifier = Modifier.fillMaxWidth(),
+            placeholder = {
+                Text(
+                    text = stringResource(R.string.hint_title),
+                    color = Color.Gray
+                )
             }
         )
     }
@@ -463,9 +541,8 @@ class AddMemoActivity : ComponentActivity() {
         onTextChange: (String) -> Unit
     ) {
         val textFieldModifier = Modifier
-            .padding(16.dp)
             .fillMaxWidth()
-            .wrapContentHeight()
+            .fillMaxHeight()
             .onFocusChanged {
                 if (!it.isFocused) dataStoreViewModel.setUnSavedMemo(text)
             }
@@ -478,25 +555,28 @@ class AddMemoActivity : ComponentActivity() {
                 }
         }
 
-        val textColor = MaterialTheme.colorScheme.onBackground
         val placeholderColor = if (!isSystemInDarkTheme()) Color.Gray else Color.LightGray
 
-        BasicTextField(
+        OutlinedTextField(
             value = text,
             onValueChange = onTextChange,
-            cursorBrush = SolidColor(Color.White),
             modifier = textFieldModifier,
+            placeholder = {
+                Text(text = getString(R.string.input_memo), color = placeholderColor)
+            },
             textStyle = TextStyle(
                 fontSize = 18.sp,
                 lineHeight = 24.sp,
-                color = textColor
+                color = MaterialTheme.colorScheme.onBackground
             ),
-            decorationBox = { innerTextField ->
-                if (text.isEmpty()) {
-                    Text(getString(R.string.input_memo), color = placeholderColor, fontSize = 18.sp)
-                }
-                innerTextField()
-            }
+            colors = TextFieldDefaults.colors(
+                focusedContainerColor = Color.Transparent,
+                unfocusedContainerColor = Color.Transparent,
+                focusedIndicatorColor = SpacePurple,
+                unfocusedIndicatorColor = SpaceBorder.copy(alpha = 0.5f),
+                cursorColor = SpaceStar
+            ),
+            shape = RoundedCornerShape(16.dp)
         )
     }
 }
