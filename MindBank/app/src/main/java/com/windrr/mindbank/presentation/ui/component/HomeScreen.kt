@@ -5,7 +5,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -26,10 +25,8 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -50,15 +47,67 @@ import com.windrr.mindbank.viewmodel.MemoViewModel
 import com.windrr.mindbank.viewmodel.TodoViewModel
 import kotlinx.coroutines.launch
 
+/**
+ * Wrapper composable that bridges ViewModel dependencies to the stable HomeScreen.
+ * This maintains backward compatibility with existing callers.
+ */
 @ExperimentalMaterial3Api
 @Composable
 fun HomeScreen(
     navController: NavController,
     memoViewModel: MemoViewModel,
     todoViewModel: TodoViewModel,
-    paddingValues: PaddingValues,
     onEditMemo: (Memo) -> Unit,
     onEditTodo: (Task) -> Unit
+) {
+    val memoList by memoViewModel.memos.collectAsState()
+    val todoList by todoViewModel.todos.collectAsState()
+
+    HomeScreenContent(
+        memoList = memoList,
+        todoList = todoList,
+        onNavigateToNotes = {
+            navController.navigate(Screen.Notes.route) {
+                popUpTo(navController.graph.startDestinationId) {
+                    saveState = true
+                }
+                launchSingleTop = true
+                restoreState = true
+            }
+        },
+        onNavigateToTodo = {
+            navController.navigate(Screen.Todo.route) {
+                popUpTo(navController.graph.startDestinationId) {
+                    saveState = true
+                }
+                launchSingleTop = true
+                restoreState = true
+            }
+        },
+        onEditMemo = onEditMemo,
+        onDeleteMemo = { memoViewModel.deleteData(it) },
+        onEditTodo = onEditTodo,
+        onUpdateTodo = { todoViewModel.updateTodo(it) },
+        onDeleteTodo = { todoViewModel.deleteTodo(it) }
+    )
+}
+
+/**
+ * Stable HomeScreen composable with all stable parameters.
+ * All parameters are @Stable: List<Memo>, List<Task>, and lambda functions.
+ */
+@ExperimentalMaterial3Api
+@Composable
+fun HomeScreenContent(
+    memoList: List<Memo>,
+    todoList: List<Task>,
+    onNavigateToNotes: () -> Unit,
+    onNavigateToTodo: () -> Unit,
+    onEditMemo: (Memo) -> Unit,
+    onDeleteMemo: (Memo) -> Unit,
+    onEditTodo: (Task) -> Unit,
+    onUpdateTodo: (Task) -> Unit,
+    onDeleteTodo: (Int) -> Unit
 ) {
     MindBankTheme {
         Scaffold(
@@ -66,11 +115,11 @@ fun HomeScreen(
             topBar = {
                 MainTopBar(stringResource(R.string.home_title))
             },
-            content = {
+            content = { paddingValues ->
                 Surface(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(it),
+                        .padding(paddingValues),
                     color = MaterialTheme.colorScheme.background
                 ) {
                     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -91,8 +140,6 @@ fun HomeScreen(
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
                         item {
-                            val memoList by memoViewModel.memos.collectAsState()
-
                             Card(
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -111,15 +158,7 @@ fun HomeScreen(
                                             modifier = Modifier
                                                 .fillMaxWidth()
                                                 .padding(horizontal = 4.dp, vertical = 8.dp)
-                                                .clickable {
-                                                    navController.navigate(Screen.Notes.route) {
-                                                        popUpTo(navController.graph.startDestinationId) {
-                                                            saveState = true
-                                                        }
-                                                        launchSingleTop = true
-                                                        restoreState = true
-                                                    }
-                                                },
+                                                .clickable { onNavigateToNotes() },
                                             verticalAlignment = Alignment.CenterVertically,
                                             horizontalArrangement = Arrangement.SpaceBetween
                                         ) {
@@ -153,8 +192,8 @@ fun HomeScreen(
                                                             selectedMemo = memo
                                                             coroutineScope.launch { sheetState.show() }
                                                         },
-                                                        onEdit = { onEditMemo.invoke(memo) },
-                                                        onDelete = { memoViewModel.deleteData(memo) }
+                                                        onEdit = { onEditMemo(memo) },
+                                                        onDelete = { onDeleteMemo(memo) }
                                                     )
                                                 }
                                             }
@@ -178,14 +217,6 @@ fun HomeScreen(
                         }
 
                         item {
-                            val todoList by todoViewModel.todos.collectAsState()
-
-                            val list = remember { mutableStateListOf<Task>() }
-                            LaunchedEffect(todoList) {
-                                list.clear()
-                                list.addAll(todoList)
-                            }
-
                             Card(
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -204,15 +235,7 @@ fun HomeScreen(
                                             modifier = Modifier
                                                 .fillMaxWidth()
                                                 .padding(horizontal = 4.dp, vertical = 8.dp)
-                                                .clickable {
-                                                    navController.navigate(Screen.Todo.route) {
-                                                        popUpTo(navController.graph.startDestinationId) {
-                                                            saveState = true
-                                                        }
-                                                        launchSingleTop = true
-                                                        restoreState = true
-                                                    }
-                                                },
+                                                .clickable { onNavigateToTodo() },
                                             verticalAlignment = Alignment.CenterVertically,
                                             horizontalArrangement = Arrangement.SpaceBetween
                                         ) {
@@ -224,7 +247,7 @@ fun HomeScreen(
 
                                             Icon(
                                                 painter = painterResource(id = R.drawable.baseline_chevron_right_24),
-                                                contentDescription = "Go to Memo Section",
+                                                contentDescription = "Go to Todo Section",
                                                 tint = MaterialTheme.colorScheme.onBackground
                                             )
                                         }
@@ -242,9 +265,9 @@ fun HomeScreen(
                                                 todoList.forEach { task ->
                                                     ChecklistItem(
                                                         item = task,
-                                                        onChecked = { checkedTodo -> todoViewModel.updateTodo(checkedTodo) },
-                                                        onEdit = { onEditTodo.invoke(task) },
-                                                        onDelete = { todoViewModel.deleteTodo(task.id) }
+                                                        onChecked = { onUpdateTodo(it) },
+                                                        onEdit = { onEditTodo(task) },
+                                                        onDelete = { onDeleteTodo(task.id) }
                                                     )
                                                 }
                                             }

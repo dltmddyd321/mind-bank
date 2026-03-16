@@ -1,9 +1,11 @@
 package com.windrr.mindbank.db.data
 
+import androidx.compose.runtime.Immutable
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.google.gson.Gson
 
+@Immutable
 @Entity(tableName = "todo_task")
 data class Task(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,

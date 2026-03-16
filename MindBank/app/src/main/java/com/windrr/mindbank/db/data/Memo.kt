@@ -1,8 +1,10 @@
 package com.windrr.mindbank.db.data
 
+import androidx.compose.runtime.Immutable
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
+@Immutable
 @Entity(tableName = "save_model")
 data class Memo(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,

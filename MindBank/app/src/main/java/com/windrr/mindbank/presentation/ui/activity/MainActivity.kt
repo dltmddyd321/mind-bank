@@ -159,16 +159,16 @@ class MainActivity : ComponentActivity() {
                     composable(Screen.Home.route) {
                         HomeScreen(
                             navController, memoViewModel, todoViewModel,
-                            paddingValues, onEditTodo = { todo ->
-                                val intent =
-                                    Intent(this@MainActivity, AddTodoActivity::class.java)
-                                        .apply { putExtra("id", todo.id) }
-                                todoLauncher.launch(intent)
-                            }, onEditMemo = { memo ->
+                            onEditMemo = { memo ->
                                 val intent =
                                     Intent(this@MainActivity, AddMemoActivity::class.java)
                                         .apply { putExtra("id", memo.id) }
                                 memoLauncher.launch(intent)
+                            }, onEditTodo = { todo ->
+                                val intent =
+                                    Intent(this@MainActivity, AddTodoActivity::class.java)
+                                        .apply { putExtra("id", todo.id) }
+                                todoLauncher.launch(intent)
                             })
                     }
                     composable(Screen.Todo.route) {
