@@ -56,6 +56,10 @@ import androidx.compose.ui.unit.sp
 import com.windrr.mindbank.presentation.ui.activity.ui.theme.MindBankTheme
 import com.windrr.mindbank.viewmodel.DataStoreViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import java.security.SecureRandom
+import java.util.Base64
+import javax.crypto.SecretKeyFactory
+import javax.crypto.spec.PBEKeySpec
 
 @AndroidEntryPoint
 class PasswordEditActivity : ComponentActivity() {
@@ -64,30 +68,34 @@ class PasswordEditActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            setContent {
-                MindBankTheme {
-                    Surface(
-                        modifier = Modifier.fillMaxSize(),
-                        color = MaterialTheme.colorScheme.background
-                    ) {
-                        var password by remember { mutableStateOf("") }
-                        var isLoading by remember { mutableStateOf(true) }
+            MindBankTheme {
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    var password by remember { mutableStateOf("") }
+                    var isLoading by remember { mutableStateOf(true) }
 
-                        LaunchedEffect(Unit) {
-                            password = dataStoreViewModel.getPassWord()
-                            isLoading = false
-                        }
+                    LaunchedEffect(Unit) {
+                        password = dataStoreViewModel.getPassWord()
+                        isLoading = false
+                    }
 
-                        if (isLoading) {
-                            CircularProgressIndicator()
-                        } else {
-                            PasswordFlowScreen(
-                                savedPassword = password,
-                                onSavePassword = { newPassword ->
-                                    dataStoreViewModel.setPassword(newPassword)
-                                }
-                            )
-                        }
+                    if (isLoading) {
+                        CircularProgressIndicator()
+                    } else {
+                        PasswordFlowScreen(
+                            savedPassword = password,
+                            onSavePassword = { newPassword ->
+                                val saltBytes = ByteArray(16)
+                                SecureRandom().nextBytes(saltBytes)
+                                val hash = pbkdf2Hash(newPassword, saltBytes)
+                                dataStoreViewModel.setPasswordSalt(Base64.getEncoder().encodeToString(saltBytes))
+                                dataStoreViewModel.setPasswordHash(hash)
+                                dataStoreViewModel.setAppLockEnabled(true)
+                                dataStoreViewModel.setPassword("")
+                            }
+                        )
                     }
                 }
             }
@@ -264,6 +272,13 @@ class PasswordEditActivity : ComponentActivity() {
                 )
             }
         }
+    }
+
+    private fun pbkdf2Hash(pin: String, salt: ByteArray): String {
+        val spec = PBEKeySpec(pin.toCharArray(), salt, 120_000, 256)
+        val skf = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256")
+        val hash = skf.generateSecret(spec).encoded
+        return Base64.getEncoder().encodeToString(hash)
     }
 }
 

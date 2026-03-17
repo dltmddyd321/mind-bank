@@ -58,6 +58,7 @@ import com.windrr.mindbank.presentation.ui.theme.SpacePurple
 import com.windrr.mindbank.presentation.ui.theme.SpaceStar
 import com.windrr.mindbank.presentation.ui.theme.SpaceTheme
 import com.windrr.mindbank.util.DataType
+import com.windrr.mindbank.viewmodel.DataStoreViewModel
 import com.windrr.mindbank.viewmodel.MemoViewModel
 import com.windrr.mindbank.viewmodel.TodoViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -67,6 +68,7 @@ import dagger.hilt.android.AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     private val todoViewModel: TodoViewModel by viewModels()
     private val memoViewModel: MemoViewModel by viewModels()
+    private val dataStoreViewModel: DataStoreViewModel by viewModels()
     private var backPressedTime: Long = 0
     private var isTodoMode = false
 
@@ -211,7 +213,7 @@ class MainActivity : ComponentActivity() {
                         )
                     }
                     composable(Screen.Settings.route) {
-                        SettingsScreen(paddingValues) {
+                        SettingsScreen(dataStoreViewModel = dataStoreViewModel) {
                             todoViewModel.clear()
                             memoViewModel.clear()
                         }

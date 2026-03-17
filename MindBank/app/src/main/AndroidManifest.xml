@@ -40,6 +40,11 @@
             android:label="@string/title_activity_password_edit"
             android:theme="@style/Theme.App.Starting" />
         <activity
+            android:name=".presentation.ui.activity.PasswordMenuActivity"
+            android:exported="false"
+            android:label="@string/pin_setup"
+            android:theme="@style/Theme.App.Starting" />
+        <activity
             android:name=".presentation.ui.activity.WebViewActivity"
             android:exported="false"
             android:label="@string/title_activity_web_view"

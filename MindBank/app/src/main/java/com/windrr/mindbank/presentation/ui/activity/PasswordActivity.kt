@@ -13,16 +13,17 @@ import android.provider.Settings
 import android.util.Log
 import android.view.animation.AnticipateInterpolator
 import android.widget.Toast
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
@@ -30,7 +31,9 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -39,6 +42,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.unit.dp
 import androidx.core.animation.doOnEnd
 import androidx.core.content.ContextCompat
@@ -57,10 +61,13 @@ import java.util.concurrent.Executor
 import androidx.core.net.toUri
 import com.windrr.mindbank.R
 import timber.log.Timber
+import java.util.Base64
+import javax.crypto.SecretKeyFactory
+import javax.crypto.spec.PBEKeySpec
 
 
 @AndroidEntryPoint
-class PasswordActivity : ComponentActivity() {
+class PasswordActivity : FragmentActivity() {
 
     @SuppressLint("InlinedApi")
     private val permissionLauncher =
@@ -80,34 +87,29 @@ class PasswordActivity : ComponentActivity() {
         }
     private lateinit var splash: androidx.core.splashscreen.SplashScreen
     private val dataStoreViewModel: DataStoreViewModel by viewModels()
-    private var password = ""
-    private var onCheckPassword: (() -> Unit?)? = null
+    private var legacyPassword = ""
+    private var appLockEnabled = false
+    private var biometricEnabled = false
+    private var passwordSalt = ""
+    private var passwordHash = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         splash = installSplashScreen()
         startSplash()
-        onCheckPassword = {
-            setContent {
-                MindBankTheme {
-                    Surface(
-                        modifier = Modifier.fillMaxSize(),
-                        color = MaterialTheme.colorScheme.background
-                    ) {
-                        BiometricAuthScreen()
-                    }
-                }
-            }
-        }
-        fetchPassword()
+        fetchLockStateAndStart()
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
     }
 
-    private fun fetchPassword() {
+    private fun fetchLockStateAndStart() {
         CoroutineScope(Dispatchers.IO).launch {
-            password = dataStoreViewModel.getPassWord()
+            legacyPassword = dataStoreViewModel.getPassWord()
+            appLockEnabled = dataStoreViewModel.isAppLockEnabled()
+            biometricEnabled = dataStoreViewModel.isBiometricEnabled()
+            passwordSalt = dataStoreViewModel.getPasswordSalt()
+            passwordHash = dataStoreViewModel.getPasswordHash()
             withContext(Dispatchers.Main) {
-                start { onCheckPassword?.invoke() }
+                start()
             }
         }
     }
@@ -119,7 +121,7 @@ class PasswordActivity : ComponentActivity() {
                 getString(R.string.permission_granted),
                 Toast.LENGTH_SHORT
             ).show()
-            start { onCheckPassword?.invoke() }
+            start()
         }
 
         override fun onPermissionDenied(deniedPermissions: List<String>) {
@@ -127,7 +129,7 @@ class PasswordActivity : ComponentActivity() {
                 this@PasswordActivity,
                 "${getString(R.string.permission_denied)}\n$deniedPermissions", Toast.LENGTH_SHORT
             ).show()
-            start { onCheckPassword?.invoke() }
+            start()
         }
     }
 
@@ -141,15 +143,15 @@ class PasswordActivity : ComponentActivity() {
                 }
                 permissionLauncher.launch(intent)
             } else {
-                start { onCheckPassword?.invoke() }
+                start()
             }
         } else {
-            start { onCheckPassword?.invoke() }
+            start()
         }
     }
 
     @OptIn(ExperimentalMaterial3Api::class)
-    private fun start(onCheckPassword: () -> Unit) {
+    private fun start() {
         val deepLink = intent?.data
         val intent = Intent(this@PasswordActivity, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -157,12 +159,97 @@ class PasswordActivity : ComponentActivity() {
             intent?.extras?.let { putExtras(it) }
         }
         Timber.tag("인텐트 확인").i(intent.data?.toString())
-        if (password.isEmpty()) startActivity(intent) else {
-            onCheckPassword.invoke()
+        if (!appLockEnabled) {
+            startActivity(intent)
+            return
+        }
+
+        setContent {
+            MindBankTheme {
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    AppLockScreen(
+                        isBiometricEnabled = biometricEnabled,
+                        isBiometricAvailable = isBiometricAvailable(),
+                        onBiometricAuth = { onSuccess, onFailure ->
+                            showBiometricPrompt(
+                                onSuccess = onSuccess,
+                                onFailure = onFailure
+                            )
+                        },
+                        onPinVerified = {
+                            startActivity(intent)
+                        },
+                        verifyPin = { pin ->
+                            verifyPin(pin)
+                        },
+                        isLegacyPinFallback = passwordHash.isEmpty() && legacyPassword.isNotEmpty(),
+                    )
+                }
+            }
         }
     }
 
-    @SuppressLint("Recycle")
+    private fun isBiometricAvailable(): Boolean {
+        val biometricManager = BiometricManager.from(this)
+        return biometricManager.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG) ==
+            BiometricManager.BIOMETRIC_SUCCESS
+    }
+
+    private fun showBiometricPrompt(
+        onSuccess: () -> Unit,
+        onFailure: (String) -> Unit,
+    ) {
+        val executor: Executor = ContextCompat.getMainExecutor(this)
+        val biometricPrompt = BiometricPrompt(
+            this,
+            executor,
+            object : BiometricPrompt.AuthenticationCallback() {
+                override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
+                    super.onAuthenticationSucceeded(result)
+                    onSuccess()
+                }
+
+                override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
+                    super.onAuthenticationError(errorCode, errString)
+                    onFailure(errString.toString())
+                }
+
+                override fun onAuthenticationFailed() {
+                    super.onAuthenticationFailed()
+                    onFailure(getString(R.string.biometric_failed))
+                }
+            }
+        )
+
+        val promptInfo = BiometricPrompt.PromptInfo.Builder()
+            .setTitle(getString(R.string.biometric_prompt_title))
+            .setSubtitle(getString(R.string.biometric_prompt_subtitle))
+            .setNegativeButtonText(getString(R.string.cancel))
+            .build()
+
+        biometricPrompt.authenticate(promptInfo)
+    }
+
+    private fun verifyPin(pin: String): Boolean {
+        if (passwordHash.isEmpty() && legacyPassword.isNotEmpty()) {
+            return pin == legacyPassword
+        }
+        if (passwordSalt.isEmpty() || passwordHash.isEmpty()) return false
+        val saltBytes = Base64.getDecoder().decode(passwordSalt)
+        val computed = pbkdf2Hash(pin, saltBytes)
+        return computed == passwordHash
+    }
+
+    private fun pbkdf2Hash(pin: String, salt: ByteArray): String {
+        val spec = PBEKeySpec(pin.toCharArray(), salt, 120_000, 256)
+        val skf = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256")
+        val hash = skf.generateSecret(spec).encoded
+        return Base64.getEncoder().encodeToString(hash)
+    }
+
     private fun startSplash() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             splashScreen.setOnExitAnimationListener { splashView ->
@@ -183,51 +270,28 @@ class PasswordActivity : ComponentActivity() {
 }
 
 @Composable
-fun BiometricAuthScreen() {
-    fun isBiometricAvailable(context: Context): Boolean {
-        val biometricManager = BiometricManager.from(context)
-        return biometricManager.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG) ==
-                BiometricManager.BIOMETRIC_SUCCESS
-    }
-
-    fun showBiometricPrompt(
-        context: Context,
-        onSuccess: () -> Unit,
-        onFailure: (String) -> Unit,
-    ) {
-        val executor: Executor = ContextCompat.getMainExecutor(context)
-        val biometricPrompt = BiometricPrompt(
-            context as FragmentActivity,
-            executor,
-            object : BiometricPrompt.AuthenticationCallback() {
-                override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
-                    super.onAuthenticationSucceeded(result)
-                    onSuccess()
-                }
-
-                override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
-                    super.onAuthenticationError(errorCode, errString)
-                    onFailure(errString.toString())
-                }
-
-                override fun onAuthenticationFailed() {
-                    super.onAuthenticationFailed()
-                    onFailure("Authentication failed")
-                }
-            }
-        )
-
-        val promptInfo = BiometricPrompt.PromptInfo.Builder()
-            .setTitle(context.getString(R.string.biometric_prompt_title))
-            .setSubtitle(context.getString(R.string.biometric_prompt_subtitle))
-            .setNegativeButtonText(context.getString(R.string.cancel))
-            .build()
-
-        biometricPrompt.authenticate(promptInfo)
-    }
-
+private fun AppLockScreen(
+    isBiometricEnabled: Boolean,
+    isBiometricAvailable: Boolean,
+    isLegacyPinFallback: Boolean,
+    onBiometricAuth: (onSuccess: () -> Unit, onFailure: (String) -> Unit) -> Unit,
+    verifyPin: (String) -> Boolean,
+    onPinVerified: () -> Unit,
+) {
     val context = LocalContext.current
-    var authMessage by remember { mutableStateOf(context.getString(R.string.biometric_auth_prompt)) }
+    var message by remember { mutableStateOf("") }
+    var pin by remember { mutableStateOf("") }
+
+    LaunchedEffect(Unit) {
+        if (isBiometricEnabled && isBiometricAvailable) {
+            onBiometricAuth(
+                { onPinVerified() },
+                { error ->
+                    message = error
+                }
+            )
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -236,27 +300,58 @@ fun BiometricAuthScreen() {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(text = authMessage)
+        val title = if (isLegacyPinFallback) {
+            context.getString(R.string.biometric_auth_prompt)
+        } else {
+            context.getString(R.string.biometric_auth_prompt)
+        }
+        Text(text = title)
+        Spacer(modifier = Modifier.height(16.dp))
 
-        Spacer(modifier = Modifier.height(20.dp))
+        TextField(
+            value = pin,
+            onValueChange = { value ->
+                pin = value.filter { it.isDigit() }.take(6)
+            },
+            modifier = Modifier.fillMaxWidth(),
+            keyboardOptions = KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Number),
+            singleLine = true
+        )
 
-        Button(
-            onClick = {
-                if (isBiometricAvailable(context)) {
-                    showBiometricPrompt(
-                        context,
-                        onSuccess = { authMessage = context.getString(R.string.biometric_success) },
-                        onFailure = { errorMsg ->
-                            authMessage =
-                                "${context.getString(R.string.biometric_failed)}: $errorMsg"
-                        }
-                    )
-                } else {
-                    authMessage = context.getString(R.string.biometric_unavailable)
+        if (message.isNotEmpty()) {
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(text = message)
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            if (isBiometricEnabled && isBiometricAvailable) {
+                Button(
+                    onClick = {
+                        onBiometricAuth(
+                            { onPinVerified() },
+                            { error -> message = error }
+                        )
+                    },
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text(text = stringResource(R.string.biometric_button))
                 }
             }
-        ) {
-            Text(stringResource(R.string.biometric_button))
+
+            Button(
+                onClick = {
+                    if (verifyPin(pin)) {
+                        onPinVerified()
+                    } else {
+                        message = context.getString(R.string.password_wrong)
+                    }
+                },
+                modifier = Modifier.weight(1f)
+            ) {
+                Text(text = stringResource(R.string.confirm))
+            }
         }
     }
 }

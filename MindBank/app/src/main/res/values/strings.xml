@@ -56,6 +56,11 @@
 
     <!-- 비밀번호 -->
     <string name="password_edit">비밀번호 등록 및 변경</string>
+    <string name="password_wrong">비밀번호가 일치하지 않습니다.</string>
+    <string name="app_lock_title">앱 잠금</string>
+    <string name="pin_setup">PIN 설정/변경</string>
+    <string name="biometric_enable">생체 인증 사용</string>
+    <string name="biometric_disable">생체 인증 사용 안 함</string>
 
     <!-- 기타 UI -->
     <string name="icon_description_settings">설정</string>

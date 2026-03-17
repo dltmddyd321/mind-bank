@@ -16,6 +16,15 @@ import javax.inject.Inject
 class DataStoreViewModel @Inject constructor(
     private val datastoreRepo: DatastoreRepo
 ) : ViewModel() {
+
+    companion object {
+        const val KEY_PASSWORD = "PASSWORD"
+        const val KEY_APP_LOCK_ENABLED = "APP_LOCK_ENABLED"
+        const val KEY_BIOMETRIC_ENABLED = "BIOMETRIC_ENABLED"
+        const val KEY_PASSWORD_SALT = "PASSWORD_SALT"
+        const val KEY_PASSWORD_HASH = "PASSWORD_HASH"
+    }
+
     suspend fun getUnSavedData(): UnSaved = withContext(Dispatchers.IO) {
         UnSaved(
             datastoreRepo.getString("UNSAVED_TITLE") ?: "",
@@ -57,11 +66,43 @@ class DataStoreViewModel @Inject constructor(
         }
     }
 
-    suspend fun getPassWord(): String = datastoreRepo.getString("PASSWORD") ?: ""
+    suspend fun getPassWord(): String = datastoreRepo.getString(KEY_PASSWORD) ?: ""
 
     fun setPassword(data: String) {
         CoroutineScope(Dispatchers.IO).launch {
-            datastoreRepo.putString("PASSWORD", data)
+            datastoreRepo.putString(KEY_PASSWORD, data)
+        }
+    }
+
+    suspend fun isAppLockEnabled(): Boolean = datastoreRepo.getString(KEY_APP_LOCK_ENABLED) == "true"
+
+    fun setAppLockEnabled(enabled: Boolean) {
+        CoroutineScope(Dispatchers.IO).launch {
+            datastoreRepo.putString(KEY_APP_LOCK_ENABLED, enabled.toString())
+        }
+    }
+
+    suspend fun isBiometricEnabled(): Boolean = datastoreRepo.getString(KEY_BIOMETRIC_ENABLED) == "true"
+
+    fun setBiometricEnabled(enabled: Boolean) {
+        CoroutineScope(Dispatchers.IO).launch {
+            datastoreRepo.putString(KEY_BIOMETRIC_ENABLED, enabled.toString())
+        }
+    }
+
+    suspend fun getPasswordSalt(): String = datastoreRepo.getString(KEY_PASSWORD_SALT) ?: ""
+
+    fun setPasswordSalt(value: String) {
+        CoroutineScope(Dispatchers.IO).launch {
+            datastoreRepo.putString(KEY_PASSWORD_SALT, value)
+        }
+    }
+
+    suspend fun getPasswordHash(): String = datastoreRepo.getString(KEY_PASSWORD_HASH) ?: ""
+
+    fun setPasswordHash(value: String) {
+        CoroutineScope(Dispatchers.IO).launch {
+            datastoreRepo.putString(KEY_PASSWORD_HASH, value)
         }
     }
 }
