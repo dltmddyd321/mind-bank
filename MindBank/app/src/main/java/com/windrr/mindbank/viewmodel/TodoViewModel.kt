@@ -74,6 +74,10 @@ class TodoViewModel @Inject constructor(
     }
 
     fun clear() {
-        todoRepository.clear()
+        viewModelScope.launch(Dispatchers.IO) {
+            todoRepository.clear()
+            _todos.value = emptyList()
+            loadTodoList()
+        }
     }
 }

@@ -61,7 +61,11 @@ class MemoViewModel @Inject constructor(
     }
 
     fun clear() {
-        memoRepository.clear()
+        viewModelScope.launch(Dispatchers.IO) {
+            memoRepository.clear()
+            _memos.value = emptyList()
+            loadMemoList()
+        }
     }
 
     fun update(data: Memo) {

@@ -1,9 +1,7 @@
 package com.windrr.mindbank.db
 
 import com.windrr.mindbank.db.data.Task
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -14,10 +12,8 @@ class TodoRepository @Inject constructor(
         todoDao.getAllSaveData()
     }
 
-    fun saveTodo(task: Task) {
-        CoroutineScope(Dispatchers.IO).launch {
-            todoDao.insertOrUpdate(task)
-        }
+    suspend fun saveTodo(task: Task) = withContext(Dispatchers.IO) {
+        todoDao.insertOrUpdate(task)
     }
 
     suspend fun searchByKeyword(keyword: String): List<Task> = withContext(Dispatchers.IO) {
@@ -28,26 +24,22 @@ class TodoRepository @Inject constructor(
         todoDao.searchById(id)
     }
 
-    fun delete(id: Int) {
-        CoroutineScope(Dispatchers.IO).launch {
-            todoDao.deleteById(id)
-        }
+    suspend fun delete(id: Int) = withContext(Dispatchers.IO) {
+        todoDao.deleteById(id)
     }
 
-    fun clear() {
-        CoroutineScope(Dispatchers.IO).launch {
-            todoDao.deleteAll()
-        }
+    suspend fun clear() = withContext(Dispatchers.IO) {
+        todoDao.deleteAll()
     }
 
-    suspend fun update(task: Task) {
-            todoDao.updateTodo(
-                task.id,
-                task.title,
-                task.dtUpdated,
-                task.color,
-                task.isDone,
-                task.position
-            )
+    suspend fun update(task: Task) = withContext(Dispatchers.IO) {
+        todoDao.updateTodo(
+            task.id,
+            task.title,
+            task.dtUpdated,
+            task.color,
+            task.isDone,
+            task.position
+        )
     }
 }

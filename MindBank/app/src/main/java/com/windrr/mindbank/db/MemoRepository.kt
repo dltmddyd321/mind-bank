@@ -1,9 +1,7 @@
 package com.windrr.mindbank.db
 
 import com.windrr.mindbank.db.data.Memo
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -22,33 +20,25 @@ class MemoRepository @Inject constructor(
         dataDao.getSaveDataById(id)
     }
 
-    fun insert(data: Memo) {
-        CoroutineScope(Dispatchers.IO).launch {
-            dataDao.insertOrUpdate(data)
-        }
+    suspend fun insert(data: Memo) = withContext(Dispatchers.IO) {
+        dataDao.insertOrUpdate(data)
     }
 
-    fun update(data: Memo) {
-        CoroutineScope(Dispatchers.IO).launch {
-            dataDao.updateMemoById(
-                data.id,
-                data.title,
-                data.detail,
-                data.dtUpdated,
-                data.color
-            )
-        }
+    suspend fun update(data: Memo) = withContext(Dispatchers.IO) {
+        dataDao.updateMemoById(
+            data.id,
+            data.title,
+            data.detail,
+            data.dtUpdated,
+            data.color
+        )
     }
 
-    fun delete(data: Memo) {
-        CoroutineScope(Dispatchers.IO).launch {
-            dataDao.deleteById(data.id)
-        }
+    suspend fun delete(data: Memo) = withContext(Dispatchers.IO) {
+        dataDao.deleteById(data.id)
     }
 
-    fun clear() {
-        CoroutineScope(Dispatchers.IO).launch {
-            dataDao.deleteAll()
-        }
+    suspend fun clear() = withContext(Dispatchers.IO) {
+        dataDao.deleteAll()
     }
 }

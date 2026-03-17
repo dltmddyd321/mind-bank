@@ -62,7 +62,6 @@ import com.windrr.mindbank.viewmodel.MemoViewModel
 import com.windrr.mindbank.viewmodel.TodoViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
-
 @ExperimentalMaterial3Api
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -70,6 +69,12 @@ class MainActivity : ComponentActivity() {
     private val memoViewModel: MemoViewModel by viewModels()
     private var backPressedTime: Long = 0
     private var isTodoMode = false
+
+    override fun onResume() {
+        super.onResume()
+        memoViewModel.loadMemoList()
+        todoViewModel.loadTodoList()
+    }
 
     private val todoLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -126,6 +131,18 @@ class MainActivity : ComponentActivity() {
             SpaceTheme {
             val navBackStackEntry by navController.currentBackStackEntryAsState()
             val currentRoute = navBackStackEntry?.destination?.route
+
+            LaunchedEffect(currentRoute) {
+                when (currentRoute) {
+                    Screen.Todo.route -> todoViewModel.loadTodoList()
+                    Screen.Notes.route -> memoViewModel.loadMemoList()
+                    Screen.Home.route -> {
+                        memoViewModel.loadMemoList()
+                        todoViewModel.loadTodoList()
+                    }
+                }
+            }
+
             Scaffold(
                 bottomBar = { BottomNavBar(navController = navController) },
                 floatingActionButton = {
