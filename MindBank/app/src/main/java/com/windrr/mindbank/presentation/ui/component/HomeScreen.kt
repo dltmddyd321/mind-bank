@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -63,6 +64,7 @@ fun HomeScreen(
     navController: NavController,
     memoViewModel: MemoViewModel,
     todoViewModel: TodoViewModel,
+    mainPaddingValues: PaddingValues,
     onEditMemo: (Memo) -> Unit,
     onEditTodo: (Task) -> Unit
 ) {
@@ -72,6 +74,7 @@ fun HomeScreen(
     HomeScreenContent(
         memoList = memoList,
         todoList = todoList,
+        mainPaddingValues = mainPaddingValues,
         onNavigateToNotes = {
             navController.navigate(Screen.Notes.route) {
                 popUpTo(navController.graph.startDestinationId) {
@@ -107,6 +110,7 @@ fun HomeScreen(
 fun HomeScreenContent(
     memoList: List<Memo>,
     todoList: List<Task>,
+    mainPaddingValues: PaddingValues,
     onNavigateToNotes: () -> Unit,
     onNavigateToTodo: () -> Unit,
     onEditMemo: (Memo) -> Unit,
@@ -121,11 +125,11 @@ fun HomeScreenContent(
             topBar = {
                 MainTopBar(stringResource(R.string.home_title))
             },
-            content = { paddingValues ->
+            content = { innerPadding ->
                 Surface(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(paddingValues),
+                        .padding(innerPadding),
                     color = MaterialTheme.colorScheme.background
                 ) {
                     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -143,6 +147,9 @@ fun HomeScreenContent(
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(horizontal = 16.dp),
+                        contentPadding = PaddingValues(
+                            bottom = mainPaddingValues.calculateBottomPadding()
+                        ),
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
                         item {

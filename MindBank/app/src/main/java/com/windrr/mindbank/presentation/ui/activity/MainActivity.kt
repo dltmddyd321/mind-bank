@@ -13,8 +13,11 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -36,6 +39,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -90,10 +94,6 @@ class MainActivity : ComponentActivity() {
                 memoViewModel.loadMemoList()
             }
         }
-
-    private fun handleAssistantIntent(intent: Intent?) {
-        intent?.getStringExtra("featureParam") ?: intent?.data?.host
-    }
 
     @SuppressLint("SourceLockedOrientationActivity")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -184,6 +184,7 @@ class MainActivity : ComponentActivity() {
                     composable(Screen.Home.route) {
                         HomeScreen(
                             navController, memoViewModel, todoViewModel,
+                            mainPaddingValues = paddingValues,
                             onEditMemo = { memo ->
                                 val intent =
                                     Intent(this@MainActivity, AddMemoActivity::class.java)
@@ -279,11 +280,15 @@ class MainActivity : ComponentActivity() {
                 }
             },
         ) { innerPadding ->
-            Column(
+            Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(paddingValues)
-                    .padding(innerPadding)
+                    .padding(
+                        start = paddingValues.calculateStartPadding(LocalLayoutDirection.current),
+                        end = paddingValues.calculateEndPadding(LocalLayoutDirection.current),
+                        top = innerPadding.calculateTopPadding(),
+                        bottom = paddingValues.calculateBottomPadding()
+                    )
             ) {
                 if (viewModel is MemoViewModel) {
                     MainGrid(viewModel, searchText) { memo ->
