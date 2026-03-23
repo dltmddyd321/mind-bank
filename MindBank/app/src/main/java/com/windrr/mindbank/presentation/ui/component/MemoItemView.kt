@@ -13,6 +13,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -47,6 +48,7 @@ fun MemoItemView(
     onEdit: (Memo) -> Unit,
     onDelete: (Memo) -> Unit,
 ) {
+    val context = LocalContext.current
     Box(
         modifier = Modifier
             .padding(horizontal = 8.dp)
@@ -93,6 +95,25 @@ fun MemoItemView(
                         )
                     }
 
+                    if (!data.link.isNullOrEmpty()) {
+                        IconButton(
+                            onClick = {
+                                val sendIntent = Intent(Intent.ACTION_SEND).apply {
+                                    putExtra(Intent.EXTRA_TEXT, data.link)
+                                    type = "text/plain"
+                                }
+                                context.startActivity(Intent.createChooser(sendIntent, null))
+                            }, modifier = Modifier.size(24.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.Share,
+                                contentDescription = "Share",
+                                modifier = Modifier.size(16.dp),
+                                tint = textColor
+                            )
+                        }
+                    }
+
                     IconButton(
                         onClick = { showDialog = true }, modifier = Modifier.size(24.dp)
                     ) {
@@ -137,7 +158,7 @@ fun MemoItemView(
                     )
 
                     var currentUrl by remember { mutableStateOf<String?>(null) }
-                    val activity = LocalContext.current as? Activity ?: return@Column
+                    val activity = context as? Activity ?: return@Column
 
                     if (currentUrl != null) {
                         currentUrl?.let {

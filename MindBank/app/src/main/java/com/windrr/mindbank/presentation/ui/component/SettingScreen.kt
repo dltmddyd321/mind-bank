@@ -38,11 +38,17 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import kotlinx.coroutines.launch
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -182,17 +188,29 @@ fun SettingsScreen(
             .canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG) == BiometricManager.BIOMETRIC_SUCCESS
     }
 
-    LaunchedEffect(Unit) {
+    val coroutineScope = rememberCoroutineScope()
+    val lifecycleOwner = LocalLifecycleOwner.current
+
+    suspend fun reloadLockState() {
         appLockEnabled = dataStoreViewModel.isAppLockEnabled()
         biometricEnabled = dataStoreViewModel.isBiometricEnabled()
-
         val passwordHash = dataStoreViewModel.getPasswordHash()
         val passwordSalt = dataStoreViewModel.getPasswordSalt()
         val legacyPassword = dataStoreViewModel.getPassWord()
-        val hasPin =
-            passwordHash.isNotEmpty() || passwordSalt.isNotEmpty() || legacyPassword.isNotEmpty()
-        val biometricRegisteredAndEnabled = biometricAvailable && biometricEnabled
-        hasPinOrBiometric = hasPin || biometricRegisteredAndEnabled
+        val hasPin = passwordHash.isNotEmpty() || passwordSalt.isNotEmpty() || legacyPassword.isNotEmpty()
+        hasPinOrBiometric = hasPin || (biometricAvailable && biometricEnabled)
+    }
+
+    LaunchedEffect(Unit) { reloadLockState() }
+
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                coroutineScope.launch { reloadLockState() }
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
 
     Scaffold(

@@ -10,7 +10,6 @@ import android.content.pm.ActivityInfo
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
-import android.util.Log
 import android.view.animation.AnticipateInterpolator
 import android.widget.Toast
 import androidx.activity.compose.setContent
@@ -18,20 +17,29 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Face
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -40,28 +48,35 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.core.animation.doOnEnd
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.fragment.app.FragmentActivity
-import com.windrr.mindbank.presentation.ui.activity.ui.theme.MindBankTheme
-import com.windrr.mindbank.viewmodel.DataStoreViewModel
 import com.gun0912.tedpermission.PermissionListener
 import com.gun0912.tedpermission.normal.TedPermission
+import com.windrr.mindbank.R
+import com.windrr.mindbank.presentation.ui.theme.SpaceBorder
+import com.windrr.mindbank.presentation.ui.theme.SpaceCloud
+import com.windrr.mindbank.presentation.ui.theme.SpaceCoral
+import com.windrr.mindbank.presentation.ui.theme.SpaceNavy
+import com.windrr.mindbank.presentation.ui.theme.SpacePurple
+import com.windrr.mindbank.presentation.ui.theme.SpaceSurface
+import com.windrr.mindbank.presentation.ui.theme.SpaceTheme
+import com.windrr.mindbank.viewmodel.DataStoreViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.util.concurrent.Executor
-import androidx.core.net.toUri
-import com.windrr.mindbank.R
 import timber.log.Timber
 import java.util.Base64
+import java.util.concurrent.Executor
 import javax.crypto.SecretKeyFactory
 import javax.crypto.spec.PBEKeySpec
 
@@ -165,7 +180,7 @@ class PasswordActivity : FragmentActivity() {
         }
 
         setContent {
-            MindBankTheme {
+            SpaceTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
@@ -173,6 +188,7 @@ class PasswordActivity : FragmentActivity() {
                     AppLockScreen(
                         isBiometricEnabled = biometricEnabled,
                         isBiometricAvailable = isBiometricAvailable(),
+                        hasPinRegistered = passwordHash.isNotEmpty() || legacyPassword.isNotEmpty(),
                         onBiometricAuth = { onSuccess, onFailure ->
                             showBiometricPrompt(
                                 onSuccess = onSuccess,
@@ -274,21 +290,21 @@ private fun AppLockScreen(
     isBiometricEnabled: Boolean,
     isBiometricAvailable: Boolean,
     isLegacyPinFallback: Boolean,
+    hasPinRegistered: Boolean,
     onBiometricAuth: (onSuccess: () -> Unit, onFailure: (String) -> Unit) -> Unit,
     verifyPin: (String) -> Boolean,
     onPinVerified: () -> Unit,
 ) {
     val context = LocalContext.current
-    var message by remember { mutableStateOf("") }
+    var errorMessage by remember { mutableStateOf("") }
     var pin by remember { mutableStateOf("") }
+    val biometricActive = isBiometricEnabled && isBiometricAvailable
 
     LaunchedEffect(Unit) {
-        if (isBiometricEnabled && isBiometricAvailable) {
+        if (biometricActive) {
             onBiometricAuth(
                 { onPinVerified() },
-                { error ->
-                    message = error
-                }
+                { error -> errorMessage = error }
             )
         }
     }
@@ -296,62 +312,198 @@ private fun AppLockScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
+            .background(SpaceNavy)
+            .padding(horizontal = 32.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        val title = if (isLegacyPinFallback) {
-            context.getString(R.string.biometric_auth_prompt)
-        } else {
-            context.getString(R.string.biometric_auth_prompt)
-        }
-        Text(text = title)
-        Spacer(modifier = Modifier.height(16.dp))
-
-        TextField(
-            value = pin,
-            onValueChange = { value ->
-                pin = value.filter { it.isDigit() }.take(6)
-            },
-            modifier = Modifier.fillMaxWidth(),
-            keyboardOptions = KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Number),
-            singleLine = true
+        Icon(
+            imageVector = Icons.Default.Lock,
+            contentDescription = null,
+            tint = SpacePurple,
+            modifier = Modifier.size(52.dp)
         )
 
-        if (message.isNotEmpty()) {
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(text = message)
-        }
-
         Spacer(modifier = Modifier.height(16.dp))
 
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            if (isBiometricEnabled && isBiometricAvailable) {
-                Button(
-                    onClick = {
-                        onBiometricAuth(
-                            { onPinVerified() },
-                            { error -> message = error }
-                        )
-                    },
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text(text = stringResource(R.string.biometric_button))
+        Text(
+            text = stringResource(R.string.app_name),
+            style = MaterialTheme.typography.titleLarge.copy(
+                fontWeight = FontWeight.Bold,
+                color = SpaceCloud
+            )
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Text(
+            text = if (biometricActive && !hasPinRegistered)
+                stringResource(R.string.biometric_auth_prompt)
+            else
+                stringResource(R.string.pin_auth_prompt),
+            style = MaterialTheme.typography.bodyMedium.copy(color = SpaceCloud.copy(alpha = 0.6f))
+        )
+
+        Spacer(modifier = Modifier.height(40.dp))
+
+        if (hasPinRegistered) {
+            // 6자리 점 인디케이터
+            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                repeat(6) { index ->
+                    Box(
+                        modifier = Modifier
+                            .size(13.dp)
+                            .background(
+                                if (index < pin.length) SpacePurple else SpaceBorder,
+                                CircleShape
+                            )
+                    )
                 }
             }
 
-            Button(
-                onClick = {
-                    if (verifyPin(pin)) {
-                        onPinVerified()
-                    } else {
-                        message = context.getString(R.string.password_wrong)
+            if (errorMessage.isNotEmpty()) {
+                Spacer(modifier = Modifier.height(12.dp))
+                Text(
+                    text = errorMessage,
+                    style = MaterialTheme.typography.bodySmall.copy(color = SpaceCoral)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(36.dp))
+
+            // 키패드
+            val rows = listOf(
+                listOf("1", "2", "3"),
+                listOf("4", "5", "6"),
+                listOf("7", "8", "9"),
+                listOf(if (biometricActive) "BIO" else "", "0", "DEL")
+            )
+            Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                rows.forEach { row ->
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceEvenly
+                    ) {
+                        row.forEach { key ->
+                            when (key) {
+                                "" -> Box(modifier = Modifier.size(72.dp))
+                                "DEL" -> KeyPadButton(onClick = {
+                                    if (pin.isNotEmpty()) {
+                                        pin = pin.dropLast(1)
+                                        errorMessage = ""
+                                    }
+                                }) {
+                                    Icon(
+                                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                        contentDescription = "Delete",
+                                        tint = SpaceCloud,
+                                        modifier = Modifier.size(22.dp)
+                                    )
+                                }
+                                "BIO" -> KeyPadButton(
+                                    onClick = {
+                                        onBiometricAuth(
+                                            { onPinVerified() },
+                                            { error -> errorMessage = error }
+                                        )
+                                    },
+                                    accentColor = true
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Face,
+                                        contentDescription = "Biometric",
+                                        tint = SpacePurple,
+                                        modifier = Modifier.size(26.dp)
+                                    )
+                                }
+                                else -> KeyPadButton(onClick = {
+                                    if (pin.length < 6) {
+                                        pin += key
+                                        errorMessage = ""
+                                        if (pin.length == 6) {
+                                            if (verifyPin(pin)) {
+                                                onPinVerified()
+                                            } else {
+                                                errorMessage = context.getString(R.string.password_wrong)
+                                                pin = ""
+                                            }
+                                        }
+                                    }
+                                }) {
+                                    Text(
+                                        text = key,
+                                        style = MaterialTheme.typography.titleLarge.copy(
+                                            fontWeight = FontWeight.Medium,
+                                            color = SpaceCloud
+                                        )
+                                    )
+                                }
+                            }
+                        }
                     }
+                }
+            }
+        } else if (biometricActive) {
+            // PIN 없이 생체인증만 등록된 경우
+            if (errorMessage.isNotEmpty()) {
+                Text(
+                    text = errorMessage,
+                    style = MaterialTheme.typography.bodySmall.copy(color = SpaceCoral)
+                )
+                Spacer(modifier = Modifier.height(20.dp))
+            }
+
+            KeyPadButton(
+                onClick = {
+                    onBiometricAuth(
+                        { onPinVerified() },
+                        { error -> errorMessage = error }
+                    )
                 },
-                modifier = Modifier.weight(1f)
+                accentColor = true
             ) {
-                Text(text = stringResource(R.string.confirm))
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Lock,
+                        contentDescription = null,
+                        tint = SpacePurple,
+                        modifier = Modifier.size(26.dp)
+                    )
+                    Text(
+                        text = stringResource(R.string.biometric_button),
+                        style = MaterialTheme.typography.bodyMedium.copy(color = SpaceCloud)
+                    )
+                }
             }
         }
+    }
+}
+
+@Composable
+private fun KeyPadButton(
+    onClick: () -> Unit,
+    accentColor: Boolean = false,
+    content: @Composable () -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .size(72.dp)
+            .clip(CircleShape)
+            .background(
+                if (accentColor) SpacePurple.copy(alpha = 0.15f) else SpaceSurface,
+                CircleShape
+            )
+            .border(
+                1.dp,
+                if (accentColor) SpacePurple.copy(alpha = 0.4f) else SpaceBorder.copy(alpha = 0.4f),
+                CircleShape
+            )
+            .clickable { onClick() },
+        contentAlignment = Alignment.Center
+    ) {
+        content()
     }
 }

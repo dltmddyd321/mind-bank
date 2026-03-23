@@ -1,5 +1,6 @@
 package com.windrr.mindbank.presentation.ui.activity
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -25,6 +26,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -33,8 +35,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -53,6 +54,7 @@ import androidx.compose.ui.unit.dp
 import com.windrr.mindbank.R
 import com.windrr.mindbank.presentation.ui.theme.SpaceBorder
 import com.windrr.mindbank.presentation.ui.theme.SpaceCloud
+import com.windrr.mindbank.presentation.ui.theme.SpaceCoral
 import com.windrr.mindbank.presentation.ui.theme.SpacePurple
 import com.windrr.mindbank.presentation.ui.theme.SpaceSurface
 import com.windrr.mindbank.presentation.ui.theme.SpaceTheme
@@ -87,6 +89,9 @@ class PasswordMenuActivity : ComponentActivity() {
 @Composable
 fun PasswordMenuScreen(context: Context, dataStoreViewModel: DataStoreViewModel) {
     var biometricEnabled by remember { mutableStateOf(false) }
+    var appLockEnabled by remember { mutableStateOf(false) }
+    var showDisableDialog by remember { mutableStateOf(false) }
+
     val biometricAvailable = remember {
         androidx.biometric.BiometricManager.from(context)
             .canAuthenticate(androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_STRONG) == androidx.biometric.BiometricManager.BIOMETRIC_SUCCESS
@@ -94,21 +99,53 @@ fun PasswordMenuScreen(context: Context, dataStoreViewModel: DataStoreViewModel)
 
     LaunchedEffect(Unit) {
         biometricEnabled = dataStoreViewModel.isBiometricEnabled()
+        appLockEnabled = dataStoreViewModel.isAppLockEnabled()
+    }
+
+    if (showDisableDialog) {
+        AlertDialog(
+            onDismissRequest = { showDisableDialog = false },
+            title = { Text(stringResource(R.string.app_lock_disable_confirm_title)) },
+            text = { Text(stringResource(R.string.app_lock_disable_confirm_message)) },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        dataStoreViewModel.setAppLockEnabled(false)
+                        dataStoreViewModel.setPassword("")
+                        dataStoreViewModel.setPasswordHash("")
+                        dataStoreViewModel.setPasswordSalt("")
+                        dataStoreViewModel.setBiometricEnabled(false)
+                        appLockEnabled = false
+                        biometricEnabled = false
+                        showDisableDialog = false
+                        (context as? Activity)?.finish()
+                    }
+                ) {
+                    Text(
+                        text = stringResource(R.string.confirm),
+                        color = SpaceCoral
+                    )
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDisableDialog = false }) {
+                    Text(stringResource(R.string.cancel))
+                }
+            }
+        )
     }
 
     Scaffold(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
             .statusBarsPadding(),
     ) { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(horizontal = 24.dp, vertical = 32.dp),
-            verticalArrangement = Arrangement.spacedBy(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .padding(horizontal = 20.dp, vertical = 24.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             SecurityOptionCard(
                 icon = Icons.Default.Lock,
@@ -132,7 +169,21 @@ fun PasswordMenuScreen(context: Context, dataStoreViewModel: DataStoreViewModel)
                     onClick = {
                         biometricEnabled = !biometricEnabled
                         dataStoreViewModel.setBiometricEnabled(biometricEnabled)
+                        if (biometricEnabled) {
+                            appLockEnabled = true
+                            dataStoreViewModel.setAppLockEnabled(true)
+                        }
                     }
+                )
+            }
+
+            if (appLockEnabled) {
+                SecurityOptionCard(
+                    icon = Icons.Default.Lock,
+                    title = stringResource(R.string.app_lock_disable),
+                    description = stringResource(R.string.app_lock_disable_description),
+                    isDangerous = true,
+                    onClick = { showDisableDialog = true }
                 )
             }
         }
@@ -146,31 +197,34 @@ fun SecurityOptionCard(
     title: String,
     description: String,
     isEnabled: Boolean = false,
+    isDangerous: Boolean = false,
     onClick: () -> Unit
 ) {
+    val accentColor = when {
+        isDangerous -> SpaceCoral
+        isEnabled -> SpacePurple
+        else -> SpaceBorder
+    }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
+            .shadow(
+                elevation = if (isEnabled || isDangerous) 6.dp else 2.dp,
+                shape = RoundedCornerShape(16.dp),
+                ambientColor = accentColor.copy(alpha = 0.2f),
+                spotColor = accentColor.copy(alpha = 0.2f)
+            )
             .clickable { onClick() },
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
             containerColor = SpaceSurface
         ),
-        border = if (isEnabled) {
-            androidx.compose.foundation.BorderStroke(
-                2.dp,
-                SpacePurple.copy(alpha = 0.5f)
-            )
-        } else {
-            androidx.compose.foundation.BorderStroke(
-                1.dp,
-                SpaceBorder.copy(alpha = 0.3f)
-            )
-        },
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = 4.dp,
-            pressedElevation = 6.dp
-        )
+        border = androidx.compose.foundation.BorderStroke(
+            width = if (isEnabled || isDangerous) 2.dp else 1.dp,
+            color = accentColor.copy(alpha = if (isEnabled || isDangerous) 0.5f else 0.3f)
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         Row(
             modifier = Modifier
@@ -182,10 +236,7 @@ fun SecurityOptionCard(
                 modifier = Modifier
                     .size(48.dp)
                     .background(
-                        if (isEnabled) 
-                            SpacePurple.copy(alpha = 0.2f)
-                        else 
-                            SpaceBorder.copy(alpha = 0.2f),
+                        accentColor.copy(alpha = 0.15f),
                         RoundedCornerShape(12.dp)
                     ),
                 contentAlignment = Alignment.Center
@@ -193,21 +244,19 @@ fun SecurityOptionCard(
                 Icon(
                     imageVector = icon,
                     contentDescription = title,
-                    tint = if (isEnabled) SpacePurple else SpaceCloud.copy(alpha = 0.7f),
+                    tint = accentColor,
                     modifier = Modifier.size(24.dp)
                 )
             }
 
             Spacer(modifier = Modifier.width(16.dp))
 
-            Column(
-                modifier = Modifier.weight(1f)
-            ) {
+            Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = title,
                     style = MaterialTheme.typography.titleMedium.copy(
                         fontWeight = FontWeight.Medium,
-                        color = SpaceCloud
+                        color = if (isDangerous) SpaceCoral else SpaceCloud
                     )
                 )
                 Spacer(modifier = Modifier.height(4.dp))
@@ -223,10 +272,7 @@ fun SecurityOptionCard(
                 Box(
                     modifier = Modifier
                         .size(24.dp)
-                        .background(
-                            SpacePurple,
-                            RoundedCornerShape(12.dp)
-                        ),
+                        .background(SpacePurple, RoundedCornerShape(12.dp)),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
