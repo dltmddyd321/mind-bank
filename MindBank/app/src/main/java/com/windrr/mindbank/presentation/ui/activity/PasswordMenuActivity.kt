@@ -90,7 +90,9 @@ class PasswordMenuActivity : ComponentActivity() {
 fun PasswordMenuScreen(context: Context, dataStoreViewModel: DataStoreViewModel) {
     var biometricEnabled by remember { mutableStateOf(false) }
     var appLockEnabled by remember { mutableStateOf(false) }
+    var hasPinRegistered by remember { mutableStateOf(false) }
     var showDisableDialog by remember { mutableStateOf(false) }
+    var showBiometricBlockedDialog by remember { mutableStateOf(false) }
 
     val biometricAvailable = remember {
         androidx.biometric.BiometricManager.from(context)
@@ -100,6 +102,7 @@ fun PasswordMenuScreen(context: Context, dataStoreViewModel: DataStoreViewModel)
     LaunchedEffect(Unit) {
         biometricEnabled = dataStoreViewModel.isBiometricEnabled()
         appLockEnabled = dataStoreViewModel.isAppLockEnabled()
+        hasPinRegistered = dataStoreViewModel.getPasswordHash().isNotEmpty()
     }
 
     if (showDisableDialog) {
@@ -117,6 +120,7 @@ fun PasswordMenuScreen(context: Context, dataStoreViewModel: DataStoreViewModel)
                         dataStoreViewModel.setBiometricEnabled(false)
                         appLockEnabled = false
                         biometricEnabled = false
+                        hasPinRegistered = false
                         showDisableDialog = false
                         (context as? Activity)?.finish()
                     }
@@ -130,6 +134,19 @@ fun PasswordMenuScreen(context: Context, dataStoreViewModel: DataStoreViewModel)
             dismissButton = {
                 TextButton(onClick = { showDisableDialog = false }) {
                     Text(stringResource(R.string.cancel))
+                }
+            }
+        )
+    }
+
+    if (showBiometricBlockedDialog) {
+        AlertDialog(
+            onDismissRequest = { showBiometricBlockedDialog = false },
+            title = { Text(stringResource(R.string.biometric_disable_blocked_title)) },
+            text = { Text(stringResource(R.string.biometric_disable_blocked_message)) },
+            confirmButton = {
+                TextButton(onClick = { showBiometricBlockedDialog = false }) {
+                    Text(stringResource(R.string.confirm))
                 }
             }
         )
@@ -167,11 +184,16 @@ fun PasswordMenuScreen(context: Context, dataStoreViewModel: DataStoreViewModel)
                     description = "생체 인증으로 빠른 접속",
                     isEnabled = biometricEnabled,
                     onClick = {
-                        biometricEnabled = !biometricEnabled
-                        dataStoreViewModel.setBiometricEnabled(biometricEnabled)
-                        if (biometricEnabled) {
-                            appLockEnabled = true
-                            dataStoreViewModel.setAppLockEnabled(true)
+                        if (biometricEnabled && !hasPinRegistered) {
+                            // PIN 없이 생체인증만 등록된 상태 → OFF 차단
+                            showBiometricBlockedDialog = true
+                        } else {
+                            biometricEnabled = !biometricEnabled
+                            dataStoreViewModel.setBiometricEnabled(biometricEnabled)
+                            if (biometricEnabled) {
+                                appLockEnabled = true
+                                dataStoreViewModel.setAppLockEnabled(true)
+                            }
                         }
                     }
                 )

@@ -60,9 +60,17 @@
     <string name="app_lock_title">앱 잠금</string>
     <string name="security_settings">보안 설정</string>
     <string name="pin_setup">PIN 설정/변경</string>
+    <string name="pin_current_enter">현재 PIN 입력</string>
+    <string name="pin_current_subtitle">등록된 PIN 번호를 입력해 주세요</string>
+    <string name="pin_new_enter">새 PIN 입력</string>
+    <string name="pin_new_subtitle">사용할 PIN 6자리를 입력해 주세요</string>
+    <string name="pin_new_confirm">PIN 확인</string>
+    <string name="pin_confirm_subtitle">PIN 번호를 한 번 더 입력해 주세요</string>
     <string name="biometric_enable">생체 인증 사용</string>
     <string name="biometric_disable">생체 인증 사용 안 함</string>
     <string name="app_lock_disable">앱 잠금 해제</string>
+    <string name="biometric_disable_blocked_title">생체 인증 해제 불가</string>
+    <string name="biometric_disable_blocked_message">PIN이 등록되지 않은 상태에서는 생체 인증을 해제할 수 없습니다.\nPIN을 먼저 설정하거나, 앱 잠금 해제 버튼을 이용해 주세요.</string>
     <string name="app_lock_disable_description">PIN 및 생체 인증 정보를 모두 초기화합니다</string>
     <string name="app_lock_disable_confirm_title">앱 잠금 해제</string>
     <string name="app_lock_disable_confirm_message">앱 잠금을 해제하시겠습니까?\n설정된 PIN과 생체 인증 정보가 모두 삭제됩니다.</string>

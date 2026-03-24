@@ -45,6 +45,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -174,7 +175,9 @@ class PasswordActivity : FragmentActivity() {
             intent?.extras?.let { putExtras(it) }
         }
         Timber.tag("인텐트 확인").i(intent.data?.toString())
-        if (!appLockEnabled) {
+        val hasPinRegistered = passwordHash.isNotEmpty() || legacyPassword.isNotEmpty()
+        val hasBiometric = biometricEnabled && isBiometricAvailable()
+        if (!appLockEnabled || (!hasPinRegistered && !hasBiometric)) {
             startActivity(intent)
             return
         }
@@ -188,7 +191,7 @@ class PasswordActivity : FragmentActivity() {
                     AppLockScreen(
                         isBiometricEnabled = biometricEnabled,
                         isBiometricAvailable = isBiometricAvailable(),
-                        hasPinRegistered = passwordHash.isNotEmpty() || legacyPassword.isNotEmpty(),
+                        hasPinRegistered = hasPinRegistered,
                         onBiometricAuth = { onSuccess, onFailure ->
                             showBiometricPrompt(
                                 onSuccess = onSuccess,
@@ -201,7 +204,6 @@ class PasswordActivity : FragmentActivity() {
                         verifyPin = { pin ->
                             verifyPin(pin)
                         },
-                        isLegacyPinFallback = passwordHash.isEmpty() && legacyPassword.isNotEmpty(),
                     )
                 }
             }
@@ -230,7 +232,18 @@ class PasswordActivity : FragmentActivity() {
 
                 override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
                     super.onAuthenticationError(errorCode, errString)
-                    onFailure(errString.toString())
+                    // 영구 잠금 또는 생체인증 미등록 → 상태 재평가
+                    // isBiometricAvailable()이 false를 반환하면 start()에서 bypass 처리
+                    val isPermanentlyUnavailable =
+                        errorCode == BiometricPrompt.ERROR_LOCKOUT_PERMANENT ||
+                        errorCode == BiometricPrompt.ERROR_NO_BIOMETRICS ||
+                        errorCode == BiometricPrompt.ERROR_HW_NOT_PRESENT ||
+                        errorCode == BiometricPrompt.ERROR_HW_UNAVAILABLE
+                    if (isPermanentlyUnavailable) {
+                        fetchLockStateAndStart()
+                    } else {
+                        onFailure(errString.toString())
+                    }
                 }
 
                 override fun onAuthenticationFailed() {
@@ -289,15 +302,16 @@ class PasswordActivity : FragmentActivity() {
 private fun AppLockScreen(
     isBiometricEnabled: Boolean,
     isBiometricAvailable: Boolean,
-    isLegacyPinFallback: Boolean,
     hasPinRegistered: Boolean,
     onBiometricAuth: (onSuccess: () -> Unit, onFailure: (String) -> Unit) -> Unit,
     verifyPin: (String) -> Boolean,
     onPinVerified: () -> Unit,
 ) {
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
     var errorMessage by remember { mutableStateOf("") }
     var pin by remember { mutableStateOf("") }
+    var isVerifying by remember { mutableStateOf(false) }
     val biometricActive = isBiometricEnabled && isBiometricAvailable
 
     LaunchedEffect(Unit) {
@@ -388,7 +402,7 @@ private fun AppLockScreen(
                             when (key) {
                                 "" -> Box(modifier = Modifier.size(72.dp))
                                 "DEL" -> KeyPadButton(onClick = {
-                                    if (pin.isNotEmpty()) {
+                                    if (!isVerifying && pin.isNotEmpty()) {
                                         pin = pin.dropLast(1)
                                         errorMessage = ""
                                     }
@@ -416,20 +430,28 @@ private fun AppLockScreen(
                                         modifier = Modifier.size(26.dp)
                                     )
                                 }
-                                else -> KeyPadButton(onClick = {
-                                    if (pin.length < 6) {
-                                        pin += key
-                                        errorMessage = ""
-                                        if (pin.length == 6) {
-                                            if (verifyPin(pin)) {
-                                                onPinVerified()
-                                            } else {
-                                                errorMessage = context.getString(R.string.password_wrong)
-                                                pin = ""
+                                else -> KeyPadButton(
+                                    onClick = {
+                                        if (!isVerifying && pin.length < 6) {
+                                            pin += key
+                                            errorMessage = ""
+                                            if (pin.length == 6) {
+                                                isVerifying = true
+                                                scope.launch {
+                                                    val ok = withContext(Dispatchers.Default) { verifyPin(pin) }
+                                                    isVerifying = false
+                                                    if (ok) {
+                                                        onPinVerified()
+                                                    } else {
+                                                        errorMessage = context.getString(R.string.password_wrong)
+                                                        pin = ""
+                                                    }
+                                                }
                                             }
                                         }
-                                    }
-                                }) {
+                                    },
+                                    isLoading = isVerifying
+                                ) {
                                     Text(
                                         text = key,
                                         style = MaterialTheme.typography.titleLarge.copy(
@@ -486,6 +508,7 @@ private fun AppLockScreen(
 private fun KeyPadButton(
     onClick: () -> Unit,
     accentColor: Boolean = false,
+    isLoading: Boolean = false,
     content: @Composable () -> Unit
 ) {
     Box(
@@ -501,9 +524,17 @@ private fun KeyPadButton(
                 if (accentColor) SpacePurple.copy(alpha = 0.4f) else SpaceBorder.copy(alpha = 0.4f),
                 CircleShape
             )
-            .clickable { onClick() },
+            .clickable(enabled = !isLoading) { onClick() },
         contentAlignment = Alignment.Center
     ) {
-        content()
+        if (isLoading) {
+            androidx.compose.material3.CircularProgressIndicator(
+                modifier = Modifier.size(24.dp),
+                color = SpacePurple,
+                strokeWidth = 2.dp
+            )
+        } else {
+            content()
+        }
     }
 }

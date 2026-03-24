@@ -1,15 +1,17 @@
 package com.windrr.mindbank.presentation.ui.activity
 
-import android.content.Context
+import android.content.Intent
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -17,43 +19,43 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.LocalTextStyle
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusDirection
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.key.Key
-import androidx.compose.ui.input.key.KeyEventType
-import androidx.compose.ui.input.key.key
-import androidx.compose.ui.input.key.onKeyEvent
-import androidx.compose.ui.input.key.type
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.windrr.mindbank.presentation.ui.activity.ui.theme.MindBankTheme
+import com.windrr.mindbank.R
+import com.windrr.mindbank.presentation.ui.theme.SpaceBorder
+import com.windrr.mindbank.presentation.ui.theme.SpaceCloud
+import com.windrr.mindbank.presentation.ui.theme.SpaceCoral
+import com.windrr.mindbank.presentation.ui.theme.SpaceNavy
+import com.windrr.mindbank.presentation.ui.theme.SpacePurple
+import com.windrr.mindbank.presentation.ui.theme.SpaceSurface
+import com.windrr.mindbank.presentation.ui.theme.SpaceTheme
 import com.windrr.mindbank.viewmodel.DataStoreViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import java.security.SecureRandom
@@ -63,38 +65,51 @@ import javax.crypto.spec.PBEKeySpec
 
 @AndroidEntryPoint
 class PasswordEditActivity : ComponentActivity() {
+
     private val dataStoreViewModel: DataStoreViewModel by viewModels()
+
+    @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            MindBankTheme {
+            SpaceTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    var password by remember { mutableStateOf("") }
                     var isLoading by remember { mutableStateOf(true) }
+                    var legacyPassword by remember { mutableStateOf("") }
+                    var savedHash by remember { mutableStateOf("") }
+                    var savedSalt by remember { mutableStateOf("") }
 
                     LaunchedEffect(Unit) {
-                        password = dataStoreViewModel.getPassWord()
+                        legacyPassword = dataStoreViewModel.getPassWord()
+                        savedHash = dataStoreViewModel.getPasswordHash()
+                        savedSalt = dataStoreViewModel.getPasswordSalt()
                         isLoading = false
                     }
 
-                    if (isLoading) {
-                        CircularProgressIndicator()
-                    } else {
-                        PasswordFlowScreen(
-                            savedPassword = password,
-                            onSavePassword = { newPassword ->
-                                val saltBytes = ByteArray(16)
-                                SecureRandom().nextBytes(saltBytes)
-                                val hash = pbkdf2Hash(newPassword, saltBytes)
+                    if (!isLoading) {
+                        val hasSavedPin = savedHash.isNotEmpty() || legacyPassword.isNotEmpty()
+                        PinEditFlow(
+                            hasSavedPin = hasSavedPin,
+                            verifyCurrentPin = { pin -> verifyPin(pin, savedHash, savedSalt, legacyPassword) },
+                            onSavePin = { newPin ->
+                                val saltBytes = ByteArray(16).also { SecureRandom().nextBytes(it) }
+                                val hash = pbkdf2Hash(newPin, saltBytes)
                                 dataStoreViewModel.setPasswordSalt(Base64.getEncoder().encodeToString(saltBytes))
                                 dataStoreViewModel.setPasswordHash(hash)
                                 dataStoreViewModel.setAppLockEnabled(true)
                                 dataStoreViewModel.setPassword("")
-                            }
+                                startActivity(
+                                    Intent(this@PasswordEditActivity, MainActivity::class.java).apply {
+                                        flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+                                    }
+                                )
+                                finish()
+                            },
+                            onCancel = { finish() }
                         )
                     }
                 }
@@ -102,184 +117,276 @@ class PasswordEditActivity : ComponentActivity() {
         }
     }
 
-    @Composable
-    fun PasswordFlowScreen(savedPassword: String, onSavePassword: (String) -> Unit) {
-        var currentStep by remember { mutableIntStateOf(if (savedPassword.isEmpty()) 1 else 0) }
-        var enteredPassword by remember { mutableStateOf("") }
-        var errorMessage by remember { mutableStateOf("") }
-        val context = LocalContext.current
-
-        val title = when (currentStep) {
-            0 -> "현재 비밀번호 입력"
-            1 -> "새 비밀번호 입력"
-            else -> "새 비밀번호 확인"
-        }
-
-        PinCodeScreen(context,
-            title = title,
-            onComplete = { pin ->
-                when (currentStep) {
-                    0 -> { // 🔵 기존 비밀번호 확인 단계
-                        if (pin != savedPassword) {
-                            errorMessage = "비밀번호가 일치하지 않습니다."
-                        } else {
-                            currentStep = 1 // 새 비밀번호 입력 단계로 이동
-                            errorMessage = ""
-                        }
-                    }
-                    1 -> { // 🟢 새 비밀번호 입력 단계
-                        enteredPassword = pin
-                        currentStep = 2 // 새 비밀번호 재확인 단계로 이동
-                        errorMessage = ""
-                    }
-                    2 -> { // 🔴 새 비밀번호 재확인 단계
-                        if (enteredPassword == pin) {
-                            onSavePassword(pin) // 저장
-                        } else {
-                            errorMessage = "비밀번호가 일치하지 않습니다."
-                        }
-                    }
-                }
-            },
-            onBack = {
-                if (currentStep > 1 || (savedPassword.isNotEmpty() && currentStep > 0)) {
-                    currentStep -= 1 // 이전 단계로 이동
-                    errorMessage = "" // 🔴 에러 메시지 초기화
-                }
-            },
-            errorMessage = errorMessage
-        )
-    }
-
-    @Composable
-    fun PinCodeScreen(
-        context: Context,
-        title: String,
-        onComplete: (String) -> Unit,
-        onBack: () -> Unit,
-        errorMessage: String = ""
-    ) {
-        val pin = remember { mutableStateListOf("", "", "", "", "", "") }
-        val focusManager = LocalFocusManager.current
-        val keyboardController = LocalSoftwareKeyboardController.current
-
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(20.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(title, fontSize = 18.sp, color = Color.White)
-            Spacer(modifier = Modifier.height(20.dp))
-
-            PinInputField(pin) { index, value ->
-                pin[index] = value
-                if (value.isNotEmpty() && index < 5) {
-                    focusManager.moveFocus(FocusDirection.Next)
-                }
-            }
-
-            if (errorMessage.isNotEmpty()) {
-                Text(
-                    text = errorMessage,
-                    color = Color.Red,
-                    fontSize = 14.sp,
-                    modifier = Modifier.padding(top = 4.dp)
-                )
-            }
-
-            Spacer(modifier = Modifier.height(30.dp))
-
-            Row {
-                if (title != "새 비밀번호 입력") { // 첫 단계에서는 뒤로가기 버튼 없음
-                    Button(onClick = onBack, modifier = Modifier.padding(end = 8.dp)) {
-                        Text("Back")
-                    }
-                }
-                Button(onClick = {
-                    val enteredPin = pin.joinToString("")
-                    if (enteredPin.length == 6) {
-                        onComplete(enteredPin)
-                        keyboardController?.hide()
-                    } else {
-                        Toast.makeText(
-                            context,
-                            "Please enter all 6 digits",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-                }) {
-                    Text("Submit")
-                }
-            }
-        }
-    }
-
-    @Composable
-    fun PinInputField(pin: List<String>, onValueChange: (Int, String) -> Unit) {
-        val textFieldRefs = remember { List(6) { FocusRequester() } }
-        Row(
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight()
-                .padding(horizontal = 16.dp)
-        ) {
-            repeat(6) { index ->
-                TextField(
-                    value = pin.getOrElse(index) { "" },
-                    onValueChange = { value ->
-                        when {
-                            value.length == 1 && value.all { it.isDigit() } -> {
-                                onValueChange(index, value)
-                                if (index < 5) {
-                                    textFieldRefs[index + 1].requestFocus() // 🎯 다음 칸으로 이동
-                                }
-                            }
-                            value.isEmpty() -> {
-                                onValueChange(index, "")
-                            }
-                        }
-                    },
-                    keyboardOptions = KeyboardOptions.Default.copy(
-                        keyboardType = KeyboardType.Number,
-                        imeAction = if (index == 5) ImeAction.Done else ImeAction.Next
-                    ),
-                    singleLine = true,
-                    textStyle = LocalTextStyle.current.copy(
-                        fontSize = 24.sp,
-                        textAlign = TextAlign.Center,
-                        color = Color.White
-                    ),
-                    modifier = Modifier
-                        .weight(1f)
-                        .border(2.dp, if (pin.getOrElse(index) { "" }.isNotEmpty()) Color.White else Color.Gray)
-                        .background(Color.Black)
-                        .focusRequester(textFieldRefs[index]) // 🎯 각 칸의 포커스 제어
-                        .onKeyEvent { keyEvent ->
-                            if (keyEvent.type == KeyEventType.KeyUp && keyEvent.key == Key.Backspace) {
-                                if (pin[index].isEmpty() && index > 0) {
-                                    textFieldRefs[index - 1].requestFocus() // 🎯 이전 칸으로 이동
-                                    onValueChange(index - 1, "") // 🎯 이전 칸 값 삭제
-                                }
-                                true
-                            } else {
-                                false
-                            }
-                        }
-                )
-            }
-        }
+    private fun verifyPin(pin: String, hash: String, salt: String, legacy: String): Boolean {
+        if (hash.isEmpty() && legacy.isNotEmpty()) return pin == legacy
+        if (salt.isEmpty() || hash.isEmpty()) return false
+        val saltBytes = Base64.getDecoder().decode(salt)
+        return pbkdf2Hash(pin, saltBytes) == hash
     }
 
     private fun pbkdf2Hash(pin: String, salt: ByteArray): String {
         val spec = PBEKeySpec(pin.toCharArray(), salt, 120_000, 256)
         val skf = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256")
-        val hash = skf.generateSecret(spec).encoded
-        return Base64.getEncoder().encodeToString(hash)
+        return Base64.getEncoder().encodeToString(skf.generateSecret(spec).encoded)
     }
 }
 
+// Step 0: 기존 PIN 확인 (PIN이 있을 때)
+// Step 1: 새 PIN 입력
+// Step 2: 새 PIN 확인
+@Composable
+private fun PinEditFlow(
+    hasSavedPin: Boolean,
+    verifyCurrentPin: (String) -> Boolean,
+    onSavePin: (String) -> Unit,
+    onCancel: () -> Unit
+) {
+    val scope = rememberCoroutineScope()
+    var step by remember { mutableIntStateOf(if (hasSavedPin) 0 else 1) }
+    var newPin by remember { mutableStateOf("") }
+    var errorMessage by remember { mutableStateOf("") }
+    var isProcessing by remember { mutableStateOf(false) }
 
+    val title = when (step) {
+        0 -> stringResource(R.string.pin_current_enter)
+        1 -> stringResource(R.string.pin_new_enter)
+        else -> stringResource(R.string.pin_new_confirm)
+    }
+    val subtitle = when (step) {
+        0 -> stringResource(R.string.pin_current_subtitle)
+        1 -> stringResource(R.string.pin_new_subtitle)
+        else -> stringResource(R.string.pin_confirm_subtitle)
+    }
+
+    BackHandler(enabled = !isProcessing) {
+        when {
+            step > 1 -> { step--; errorMessage = "" }
+            step == 1 && hasSavedPin -> { step = 0; errorMessage = "" }
+            else -> onCancel()
+        }
+    }
+
+    PinDialPad(
+        title = title,
+        subtitle = subtitle,
+        errorMessage = errorMessage,
+        isProcessing = isProcessing,
+        onBack = {
+            if (!isProcessing) {
+                when {
+                    step > 1 -> { step--; errorMessage = "" }
+                    step == 1 && hasSavedPin -> { step = 0; errorMessage = "" }
+                    else -> onCancel()
+                }
+            }
+        },
+        onComplete = { pin ->
+            if (isProcessing) return@PinDialPad
+            errorMessage = ""
+            when (step) {
+                0 -> {
+                    // PBKDF2 검증 → 백그라운드 실행
+                    isProcessing = true
+                    scope.launch {
+                        val ok = withContext(Dispatchers.Default) { verifyCurrentPin(pin) }
+                        isProcessing = false
+                        if (ok) {
+                            step = 1
+                        } else {
+                            errorMessage = "비밀번호가 일치하지 않습니다."
+                        }
+                    }
+                }
+                1 -> {
+                    newPin = pin
+                    step = 2
+                }
+                2 -> {
+                    if (pin == newPin) {
+                        onSavePin(pin)
+                    } else {
+                        errorMessage = "비밀번호가 일치하지 않습니다."
+                    }
+                }
+            }
+        }
+    )
+}
+
+@Composable
+private fun PinDialPad(
+    title: String,
+    subtitle: String,
+    errorMessage: String,
+    isProcessing: Boolean = false,
+    onBack: () -> Unit,
+    onComplete: (String) -> Unit
+) {
+    var pin by remember(title) { mutableStateOf("") }
+
+    LaunchedEffect(title) { pin = "" }
+
+    val rows = listOf(
+        listOf("1", "2", "3"),
+        listOf("4", "5", "6"),
+        listOf("7", "8", "9"),
+        listOf("", "0", "DEL")
+    )
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(SpaceNavy)
+            .statusBarsPadding()
+            .navigationBarsPadding(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        // 상단 뒤로가기
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp, vertical = 4.dp),
+            contentAlignment = Alignment.CenterStart
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(44.dp)
+                    .clip(CircleShape)
+                    .clickable { onBack() },
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Back",
+                    tint = SpaceCloud,
+                    modifier = Modifier.size(22.dp)
+                )
+            }
+        }
+
+        // 타이틀 + 점 인디케이터 영역
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 32.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleLarge.copy(
+                    fontWeight = FontWeight.Bold,
+                    color = SpaceCloud
+                )
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = subtitle,
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    color = SpaceCloud.copy(alpha = 0.6f)
+                )
+            )
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            // 점 인디케이터
+            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                repeat(6) { index ->
+                    Box(
+                        modifier = Modifier
+                            .size(13.dp)
+                            .background(
+                                if (index < pin.length) SpacePurple else SpaceBorder,
+                                CircleShape
+                            )
+                    )
+                }
+            }
+
+            // 에러 메시지 (고정 높이 확보해 레이아웃 흔들림 방지)
+            Spacer(modifier = Modifier.height(12.dp))
+            Text(
+                text = errorMessage,
+                style = MaterialTheme.typography.bodySmall.copy(color = SpaceCoral),
+                minLines = 1
+            )
+        }
+
+        Spacer(modifier = Modifier.height(32.dp))
+
+        // 키패드
+        Column(
+            modifier = Modifier.padding(bottom = 40.dp, start = 16.dp, end = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp)
+        ) {
+            rows.forEach { row ->
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    row.forEach { key ->
+                        when (key) {
+                            "" -> Box(modifier = Modifier.size(72.dp))
+                            "DEL" -> DialButton(
+                                onClick = {
+                                    if (!isProcessing && pin.isNotEmpty()) pin = pin.dropLast(1)
+                                },
+                                isLoading = false
+                            ) {
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                    contentDescription = "Delete",
+                                    tint = SpaceCloud,
+                                    modifier = Modifier.size(22.dp)
+                                )
+                            }
+                            else -> DialButton(
+                                onClick = {
+                                    if (!isProcessing && pin.length < 6) {
+                                        pin += key
+                                        if (pin.length == 6) onComplete(pin)
+                                    }
+                                },
+                                isLoading = isProcessing && pin.length == 6
+                            ) {
+                                Text(
+                                    text = key,
+                                    style = MaterialTheme.typography.titleLarge.copy(
+                                        fontWeight = FontWeight.Medium,
+                                        color = SpaceCloud
+                                    )
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun DialButton(
+    onClick: () -> Unit,
+    isLoading: Boolean = false,
+    content: @Composable () -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .size(72.dp)
+            .clip(CircleShape)
+            .background(SpaceSurface, CircleShape)
+            .border(1.dp, SpaceBorder.copy(alpha = 0.4f), CircleShape)
+            .clickable(enabled = !isLoading) { onClick() },
+        contentAlignment = Alignment.Center
+    ) {
+        if (isLoading) {
+            androidx.compose.material3.CircularProgressIndicator(
+                modifier = Modifier.size(24.dp),
+                color = SpacePurple,
+                strokeWidth = 2.dp
+            )
+        } else {
+            content()
+        }
+    }
+}
