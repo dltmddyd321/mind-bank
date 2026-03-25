@@ -74,6 +74,7 @@ import com.windrr.mindbank.presentation.ui.theme.SpaceSurface
 import com.windrr.mindbank.presentation.ui.theme.SpaceTheme
 import com.windrr.mindbank.util.hexToColor
 import com.windrr.mindbank.util.toHex
+import com.windrr.mindbank.viewmodel.DataStoreViewModel
 import com.windrr.mindbank.viewmodel.TodoViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.FlowPreview
@@ -89,6 +90,7 @@ import java.util.Locale
 @AndroidEntryPoint
 class AddTodoActivity : ComponentActivity() {
 
+    private val dataStoreViewModel: DataStoreViewModel by viewModels()
     private val todoViewModel: TodoViewModel by viewModels()
     private var alarmTime = 0L
     private var editId = -1
@@ -136,7 +138,12 @@ class AddTodoActivity : ComponentActivity() {
                         title = editingData?.title ?: ""
                         val lastColor = editingData?.color
                         alarmTime = editingData?.alarmTime ?: 0L
-                        if (!lastColor.isNullOrEmpty()) circleColor = hexToColor(lastColor)
+                        if (!lastColor.isNullOrEmpty()) {
+                            circleColor = hexToColor(lastColor)
+                        } else {
+                            val savedColor = dataStoreViewModel.getLastColor()
+                            if (savedColor.isNotEmpty()) circleColor = hexToColor(savedColor)
+                        }
                         if (editingData != null) isEditMode = true
                     }
 
@@ -243,6 +250,7 @@ class AddTodoActivity : ComponentActivity() {
                                 ).show()
                                 return@Button
                             }
+                            dataStoreViewModel.setLastColor(circleColor.toHex())
                             val currentTime = System.currentTimeMillis()
                             if (isEditMode) {
                                 val task = Task(

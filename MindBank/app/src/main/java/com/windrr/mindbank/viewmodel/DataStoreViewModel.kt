@@ -10,7 +10,7 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 /**
- * App Open Password와 Save되지 않은 작성 중 데이터를 저장
+ * App Open Password 데이터를 저장
  */
 @HiltViewModel
 class DataStoreViewModel @Inject constructor(
@@ -23,46 +23,14 @@ class DataStoreViewModel @Inject constructor(
         const val KEY_BIOMETRIC_ENABLED = "BIOMETRIC_ENABLED"
         const val KEY_PASSWORD_SALT = "PASSWORD_SALT"
         const val KEY_PASSWORD_HASH = "PASSWORD_HASH"
+        const val KEY_LAST_COLOR = "LAST_COLOR"
     }
 
-    suspend fun getUnSavedData(): UnSaved = withContext(Dispatchers.IO) {
-        UnSaved(
-            datastoreRepo.getString("UNSAVED_TITLE") ?: "",
-            datastoreRepo.getString("UNSAVED_LINK") ?: "",
-            datastoreRepo.getString("UNSAVED_MEMO") ?: "",
-            datastoreRepo.getString("UNSAVED_COLOR") ?: ""
-        )
-    }
+    suspend fun getLastColor(): String = datastoreRepo.getString(KEY_LAST_COLOR) ?: ""
 
-    fun setUnSavedTitle(data: String) {
+    fun setLastColor(color: String) {
         CoroutineScope(Dispatchers.IO).launch {
-            datastoreRepo.putString("UNSAVED_TITLE", data)
-        }
-    }
-
-    fun setUnSavedLink(data: String) {
-        CoroutineScope(Dispatchers.IO).launch {
-            datastoreRepo.putString("UNSAVED_LINK", data)
-        }
-    }
-
-    fun setUnSavedMemo(data: String) {
-        CoroutineScope(Dispatchers.IO).launch {
-            datastoreRepo.putString("UNSAVED_MEMO", data)
-        }
-    }
-
-    fun setUnSavedColor(data: String) {
-        CoroutineScope(Dispatchers.IO).launch {
-            datastoreRepo.putString("UNSAVED_COLOR", data)
-        }
-    }
-
-    fun clearUnSaved() {
-        CoroutineScope(Dispatchers.IO).launch {
-            datastoreRepo.putString("UNSAVED_TITLE", "")
-            datastoreRepo.putString("UNSAVED_MEMO", "")
-            datastoreRepo.putString("UNSAVED_COLOR", "")
+            datastoreRepo.putString(KEY_LAST_COLOR, color)
         }
     }
 
@@ -106,10 +74,3 @@ class DataStoreViewModel @Inject constructor(
         }
     }
 }
-
-data class UnSaved(
-    val title: String,
-    val link: String,
-    val memo: String,
-    val color: String
-)

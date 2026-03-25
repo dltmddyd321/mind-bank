@@ -50,10 +50,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -79,8 +77,6 @@ import com.windrr.mindbank.util.toHex
 import com.windrr.mindbank.viewmodel.DataStoreViewModel
 import com.windrr.mindbank.viewmodel.MemoViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.debounce
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -96,7 +92,7 @@ class AddMemoActivity : ComponentActivity() {
     private var editId = -1
     private var isEditMode = false
 
-    @OptIn(ExperimentalMaterial3Api::class, FlowPreview::class)
+    @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -120,16 +116,12 @@ class AddMemoActivity : ComponentActivity() {
                         if (!lastColor.isNullOrEmpty()) {
                             isEditMode = true
                             circleColor = hexToColor(lastColor)
+                        } else {
+                            val savedColor = dataStoreViewModel.getLastColor()
+                            if (savedColor.isNotEmpty()) circleColor = hexToColor(savedColor)
                         }
                     }
 
-                    AutoBackUpCheckDialog(dataStoreViewModel) { backupTitle, backupLink, backupMemo, backupColor ->
-                        title = backupTitle
-                        link = backupLink
-                        memo = backupMemo
-                        circleColor = hexToColor(backupColor)
-                        isEditMode = true
-                    }
                     BackHandlerWithQuestionDialog(false)
                     InputScreen(
                         title,
@@ -153,50 +145,6 @@ class AddMemoActivity : ComponentActivity() {
             }
         }
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
-    }
-
-    @Composable
-    fun AutoBackUpCheckDialog(
-        viewModel: DataStoreViewModel,
-        onBackupLoad: (String, String, String, String) -> Unit
-    ) {
-        var showDialog by remember { mutableStateOf(false) }
-        var initTitle = ""
-        var initLink = ""
-        var initMemo = ""
-        var initColor = ""
-
-        LaunchedEffect(key1 = Unit) {
-            val unSaved = viewModel.getUnSavedData()
-            initTitle = unSaved.title
-            initLink = unSaved.link
-            initMemo = unSaved.memo
-            initColor = unSaved.color
-            if (initTitle.isNotEmpty() || initMemo.isNotEmpty() || initLink.isNotEmpty()) showDialog =
-                true
-        }
-
-        if (showDialog) {
-            AlertDialog(onDismissRequest = {
-                showDialog = false
-            }, title = {
-                Text(text = stringResource(R.string.dialog_backup_title))
-            }, confirmButton = {
-                TextButton(onClick = {
-                    onBackupLoad.invoke(initTitle, initLink, initMemo, initColor)
-                    showDialog = false
-                }) { Text(stringResource(R.string.confirm)) }
-            }, text = {
-                Text(
-                    text = stringResource(R.string.dialog_backup_message),
-                    textAlign = TextAlign.Center
-                )
-            }, dismissButton = {
-                TextButton(onClick = {
-                    showDialog = false
-                }) { Text(stringResource(R.string.cancel)) }
-            })
-        }
     }
 
     @Composable
@@ -233,7 +181,6 @@ class AddMemoActivity : ComponentActivity() {
         BackHandler { showDialog = true }
     }
 
-    @FlowPreview
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     @ExperimentalMaterial3Api
     @Composable
@@ -336,6 +283,7 @@ class AddMemoActivity : ComponentActivity() {
                                 ).show()
                                 return@Button
                             }
+                            dataStoreViewModel.setLastColor(circleColor.toHex())
                             if (editId != -1) {
                                 editMemo?.let {
                                     it.title = title
@@ -404,10 +352,7 @@ class AddMemoActivity : ComponentActivity() {
                                 onTitleChange(it)
                             },
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .onFocusChanged {
-                                    if (!it.isFocused) dataStoreViewModel.setUnSavedTitle(title)
-                                },
+                                .fillMaxWidth(),
                             placeholder = {
                                 Text(
                                     text = stringResource(R.string.hint_title),
@@ -436,10 +381,7 @@ class AddMemoActivity : ComponentActivity() {
                                 onLinkChange(it)
                             },
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .onFocusChanged { focus ->
-                                    if (!focus.isFocused) dataStoreViewModel.setUnSavedLink(link)
-                                },
+                                .fillMaxWidth(),
                             placeholder = {
                                 Text(
                                     text = getString(R.string.input_url),
@@ -534,7 +476,6 @@ class AddMemoActivity : ComponentActivity() {
         )
     }
 
-    @FlowPreview
     @Composable
     fun InputField(
         text: String,
@@ -543,17 +484,6 @@ class AddMemoActivity : ComponentActivity() {
         val textFieldModifier = Modifier
             .fillMaxWidth()
             .fillMaxHeight()
-            .onFocusChanged {
-                if (!it.isFocused) dataStoreViewModel.setUnSavedMemo(text)
-            }
-
-        LaunchedEffect(key1 = text) {
-            snapshotFlow { text }
-                .debounce(1000)
-                .collect {
-                    dataStoreViewModel.setUnSavedMemo(it)
-                }
-        }
 
         val placeholderColor = if (!isSystemInDarkTheme()) Color.Gray else Color.LightGray
 
