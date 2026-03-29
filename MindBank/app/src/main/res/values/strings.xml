@@ -117,6 +117,14 @@
     <string name="action_edit">편집</string>
     <string name="action_delete">삭제</string>
     <string name="share_link">링크 공유</string>
+    <string name="backup_export">데이터 내보내기</string>
+    <string name="backup_export_chooser">백업 파일 저장</string>
+    <string name="backup_export_fail">내보내기에 실패했습니다</string>
+    <string name="backup_import">데이터 가져오기</string>
+    <string name="backup_import_confirm_message">백업 파일의 데이터를 기존 데이터에 추가합니다. 계속하시겠습니까?</string>
+    <string name="backup_import_success">복원 완료: 메모 %1$d개, 할일 %2$d개</string>
+    <string name="backup_import_fail">가져오기에 실패했습니다. 올바른 백업 파일인지 확인해주세요</string>
+
     <string name="copied_to_clipboard">클립보드에 복사되었습니다</string>
     <string name="copy_select_title">복사할 항목 선택</string>
     <string name="copy_select_message">링크와 내용 중 어떤 것을 복사할까요?</string>

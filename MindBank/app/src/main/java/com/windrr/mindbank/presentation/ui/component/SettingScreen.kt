@@ -37,6 +37,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -45,6 +47,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -60,9 +63,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.windrr.mindbank.R
+import android.widget.Toast
 import com.windrr.mindbank.presentation.ui.activity.PasswordMenuActivity
 import com.windrr.mindbank.util.AppLanguageState
+import com.windrr.mindbank.viewmodel.BackupViewModel
 import com.windrr.mindbank.viewmodel.DataStoreViewModel
+import kotlinx.coroutines.launch
 import java.util.Locale
 
 @Composable
@@ -169,6 +175,7 @@ fun SettingsScreen(
     onConfirmDelete: () -> Unit,
 ) {
     val context = LocalContext.current
+    val backupViewModel: BackupViewModel = hiltViewModel()
     val prefs = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
     var showDialog by remember { mutableStateOf(false) }
     var selectedLanguage by remember {
@@ -190,6 +197,27 @@ fun SettingsScreen(
 
     val coroutineScope = rememberCoroutineScope()
     val lifecycleOwner = LocalLifecycleOwner.current
+    var showImportConfirmDialog by remember { mutableStateOf(false) }
+    var isExporting by remember { mutableStateOf(false) }
+
+    val importLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocument()
+    ) { uri ->
+        uri ?: return@rememberLauncherForActivityResult
+        coroutineScope.launch {
+            runCatching { backupViewModel.import(context, uri) }
+                .onSuccess { (memos, todos) ->
+                    Toast.makeText(
+                        context,
+                        context.getString(R.string.backup_import_success, memos, todos),
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+                .onFailure {
+                    Toast.makeText(context, context.getString(R.string.backup_import_fail), Toast.LENGTH_SHORT).show()
+                }
+        }
+    }
 
     suspend fun reloadLockState() {
         appLockEnabled = dataStoreViewModel.isAppLockEnabled()
@@ -244,13 +272,44 @@ fun SettingsScreen(
                     }
                 )
 
-                // 2. 언어 변경 버튼 (기존 PasswordEditBtn 재활용)
+                // 2. 언어 변경 버튼
                 PasswordEditBtn(
                     title = stringResource(R.string.language_change),
                     onClick = { showDialog = true }
                 )
 
-                // 3. 데이터 삭제 버튼
+                // 3. 데이터 내보내기
+                PasswordEditBtn(
+                    title = stringResource(R.string.backup_export),
+                    onClick = {
+                        if (!isExporting) {
+                            isExporting = true
+                            coroutineScope.launch {
+                                runCatching { backupViewModel.export(context) }
+                                    .onSuccess { uri ->
+                                        val shareIntent = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
+                                            type = "application/json"
+                                            putExtra(android.content.Intent.EXTRA_STREAM, uri)
+                                            addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                                        }
+                                        context.startActivity(android.content.Intent.createChooser(shareIntent, context.getString(R.string.backup_export_chooser)))
+                                    }
+                                    .onFailure {
+                                        Toast.makeText(context, context.getString(R.string.backup_export_fail), Toast.LENGTH_SHORT).show()
+                                    }
+                                isExporting = false
+                            }
+                        }
+                    }
+                )
+
+                // 4. 데이터 가져오기
+                PasswordEditBtn(
+                    title = stringResource(R.string.backup_import),
+                    onClick = { showImportConfirmDialog = true }
+                )
+
+                // 5. 데이터 삭제 버튼
                 DeleteButton(
                     title = stringResource(R.string.delete_all_data),
                     onConfirmDelete = onConfirmDelete
@@ -258,6 +317,27 @@ fun SettingsScreen(
             }
         }
     }
+    if (showImportConfirmDialog) {
+        AlertDialog(
+            onDismissRequest = { showImportConfirmDialog = false },
+            title = { Text(stringResource(R.string.backup_import)) },
+            text = { Text(stringResource(R.string.backup_import_confirm_message)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    showImportConfirmDialog = false
+                    importLauncher.launch(arrayOf("application/json", "*/*"))
+                }) {
+                    Text(stringResource(R.string.confirm))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showImportConfirmDialog = false }) {
+                    Text(stringResource(R.string.cancel))
+                }
+            }
+        )
+    }
+
     if (showDialog) {
         LanguageSelectorDialog(
             currentSelection = selectedLanguage,
