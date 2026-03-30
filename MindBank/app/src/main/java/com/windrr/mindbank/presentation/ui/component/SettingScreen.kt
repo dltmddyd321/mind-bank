@@ -33,6 +33,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -68,6 +69,7 @@ import com.windrr.mindbank.presentation.ui.activity.PasswordMenuActivity
 import com.windrr.mindbank.util.AppLanguageState
 import com.windrr.mindbank.viewmodel.BackupViewModel
 import com.windrr.mindbank.viewmodel.DataStoreViewModel
+import com.windrr.mindbank.work.AutoBackupScheduler
 import kotlinx.coroutines.launch
 import java.util.Locale
 
@@ -199,6 +201,9 @@ fun SettingsScreen(
     val lifecycleOwner = LocalLifecycleOwner.current
     var showImportConfirmDialog by remember { mutableStateOf(false) }
     var isExporting by remember { mutableStateOf(false) }
+    var autoBackupEnabled by remember { 
+        mutableStateOf(prefs.getBoolean("auto_backup_enabled", true)) 
+    }
 
     val importLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenDocument()
@@ -309,7 +314,24 @@ fun SettingsScreen(
                     onClick = { showImportConfirmDialog = true }
                 )
 
-                // 5. 데이터 삭제 버튼
+                // 5. 자동 백업 설정
+                AutoBackupToggleSection(
+                    autoBackupEnabled = autoBackupEnabled,
+                    onToggle = { enabled ->
+                        autoBackupEnabled = enabled
+                        coroutineScope.launch {
+                            prefs.edit().putBoolean("auto_backup_enabled", enabled).apply()
+                            AutoBackupScheduler.scheduleAutoBackup(context, enabled)
+                            Toast.makeText(
+                                context,
+                                if (enabled) R.string.auto_backup_enabled else R.string.auto_backup_disabled,
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    }
+                )
+
+                // 6. 데이터 삭제 버튼
                 DeleteButton(
                     title = stringResource(R.string.delete_all_data),
                     onConfirmDelete = onConfirmDelete
@@ -355,6 +377,47 @@ fun SettingsScreen(
                 AppLanguageState().updateLocale(context, langCode)
                 (context as? Activity)?.recreate()
             })
+    }
+}
+
+@Composable
+fun AutoBackupToggleSection(
+    autoBackupEnabled: Boolean,
+    onToggle: (Boolean) -> Unit,
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 12.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(48.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = stringResource(R.string.auto_backup_title),
+                    color = Color.White,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Medium
+                )
+                Text(
+                    text = stringResource(R.string.auto_backup_description),
+                    color = Color.Gray,
+                    fontSize = 14.sp
+                )
+            }
+            
+            Switch(
+                checked = autoBackupEnabled,
+                onCheckedChange = onToggle
+            )
+        }
+        Spacer(modifier = Modifier.height(8.dp))
+        Divider(color = Color.LightGray, thickness = 1.dp)
     }
 }
 
